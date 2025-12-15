@@ -6,7 +6,7 @@ const starterBooks = [
         author: "Matt Haig",
         genres: ["Fiction", "Fantasy", "Philosophy"],
         description: "A dazzling novel about all the choices that go into a life well lived.",
-        thumbnail: null
+        thumbnail: "http://books.google.com/books/content?id=9HJpzQEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
     },
     {
         id: 'starter-2',
@@ -14,7 +14,7 @@ const starterBooks = [
         author: "James Clear",
         genres: ["Self-Help", "Psychology", "Productivity"],
         description: "An easy and proven way to build good habits and break bad ones.",
-        thumbnail: null
+        thumbnail: "http://books.google.com/books/content?id=XfFvDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
     },
     {
         id: 'starter-3',
@@ -22,7 +22,7 @@ const starterBooks = [
         author: "Andy Weir",
         genres: ["Science Fiction", "Adventure", "Thriller"],
         description: "A lone astronaut must save the earth from disaster in this incredible new science-based thriller.",
-        thumbnail: null
+        thumbnail: "http://books.google.com/books/content?id=G1lmEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
     },
     {
         id: 'starter-4',
@@ -30,7 +30,7 @@ const starterBooks = [
         author: "Tara Westover",
         genres: ["Memoir", "Biography", "Non-Fiction"],
         description: "A memoir about a young girl who leaves her survivalist family and goes on to earn a PhD from Cambridge.",
-        thumbnail: null
+        thumbnail: "http://books.google.com/books/content?id=2ObWDgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
     },
     {
         id: 'starter-5',
@@ -38,7 +38,7 @@ const starterBooks = [
         author: "Taylor Jenkins Reid",
         genres: ["Fiction", "Historical", "Romance"],
         description: "Aging Hollywood icon Evelyn Hugo finally tells the story of her glamorous and scandalous life.",
-        thumbnail: null
+        thumbnail: "http://books.google.com/books/content?id=lVsDDgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
     }
 ];
 
