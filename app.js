@@ -293,8 +293,6 @@ function initializeTabs() {
                 displayRecommendations();
             } else if (tabName === 'library') {
                 displayLibrary();
-            } else if (tabName === 'want-to-read') {
-                displayWantToReadShelf();
             }
         });
     });
@@ -340,6 +338,9 @@ function setupLibrarySearch() {
 
 // Display User's Library
 function displayLibrary() {
+    // First display want to read shelf
+    displayWantToReadShelf();
+
     const booksGrid = document.getElementById('books-grid');
     const filteredBooks = userLibrary.filter(book => {
         const matchesSearch = !currentFilter ||
@@ -456,20 +457,31 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
 
     const publishedDateHTML = book.publishedDate ?
-        `<div class="book-published-date">Published: ${book.publishedDate}</div>` : '';
+        `<div class="book-published-date">published ${book.publishedDate}</div>` : '';
+
+    // Check if book is already in want to read shelf
+    const isInWantToRead = wantToReadShelf.find(b => b.id === book.id);
 
     // For recommendations, add a "want to read" button
     const wantToReadButtonHTML = matchScore !== null ?
-        `<button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>🐛 Want to Read</button>` : '';
+        `<button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>${isInWantToRead ? 'Already on your want to read shelf' : '🐛 Want to Read'}</button>` : '';
+
+    const isInLibrary = !isSearchResult && matchScore === null;
 
     const addButtonHTML = isSearchResult ?
-        `<button class="add-to-library-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>` :
+        `<div class="search-result-buttons">
+            <button class="add-to-library-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>
+            <button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>${isInWantToRead ? 'Already on your want to read shelf' : '🐛 Want to Read'}</button>
+        </div>` :
         `<div class="rating-section">
             <div class="rating-label">Your Rating:</div>
             <div class="stars" data-book-id="${book.id}">
                 ${stars}
             </div>
         </div>`;
+
+    const removeButtonHTML = isInLibrary ?
+        `<button class="remove-from-library-btn" data-book-id="${book.id}">Remove from Library</button>` : '';
 
     card.innerHTML = `
         ${thumbnailHTML}
@@ -482,6 +494,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         ${matchScoreHTML}
         ${wantToReadButtonHTML}
         ${addButtonHTML}
+        ${removeButtonHTML}
     `;
 
     return card;
@@ -550,6 +563,12 @@ document.addEventListener('click', (e) => {
         // Update card appearance
         const bookCard = starsContainer.closest('.book-card');
         bookCard.classList.add('rated');
+
+        // Auto-resort library when rating changes
+        const libraryTab = document.getElementById('library-tab');
+        if (libraryTab.classList.contains('active')) {
+            displayLibrary();
+        }
     }
 
     // Add to library button
@@ -602,6 +621,20 @@ document.addEventListener('click', (e) => {
         setTimeout(() => {
             button.textContent = '🐛 On Your Shelf';
         }, 1500);
+    }
+
+    // Remove from library button
+    if (e.target.classList.contains('remove-from-library-btn')) {
+        const button = e.target;
+        const bookId = button.dataset.bookId;
+        const book = userLibrary.find(b => b.id === bookId);
+
+        if (book && confirm(`Remove "${book.title}" from your library?`)) {
+            userLibrary = userLibrary.filter(b => b.id !== bookId);
+            saveLibrary();
+            populateGenreFilter();
+            displayLibrary();
+        }
     }
 });
 
@@ -691,19 +724,9 @@ async function searchBooks(query) {
             }
         });
 
-        // Filter out books with no rating data or low ratings (< 2 stars)
-        const filteredBooks = uniqueBooks.filter(book => {
-            return book.averageRating && book.ratingsCount && book.averageRating >= 2;
-        });
-
-        // Update status to show filtered count
-        if (filteredBooks.length === 0) {
-            searchStatus.textContent = 'No highly-rated books found. Try a different search term.';
+        if (uniqueBooks.length === 0) {
+            searchStatus.textContent = 'No books found. Try a different search term.';
             return;
-        }
-
-        if (uniqueBooks.length > filteredBooks.length) {
-            searchStatus.textContent = `Found ${filteredBooks.length} highly-rated books (${uniqueBooks.length} total results)`;
         }
 
         // Sort by popularity (combination of rating and number of ratings)
@@ -722,14 +745,10 @@ async function searchBooks(query) {
             return popularityB - popularityA; // Sort descending (most popular first)
         });
 
-        // Update status to show deduplicated count
-        if (uniqueBooks.length < books.length) {
-            searchStatus.textContent = `Found ${uniqueBooks.length} unique books (${books.length} total results)`;
-        } else {
-            searchStatus.textContent = `Found ${filteredBooks.length} books`;
-        }
+        // Update status to show count
+        searchStatus.textContent = `Found ${uniqueBooks.length} book${uniqueBooks.length !== 1 ? 's' : ''}`;
 
-        filteredBooks.forEach(book => {
+        uniqueBooks.forEach(book => {
             const bookCard = createBookCard(book, true);
             resultsGrid.appendChild(bookCard);
         });
@@ -865,17 +884,18 @@ function calculateMatchScore(book, preferences) {
 // Display Want to Read Shelf
 function displayWantToReadShelf() {
     const shelfContainer = document.getElementById('want-to-read-shelf');
-    const wtrDescription = document.getElementById('wtr-description');
+    const wtrSection = document.getElementById('want-to-read-section');
 
     shelfContainer.innerHTML = '';
 
     if (wantToReadShelf.length === 0) {
-        wtrDescription.textContent = 'No books on your shelf yet. Add some from the Recommendations tab!';
-        shelfContainer.innerHTML = '<div class="empty-shelf"><p>Your bookshelf is empty! 📚</p><p>Browse recommendations and click "🐛 Want to Read" to add books here.</p></div>';
+        // Hide the entire section if empty
+        wtrSection.style.display = 'none';
         return;
     }
 
-    wtrDescription.textContent = `You have ${wantToReadShelf.length} book${wantToReadShelf.length !== 1 ? 's' : ''} waiting to be read!`;
+    // Show the section
+    wtrSection.style.display = 'block';
 
     // Create shelves (group books in rows of up to 8)
     const booksPerShelf = 8;
@@ -911,13 +931,9 @@ function displayWantToReadShelf() {
             bookSpine.appendChild(titleDiv);
             bookSpine.appendChild(authorDiv);
 
-            // Add click handler to remove book from shelf
+            // Add click handler to show book details popup
             bookSpine.addEventListener('click', () => {
-                if (confirm(`Remove "${book.title}" from your Want to Read shelf?`)) {
-                    wantToReadShelf = wantToReadShelf.filter(b => b.id !== book.id);
-                    saveWantToReadShelf();
-                    displayWantToReadShelf();
-                }
+                showBookDetailsPopup(book);
             });
 
             booksDiv.appendChild(bookSpine);
@@ -930,4 +946,69 @@ function displayWantToReadShelf() {
         shelfDiv.appendChild(shelfBoard);
         shelfContainer.appendChild(shelfDiv);
     }
+}
+
+// Show book details popup
+function showBookDetailsPopup(book) {
+    // Create popup overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+
+    // Create popup content
+    const popup = document.createElement('div');
+    popup.className = 'popup-content';
+
+    const color = getGenreColor(book.genres);
+    popup.setAttribute('data-color', color);
+
+    const genreTags = book.genres.map(genre =>
+        `<span class="genre-tag">${genre}</span>`
+    ).join('');
+
+    const thumbnailHTML = book.thumbnail ?
+        `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
+
+    const publishedDateHTML = book.publishedDate ?
+        `<div class="book-published-date">published ${book.publishedDate}</div>` : '';
+
+    const popularityHTML = book.averageRating && book.ratingsCount ?
+        `<div class="popularity-rating">
+            <span class="rating-label-small">Google Books Rating:</span>
+            <span class="rating-stars">★ ${book.averageRating.toFixed(1)}</span>
+            <span class="rating-count">(${book.ratingsCount.toLocaleString()} ratings)</span>
+        </div>` : '';
+
+    popup.innerHTML = `
+        <button class="popup-close">&times;</button>
+        ${thumbnailHTML}
+        <div class="book-title">${book.title}</div>
+        <div class="book-author">by ${book.author}</div>
+        ${publishedDateHTML}
+        <div class="book-genres">${genreTags}</div>
+        <div class="book-description">${book.description}</div>
+        ${popularityHTML}
+        <button class="add-to-library-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>
+        <button class="remove-from-wtr-btn" data-book-id="${book.id}">Remove from Want to Read</button>
+    `;
+
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+
+    // Close popup when clicking overlay or close button
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay || e.target.classList.contains('popup-close')) {
+            document.body.removeChild(overlay);
+        }
+    });
+
+    // Handle remove from want to read button
+    const removeBtn = popup.querySelector('.remove-from-wtr-btn');
+    removeBtn.addEventListener('click', () => {
+        if (confirm(`Remove "${book.title}" from your Want to Read shelf?`)) {
+            wantToReadShelf = wantToReadShelf.filter(b => b.id !== book.id);
+            saveWantToReadShelf();
+            displayLibrary();
+            document.body.removeChild(overlay);
+        }
+    });
 }

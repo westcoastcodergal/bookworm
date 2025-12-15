@@ -19,7 +19,6 @@
                 <button class="tab-btn active" data-tab="search">Search Books</button>
                 <button class="tab-btn" data-tab="library">My Library</button>
                 <button class="tab-btn" data-tab="recommendations">Recommendations</button>
-                <button class="tab-btn" data-tab="want-to-read">Want to Read</button>
             </div>
 
             <!-- Search Books Tab -->
@@ -41,6 +40,12 @@
                     </select>
                 </div>
 
+                <!-- Want to Read Section -->
+                <div id="want-to-read-section" class="want-to-read-section">
+                    <h3 class="want-to-read-title">📚 Want to Read</h3>
+                    <div id="want-to-read-shelf" class="bookshelf"></div>
+                </div>
+
                 <div id="books-grid" class="books-grid"></div>
             </div>
 
@@ -53,14 +58,6 @@
                 <div id="recommendations-grid" class="books-grid"></div>
             </div>
 
-            <!-- Want to Read Tab -->
-            <div id="want-to-read-tab" class="tab-content">
-                <div class="want-to-read-header">
-                    <h2>📚 My Want to Read Shelf</h2>
-                    <p id="wtr-description">Books you're planning to read soon</p>
-                </div>
-                <div id="want-to-read-shelf" class="bookshelf"></div>
-            </div>
         </main>
     </div>
 
