@@ -6,7 +6,7 @@ const starterBooks = [
         author: "Matt Haig",
         genres: ["Fiction", "Fantasy", "Philosophy"],
         description: "A dazzling novel about all the choices that go into a life well lived.",
-        thumbnail: "http://books.google.com/books/content?id=9HJpzQEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=1ZxRzgEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api"
     },
     {
         id: 'starter-2',
@@ -38,7 +38,7 @@ const starterBooks = [
         author: "Taylor Jenkins Reid",
         genres: ["Fiction", "Historical", "Romance"],
         description: "Aging Hollywood icon Evelyn Hugo finally tells the story of her glamorous and scandalous life.",
-        thumbnail: "http://books.google.com/books/content?id=lVsDDgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=y8pLDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
     }
 ];
 
@@ -262,9 +262,11 @@ function initializeTabs() {
             });
             document.getElementById(`${tabName}-tab`).classList.add('active');
 
-            // Load recommendations when switching to recommendations tab
+            // Refresh content when switching tabs
             if (tabName === 'recommendations') {
                 displayRecommendations();
+            } else if (tabName === 'library') {
+                displayLibrary();
             }
         });
     });
@@ -336,10 +338,53 @@ function displayLibrary() {
     });
 }
 
+// Genre Color Mapping
+const genreColorMap = {
+    'Romance': 'coral',
+    'LGBTQ': 'coral',
+    'Memoir': 'coral',
+    'Biography': 'coral',
+    'Science Fiction': 'teal',
+    'Science': 'teal',
+    'Thriller': 'teal',
+    'Mystery': 'teal',
+    'Dystopian': 'teal',
+    'Fantasy': 'purple',
+    'Mythology': 'purple',
+    'Self-Help': 'yellow',
+    'Psychology': 'yellow',
+    'Philosophy': 'yellow',
+    'Spirituality': 'yellow',
+    'Productivity': 'yellow',
+    'Non-Fiction': 'green',
+    'History': 'green',
+    'Finance': 'green',
+    'Classic': 'green',
+    'Fiction': 'orange',
+    'Adventure': 'orange',
+    'Humor': 'orange',
+    'Contemporary': 'orange',
+    'Historical': 'orange'
+};
+
+// Get color based on primary genre
+function getGenreColor(genres) {
+    for (const genre of genres) {
+        if (genreColorMap[genre]) {
+            return genreColorMap[genre];
+        }
+    }
+    return 'orange'; // default fallback
+}
+
 // Create Book Card
 function createBookCard(book, isSearchResult = false, matchScore = null) {
     const card = document.createElement('div');
     card.className = 'book-card';
+
+    // Add genre-based color
+    const color = getGenreColor(book.genres);
+    card.setAttribute('data-color', color);
 
     if (ratings[book.id]) {
         card.classList.add('rated');
@@ -359,6 +404,12 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
     const matchScoreHTML = matchScore !== null ?
         `<div class="match-score">${matchScore}% Match</div>` : '';
 
+    const popularityHTML = book.averageRating && book.ratingsCount ?
+        `<div class="popularity-rating">
+            <span class="rating-stars">★ ${book.averageRating.toFixed(1)}</span>
+            <span class="rating-count">(${book.ratingsCount.toLocaleString()} ratings)</span>
+        </div>` : '';
+
     const thumbnailHTML = book.thumbnail ?
         `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
 
@@ -377,6 +428,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         <div class="book-author">by ${book.author}</div>
         <div class="book-genres">${genreTags}</div>
         <div class="book-description">${book.description}</div>
+        ${popularityHTML}
         ${matchScoreHTML}
         ${addButtonHTML}
     `;
@@ -536,6 +588,8 @@ async function searchBooks(query) {
                 thumbnail: thumbnail,
                 averageRating: volumeInfo.averageRating || 0,
                 ratingsCount: volumeInfo.ratingsCount || 0
+                averageRating: volumeInfo.averageRating || null,
+                ratingsCount: volumeInfo.ratingsCount || null
             };
         });
 
@@ -653,8 +707,8 @@ function calculateMatchScore(book, preferences) {
     let score = 0;
     let maxScore = 0;
 
-    // Genre matching (70% of score)
-    const genreWeight = 70;
+    // Genre matching (60% of score)
+    const genreWeight = 60;
     book.genres.forEach(genre => {
         if (preferences.genres[genre]) {
             score += preferences.genres[genre] * genreWeight;
@@ -664,14 +718,35 @@ function calculateMatchScore(book, preferences) {
     const maxGenreScore = Math.max(...Object.values(preferences.genres)) * book.genres.length * genreWeight;
     maxScore += maxGenreScore;
 
-    // Author matching (30% of score)
-    const authorWeight = 30;
+    // Author matching (25% of score)
+    const authorWeight = 25;
     if (preferences.authors[book.author]) {
         score += preferences.authors[book.author] * authorWeight;
     }
 
     const maxAuthorScore = Math.max(...Object.values(preferences.authors || {1: 1})) * authorWeight;
     maxScore += maxAuthorScore;
+
+    // Popularity boost (15% of score)
+    const popularityWeight = 15;
+    let popularityScore = 0;
+
+    if (book.averageRating && book.ratingsCount) {
+        // Rating component: Books rated 4+ stars get higher scores
+        // Scale: 0-5 stars -> 0-1
+        const ratingScore = book.averageRating / 5;
+
+        // Ratings count component: More ratings = more popular
+        // Use logarithmic scale so 10,000 ratings isn't 100x better than 100
+        // Scale caps around 10,000+ ratings
+        const countScore = Math.min(Math.log10(book.ratingsCount + 1) / 4, 1);
+
+        // Combine both (60% weight on rating quality, 40% on popularity)
+        popularityScore = (ratingScore * 0.6 + countScore * 0.4) * 5 * popularityWeight;
+    }
+
+    score += popularityScore;
+    maxScore += 5 * popularityWeight; // Max possible popularity score
 
     // Convert to percentage
     const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;

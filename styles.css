@@ -167,63 +167,69 @@ main {
     position: relative;
 }
 
-/* Colorful border variations - will be applied via nth-child in enhanced version */
-.book-card:nth-child(6n+1) {
+/* Colorful border variations based on genre */
+/* Coral - Romance, LGBTQ, Memoir, Biography */
+.book-card[data-color="coral"] {
     border-color: #ff6b6b;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
 }
 
-.book-card:nth-child(6n+2) {
+.book-card[data-color="coral"]:hover {
+    box-shadow: 0 12px 35px rgba(255, 107, 107, 0.5);
+}
+
+/* Teal - Science Fiction, Science, Thriller, Mystery, Dystopian */
+.book-card[data-color="teal"] {
     border-color: #4ecdc4;
     box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
 }
 
-.book-card:nth-child(6n+3) {
+.book-card[data-color="teal"]:hover {
+    box-shadow: 0 12px 35px rgba(78, 205, 196, 0.5);
+}
+
+/* Purple - Fantasy, Mythology */
+.book-card[data-color="purple"] {
     border-color: #a855f7;
     box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
 }
 
-.book-card:nth-child(6n+4) {
+.book-card[data-color="purple"]:hover {
+    box-shadow: 0 12px 35px rgba(168, 85, 247, 0.5);
+}
+
+/* Yellow - Self-Help, Psychology, Philosophy, Spirituality, Productivity */
+.book-card[data-color="yellow"] {
     border-color: #ffd93d;
     box-shadow: 0 4px 15px rgba(255, 217, 61, 0.3);
 }
 
-.book-card:nth-child(6n+5) {
+.book-card[data-color="yellow"]:hover {
+    box-shadow: 0 12px 35px rgba(255, 217, 61, 0.5);
+}
+
+/* Green - Non-Fiction, History, Finance, Classic */
+.book-card[data-color="green"] {
     border-color: #6bcf7f;
     box-shadow: 0 4px 15px rgba(107, 207, 127, 0.3);
 }
 
-.book-card:nth-child(6n+6) {
+.book-card[data-color="green"]:hover {
+    box-shadow: 0 12px 35px rgba(107, 207, 127, 0.5);
+}
+
+/* Orange - Fiction, Adventure, Humor, Contemporary, Historical */
+.book-card[data-color="orange"] {
     border-color: #ff8a5b;
     box-shadow: 0 4px 15px rgba(255, 138, 91, 0.3);
 }
 
+.book-card[data-color="orange"]:hover {
+    box-shadow: 0 12px 35px rgba(255, 138, 91, 0.5);
+}
+
 .book-card:hover {
     transform: translateY(-8px);
-}
-
-.book-card:nth-child(6n+1):hover {
-    box-shadow: 0 12px 35px rgba(255, 107, 107, 0.5);
-}
-
-.book-card:nth-child(6n+2):hover {
-    box-shadow: 0 12px 35px rgba(78, 205, 196, 0.5);
-}
-
-.book-card:nth-child(6n+3):hover {
-    box-shadow: 0 12px 35px rgba(168, 85, 247, 0.5);
-}
-
-.book-card:nth-child(6n+4):hover {
-    box-shadow: 0 12px 35px rgba(255, 217, 61, 0.5);
-}
-
-.book-card:nth-child(6n+5):hover {
-    box-shadow: 0 12px 35px rgba(107, 207, 127, 0.5);
-}
-
-.book-card:nth-child(6n+6):hover {
-    box-shadow: 0 12px 35px rgba(255, 138, 91, 0.5);
 }
 
 .book-card.rated {
@@ -336,6 +342,25 @@ main {
     font-weight: 700;
     margin-top: 10px;
     box-shadow: 0 3px 10px rgba(56, 239, 125, 0.4);
+}
+
+/* Popularity Rating */
+.popularity-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.rating-stars {
+    color: #ffa500;
+    font-weight: 700;
+}
+
+.rating-count {
+    color: #666;
+    font-size: 0.85rem;
 }
 
 /* Add to Library Button */
