@@ -6,7 +6,7 @@ const starterBooks = [
         author: "Matt Haig",
         genres: ["Fiction", "Fantasy", "Philosophy"],
         description: "A dazzling novel about all the choices that go into a life well lived.",
-        thumbnail: "http://books.google.com/books/content?id=9HJpzQEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=9HJpzQEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api"
     },
     {
         id: 'starter-2',
@@ -14,7 +14,7 @@ const starterBooks = [
         author: "James Clear",
         genres: ["Self-Help", "Psychology", "Productivity"],
         description: "An easy and proven way to build good habits and break bad ones.",
-        thumbnail: "http://books.google.com/books/content?id=XfFvDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=XfFvDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
     },
     {
         id: 'starter-3',
@@ -22,7 +22,7 @@ const starterBooks = [
         author: "Andy Weir",
         genres: ["Science Fiction", "Adventure", "Thriller"],
         description: "A lone astronaut must save the earth from disaster in this incredible new science-based thriller.",
-        thumbnail: "http://books.google.com/books/content?id=G1lmEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=G1lmEAAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
     },
     {
         id: 'starter-4',
@@ -30,7 +30,7 @@ const starterBooks = [
         author: "Tara Westover",
         genres: ["Memoir", "Biography", "Non-Fiction"],
         description: "A memoir about a young girl who leaves her survivalist family and goes on to earn a PhD from Cambridge.",
-        thumbnail: "http://books.google.com/books/content?id=2ObWDgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=2ObWDgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
     },
     {
         id: 'starter-5',
@@ -38,7 +38,7 @@ const starterBooks = [
         author: "Taylor Jenkins Reid",
         genres: ["Fiction", "Historical", "Romance"],
         description: "Aging Hollywood icon Evelyn Hugo finally tells the story of her glamorous and scandalous life.",
-        thumbnail: "http://books.google.com/books/content?id=lVsDDgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=lVsDDgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
     }
 ];
 
@@ -306,6 +306,11 @@ async function searchBooks(query) {
 
         const books = data.items.map(item => {
             const volumeInfo = item.volumeInfo;
+            // Get higher resolution thumbnail by replacing zoom=1 with zoom=5
+            let thumbnail = volumeInfo.imageLinks?.thumbnail || null;
+            if (thumbnail) {
+                thumbnail = thumbnail.replace('zoom=1', 'zoom=5');
+            }
             return {
                 id: item.id,
                 title: volumeInfo.title || 'Unknown Title',
@@ -316,7 +321,7 @@ async function searchBooks(query) {
                         volumeInfo.description.substring(0, 200) + '...' :
                         volumeInfo.description) :
                     'No description available.',
-                thumbnail: volumeInfo.imageLinks?.thumbnail || null
+                thumbnail: thumbnail
             };
         });
 
