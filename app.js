@@ -516,8 +516,6 @@ async function searchBooks(query) {
             return;
         }
 
-        searchStatus.textContent = `Found ${data.items.length} books`;
-
         const books = data.items.map(item => {
             const volumeInfo = item.volumeInfo;
             // Get higher resolution thumbnail by replacing zoom=1 with zoom=5
@@ -539,7 +537,28 @@ async function searchBooks(query) {
             };
         });
 
+        // Deduplicate books by title and author pair
+        const uniqueBooks = [];
+        const seenPairs = new Map();
+
         books.forEach(book => {
+            // Create a normalized key for book/author pair
+            const key = `${book.title.toLowerCase()}||${book.author.toLowerCase()}`;
+
+            if (!seenPairs.has(key)) {
+                seenPairs.set(key, true);
+                uniqueBooks.push(book);
+            }
+        });
+
+        // Update status to show deduplicated count
+        if (uniqueBooks.length < books.length) {
+            searchStatus.textContent = `Found ${uniqueBooks.length} unique books (${books.length} total results)`;
+        } else {
+            searchStatus.textContent = `Found ${uniqueBooks.length} books`;
+        }
+
+        uniqueBooks.forEach(book => {
             const bookCard = createBookCard(book, true);
             resultsGrid.appendChild(bookCard);
         });
