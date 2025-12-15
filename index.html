@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookworm - Book Recommendations</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Bookworm</h1>
+            <p class="tagline">Discover your next great read</p>
+        </header>
+
+        <main>
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="rate">Rate Books</button>
+                <button class="tab-btn" data-tab="recommendations">Get Recommendations</button>
+            </div>
+
+            <!-- Rate Books Tab -->
+            <div id="rate-tab" class="tab-content active">
+                <div class="search-section">
+                    <input type="text" id="search-input" placeholder="Search books by title, author, or genre...">
+                    <select id="genre-filter">
+                        <option value="">All Genres</option>
+                    </select>
+                </div>
+
+                <div id="books-grid" class="books-grid"></div>
+            </div>
+
+            <!-- Recommendations Tab -->
+            <div id="recommendations-tab" class="tab-content">
+                <div class="recommendations-header">
+                    <h2>Recommended for You</h2>
+                    <p id="rec-description">Rate some books to get personalized recommendations!</p>
+                </div>
+                <div id="recommendations-grid" class="books-grid"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
