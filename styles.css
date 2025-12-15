@@ -486,6 +486,21 @@ main {
     margin-bottom: 0;
 }
 
+/* Library Shelf Section */
+.library-shelf-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    border-radius: 15px;
+}
+
+.library-shelf-title {
+    color: #2d3748;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
 /* Want to Read Section in Library */
 .want-to-read-section {
     margin-bottom: 30px;
@@ -736,6 +751,21 @@ main {
 .remove-from-wtr-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+}
+
+/* Popup Action Buttons */
+.popup-action-btn {
+    margin-top: 10px;
+}
+
+.popup-content .rating-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid rgba(0,0,0,0.08);
+}
+
+.book-card {
+    cursor: pointer;
 }
 
 /* Responsive */
