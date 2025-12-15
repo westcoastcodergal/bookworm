@@ -1,158 +1,71 @@
-// Book Database
-const books = [
+// Starter books for new users
+const starterBooks = [
     {
-        id: 1,
+        id: 'starter-1',
         title: "The Midnight Library",
         author: "Matt Haig",
         genres: ["Fiction", "Fantasy", "Philosophy"],
-        description: "A dazzling novel about all the choices that go into a life well lived."
+        description: "A dazzling novel about all the choices that go into a life well lived.",
+        thumbnail: "http://books.google.com/books/content?id=9HJpzQEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
     },
     {
-        id: 2,
+        id: 'starter-2',
         title: "Atomic Habits",
         author: "James Clear",
         genres: ["Self-Help", "Psychology", "Productivity"],
-        description: "An easy and proven way to build good habits and break bad ones."
+        description: "An easy and proven way to build good habits and break bad ones.",
+        thumbnail: "http://books.google.com/books/content?id=XfFvDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
     },
     {
-        id: 3,
-        title: "The Song of Achilles",
-        author: "Madeline Miller",
-        genres: ["Fiction", "Historical", "Romance", "Mythology"],
-        description: "A tale of gods, kings, immortal fame and the human heart."
-    },
-    {
-        id: 4,
-        title: "Educated",
-        author: "Tara Westover",
-        genres: ["Memoir", "Biography", "Non-Fiction"],
-        description: "A memoir about a young girl who leaves her survivalist family and goes on to earn a PhD from Cambridge."
-    },
-    {
-        id: 5,
+        id: 'starter-3',
         title: "Project Hail Mary",
         author: "Andy Weir",
         genres: ["Science Fiction", "Adventure", "Thriller"],
-        description: "A lone astronaut must save the earth from disaster in this incredible new science-based thriller."
+        description: "A lone astronaut must save the earth from disaster in this incredible new science-based thriller.",
+        thumbnail: "http://books.google.com/books/content?id=G1lmEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
     },
     {
-        id: 6,
+        id: 'starter-4',
+        title: "Educated",
+        author: "Tara Westover",
+        genres: ["Memoir", "Biography", "Non-Fiction"],
+        description: "A memoir about a young girl who leaves her survivalist family and goes on to earn a PhD from Cambridge.",
+        thumbnail: "http://books.google.com/books/content?id=2ObWDgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'starter-5',
         title: "The Seven Husbands of Evelyn Hugo",
         author: "Taylor Jenkins Reid",
-        genres: ["Fiction", "Historical", "Romance", "LGBTQ"],
-        description: "Aging Hollywood icon Evelyn Hugo finally tells the story of her glamorous and scandalous life."
-    },
-    {
-        id: 7,
-        title: "Thinking, Fast and Slow",
-        author: "Daniel Kahneman",
-        genres: ["Psychology", "Non-Fiction", "Science"],
-        description: "A groundbreaking tour of the mind explaining the two systems that drive the way we think."
-    },
-    {
-        id: 8,
-        title: "The Invisible Life of Addie LaRue",
-        author: "V.E. Schwab",
-        genres: ["Fantasy", "Fiction", "Romance", "Historical"],
-        description: "A woman who makes a Faustian bargain to live forever but is cursed to be forgotten by everyone she meets."
-    },
-    {
-        id: 9,
-        title: "Sapiens",
-        author: "Yuval Noah Harari",
-        genres: ["History", "Non-Fiction", "Science", "Philosophy"],
-        description: "A brief history of humankind, exploring how Homo sapiens came to dominate the world."
-    },
-    {
-        id: 10,
-        title: "Circe",
-        author: "Madeline Miller",
-        genres: ["Fiction", "Fantasy", "Mythology", "Historical"],
-        description: "The story of the sorceress Circe and her journey of finding her own power."
-    },
-    {
-        id: 11,
-        title: "Where the Crawdads Sing",
-        author: "Delia Owens",
-        genres: ["Fiction", "Mystery", "Romance"],
-        description: "A coming-of-age story and murder mystery set in the marshlands of North Carolina."
-    },
-    {
-        id: 12,
-        title: "The Psychology of Money",
-        author: "Morgan Housel",
-        genres: ["Finance", "Non-Fiction", "Psychology"],
-        description: "Timeless lessons on wealth, greed, and happiness."
-    },
-    {
-        id: 13,
-        title: "Anxious People",
-        author: "Fredrik Backman",
-        genres: ["Fiction", "Humor", "Contemporary"],
-        description: "A poignant comedy about a crime that never took place, a would-be bank robber, and eight anxiety-ridden strangers."
-    },
-    {
-        id: 14,
-        title: "The Silent Patient",
-        author: "Alex Michaelides",
-        genres: ["Thriller", "Mystery", "Psychology"],
-        description: "A woman shoots her husband and then never speaks another word."
-    },
-    {
-        id: 15,
-        title: "Dune",
-        author: "Frank Herbert",
-        genres: ["Science Fiction", "Adventure", "Fantasy"],
-        description: "A stunning blend of adventure and mysticism set on the desert planet Arrakis."
-    },
-    {
-        id: 16,
-        title: "The Alchemist",
-        author: "Paulo Coelho",
-        genres: ["Fiction", "Philosophy", "Adventure"],
-        description: "A magical story about following your dreams and listening to your heart."
-    },
-    {
-        id: 17,
-        title: "Normal People",
-        author: "Sally Rooney",
-        genres: ["Fiction", "Romance", "Contemporary"],
-        description: "A story of mutual fascination, friendship and love between two young people."
-    },
-    {
-        id: 18,
-        title: "The Power of Now",
-        author: "Eckhart Tolle",
-        genres: ["Self-Help", "Philosophy", "Spirituality"],
-        description: "A guide to spiritual enlightenment and living in the present moment."
-    },
-    {
-        id: 19,
-        title: "1984",
-        author: "George Orwell",
-        genres: ["Fiction", "Dystopian", "Classic", "Science Fiction"],
-        description: "A dystopian social science fiction novel and cautionary tale about totalitarianism."
-    },
-    {
-        id: 20,
-        title: "The House in the Cerulean Sea",
-        author: "TJ Klune",
-        genres: ["Fantasy", "Fiction", "LGBTQ", "Romance"],
-        description: "A magical tale about found family, second chances, and the power of love."
+        genres: ["Fiction", "Historical", "Romance"],
+        description: "Aging Hollywood icon Evelyn Hugo finally tells the story of her glamorous and scandalous life.",
+        thumbnail: "http://books.google.com/books/content?id=lVsDDgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
     }
 ];
 
 // Application State
+let userLibrary = JSON.parse(localStorage.getItem('userLibrary')) || [...starterBooks];
 let ratings = JSON.parse(localStorage.getItem('bookRatings')) || {};
 let currentFilter = '';
 let currentGenreFilter = '';
+
+// Save library to localStorage
+function saveLibrary() {
+    localStorage.setItem('userLibrary', JSON.stringify(userLibrary));
+}
+
+// Save ratings to localStorage
+function saveRatings() {
+    localStorage.setItem('bookRatings', JSON.stringify(ratings));
+}
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     initializeTabs();
     populateGenreFilter();
-    displayBooks();
-    setupSearch();
+    setupGenreFilter();
+    displayLibrary();
+    setupLibrarySearch();
+    setupAPISearch();
 });
 
 // Tab Functionality
@@ -184,37 +97,45 @@ function initializeTabs() {
 // Populate Genre Filter
 function populateGenreFilter() {
     const genres = new Set();
-    books.forEach(book => {
+    userLibrary.forEach(book => {
         book.genres.forEach(genre => genres.add(genre));
     });
 
     const genreFilter = document.getElementById('genre-filter');
+    genreFilter.innerHTML = '<option value="">All Genres</option>';
+
     Array.from(genres).sort().forEach(genre => {
         const option = document.createElement('option');
         option.value = genre;
         option.textContent = genre;
         genreFilter.appendChild(option);
     });
+}
 
+// Setup Genre Filter Event Listener
+function setupGenreFilter() {
+    const genreFilter = document.getElementById('genre-filter');
     genreFilter.addEventListener('change', (e) => {
         currentGenreFilter = e.target.value;
-        displayBooks();
+        displayLibrary();
     });
 }
 
-// Search Functionality
-function setupSearch() {
-    const searchInput = document.getElementById('search-input');
-    searchInput.addEventListener('input', (e) => {
-        currentFilter = e.target.value.toLowerCase();
-        displayBooks();
-    });
+// Library Search Functionality
+function setupLibrarySearch() {
+    const searchInput = document.getElementById('library-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentFilter = e.target.value.toLowerCase();
+            displayLibrary();
+        });
+    }
 }
 
-// Display Books
-function displayBooks() {
+// Display User's Library
+function displayLibrary() {
     const booksGrid = document.getElementById('books-grid');
-    const filteredBooks = books.filter(book => {
+    const filteredBooks = userLibrary.filter(book => {
         const matchesSearch = !currentFilter ||
             book.title.toLowerCase().includes(currentFilter) ||
             book.author.toLowerCase().includes(currentFilter) ||
@@ -228,14 +149,19 @@ function displayBooks() {
 
     booksGrid.innerHTML = '';
 
+    if (filteredBooks.length === 0) {
+        booksGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666;">No books found. Try searching for books in the "Search Books" tab!</p>';
+        return;
+    }
+
     filteredBooks.forEach(book => {
-        const bookCard = createBookCard(book);
+        const bookCard = createBookCard(book, false);
         booksGrid.appendChild(bookCard);
     });
 }
 
 // Create Book Card
-function createBookCard(book, matchScore = null) {
+function createBookCard(book, isSearchResult = false, matchScore = null) {
     const card = document.createElement('div');
     card.className = 'book-card';
 
@@ -257,18 +183,26 @@ function createBookCard(book, matchScore = null) {
     const matchScoreHTML = matchScore !== null ?
         `<div class="match-score">${matchScore}% Match</div>` : '';
 
+    const thumbnailHTML = book.thumbnail ?
+        `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
+
+    const addButtonHTML = isSearchResult ?
+        `<button class="add-to-library-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>` :
+        `<div class="rating-section">
+            <div class="rating-label">Your Rating:</div>
+            <div class="stars" data-book-id="${book.id}">
+                ${stars}
+            </div>
+        </div>`;
+
     card.innerHTML = `
+        ${thumbnailHTML}
         <div class="book-title">${book.title}</div>
         <div class="book-author">by ${book.author}</div>
         <div class="book-genres">${genreTags}</div>
         <div class="book-description">${book.description}</div>
         ${matchScoreHTML}
-        <div class="rating-section">
-            <div class="rating-label">Your Rating:</div>
-            <div class="stars" data-book-id="${book.id}">
-                ${stars}
-            </div>
-        </div>
+        ${addButtonHTML}
     `;
 
     return card;
@@ -284,16 +218,17 @@ function createStars(bookId, rating) {
     return starsHTML;
 }
 
-// Event Delegation for Star Ratings
+// Event Delegation for Star Ratings and Add to Library
 document.addEventListener('click', (e) => {
+    // Star rating
     if (e.target.classList.contains('star')) {
         const starsContainer = e.target.parentElement;
-        const bookId = parseInt(starsContainer.dataset.bookId);
+        const bookId = starsContainer.dataset.bookId;
         const rating = parseInt(e.target.dataset.rating);
 
         // Update rating
         ratings[bookId] = rating;
-        localStorage.setItem('bookRatings', JSON.stringify(ratings));
+        saveRatings();
 
         // Update star display
         const stars = starsContainer.querySelectorAll('.star');
@@ -311,7 +246,102 @@ document.addEventListener('click', (e) => {
         const bookCard = starsContainer.closest('.book-card');
         bookCard.classList.add('rated');
     }
+
+    // Add to library button
+    if (e.target.classList.contains('add-to-library-btn')) {
+        const button = e.target;
+        const bookData = JSON.parse(button.dataset.book.replace(/&apos;/g, "'"));
+
+        // Check if already in library
+        const exists = userLibrary.find(b => b.id === bookData.id);
+        if (exists) {
+            button.textContent = 'Already in Library';
+            button.disabled = true;
+            return;
+        }
+
+        // Add to library
+        userLibrary.push(bookData);
+        saveLibrary();
+        populateGenreFilter();
+
+        // Update button
+        button.textContent = 'Added to Library!';
+        button.classList.add('added');
+        button.disabled = true;
+    }
 });
+
+// API Search Setup
+function setupAPISearch() {
+    const searchInput = document.getElementById('api-search-input');
+    const searchButton = document.getElementById('search-btn');
+
+    if (!searchInput || !searchButton) {
+        console.error('Search elements not found');
+        return;
+    }
+
+    const performSearch = () => {
+        const query = searchInput.value.trim();
+        if (query) {
+            searchBooks(query);
+        }
+    };
+
+    searchButton.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+}
+
+// Search Books using Google Books API
+async function searchBooks(query) {
+    const searchStatus = document.getElementById('search-status');
+    const resultsGrid = document.getElementById('search-results-grid');
+
+    searchStatus.textContent = 'Searching...';
+    resultsGrid.innerHTML = '';
+
+    try {
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20`);
+        const data = await response.json();
+
+        if (!data.items || data.items.length === 0) {
+            searchStatus.textContent = 'No books found. Try a different search term.';
+            return;
+        }
+
+        searchStatus.textContent = `Found ${data.items.length} books`;
+
+        const books = data.items.map(item => {
+            const volumeInfo = item.volumeInfo;
+            return {
+                id: item.id,
+                title: volumeInfo.title || 'Unknown Title',
+                author: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown Author',
+                genres: volumeInfo.categories || ['General'],
+                description: volumeInfo.description ?
+                    (volumeInfo.description.length > 200 ?
+                        volumeInfo.description.substring(0, 200) + '...' :
+                        volumeInfo.description) :
+                    'No description available.',
+                thumbnail: volumeInfo.imageLinks?.thumbnail || null
+            };
+        });
+
+        books.forEach(book => {
+            const bookCard = createBookCard(book, true);
+            resultsGrid.appendChild(bookCard);
+        });
+
+    } catch (error) {
+        searchStatus.textContent = 'Error searching books. Please try again.';
+        console.error('Search error:', error);
+    }
+}
 
 // Recommendation Algorithm
 function displayRecommendations() {
@@ -331,8 +361,8 @@ function displayRecommendations() {
     // Get user preferences
     const preferences = analyzePreferences(ratedBooks);
 
-    // Get unrated books
-    const unratedBooks = books.filter(book => !ratings[book.id]);
+    // Get unrated books from library
+    const unratedBooks = userLibrary.filter(book => !ratings[book.id]);
 
     // Score and sort recommendations
     const recommendations = unratedBooks.map(book => {
@@ -345,12 +375,12 @@ function displayRecommendations() {
     recommendationsGrid.innerHTML = '';
 
     if (recommendations.length === 0) {
-        recommendationsGrid.innerHTML = '<p style="text-align: center; color: #666;">No recommendations available. Try rating more diverse books!</p>';
+        recommendationsGrid.innerHTML = '<p style="text-align: center; color: #666;">No recommendations available. Try rating more books or adding more books to your library!</p>';
         return;
     }
 
     recommendations.forEach(({ book, score }) => {
-        const bookCard = createBookCard(book, score);
+        const bookCard = createBookCard(book, false, score);
         recommendationsGrid.appendChild(bookCard);
     });
 }
@@ -365,7 +395,7 @@ function analyzePreferences(ratedBooks) {
     };
 
     ratedBooks.forEach(([bookId, rating]) => {
-        const book = books.find(b => b.id === parseInt(bookId));
+        const book = userLibrary.find(b => b.id === bookId);
         if (!book) return;
 
         // Weight by rating
