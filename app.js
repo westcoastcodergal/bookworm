@@ -192,6 +192,7 @@ let ratings = JSON.parse(localStorage.getItem('bookRatings')) || {};
 let currentFilter = '';
 let currentGenreFilter = '';
 let activeRecommendations = JSON.parse(localStorage.getItem('activeRecommendations')) || [];
+let wantToReadShelf = JSON.parse(localStorage.getItem('wantToReadShelf')) || [];
 
 // Save library to localStorage
 function saveLibrary() {
@@ -206,6 +207,11 @@ function saveRatings() {
 // Save active recommendations to localStorage
 function saveActiveRecommendations() {
     localStorage.setItem('activeRecommendations', JSON.stringify(activeRecommendations));
+}
+
+// Save want to read shelf to localStorage
+function saveWantToReadShelf() {
+    localStorage.setItem('wantToReadShelf', JSON.stringify(wantToReadShelf));
 }
 
 // Initialize active recommendations with 10 books
@@ -287,6 +293,8 @@ function initializeTabs() {
                 displayRecommendations();
             } else if (tabName === 'library') {
                 displayLibrary();
+            } else if (tabName === 'want-to-read') {
+                displayWantToReadShelf();
             }
         });
     });
@@ -436,6 +444,10 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
     const publishedDateHTML = book.publishedDate ?
         `<div class="book-published-date">Published: ${book.publishedDate}</div>` : '';
 
+    // For recommendations, add a "want to read" button
+    const wantToReadButtonHTML = matchScore !== null ?
+        `<button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>🐛 Want to Read</button>` : '';
+
     const addButtonHTML = isSearchResult ?
         `<button class="add-to-library-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>` :
         `<div class="rating-section">
@@ -454,6 +466,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         <div class="book-description">${book.description}</div>
         ${popularityHTML}
         ${matchScoreHTML}
+        ${wantToReadButtonHTML}
         ${addButtonHTML}
     `;
 
@@ -547,6 +560,34 @@ document.addEventListener('click', (e) => {
         button.textContent = 'Added to Library!';
         button.classList.add('added');
         button.disabled = true;
+    }
+
+    // Want to read button
+    if (e.target.classList.contains('want-to-read-btn')) {
+        const button = e.target;
+        const bookData = JSON.parse(button.dataset.book.replace(/&apos;/g, "'"));
+
+        // Check if already in want to read shelf
+        const exists = wantToReadShelf.find(b => b.id === bookData.id);
+        if (exists) {
+            button.textContent = '✓ Already Added';
+            button.disabled = true;
+            return;
+        }
+
+        // Add to want to read shelf
+        wantToReadShelf.push(bookData);
+        saveWantToReadShelf();
+
+        // Update button
+        button.textContent = '✓ Added to Shelf!';
+        button.classList.add('added');
+        button.disabled = true;
+
+        // Show a quick visual feedback
+        setTimeout(() => {
+            button.textContent = '🐛 On Your Shelf';
+        }, 1500);
     }
 });
 
@@ -777,4 +818,74 @@ function calculateMatchScore(book, preferences) {
     const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
 
     return Math.min(percentage, 99);
+}
+
+// Display Want to Read Shelf
+function displayWantToReadShelf() {
+    const shelfContainer = document.getElementById('want-to-read-shelf');
+    const wtrDescription = document.getElementById('wtr-description');
+
+    shelfContainer.innerHTML = '';
+
+    if (wantToReadShelf.length === 0) {
+        wtrDescription.textContent = 'No books on your shelf yet. Add some from the Recommendations tab!';
+        shelfContainer.innerHTML = '<div class="empty-shelf"><p>Your bookshelf is empty! 📚</p><p>Browse recommendations and click "🐛 Want to Read" to add books here.</p></div>';
+        return;
+    }
+
+    wtrDescription.textContent = `You have ${wantToReadShelf.length} book${wantToReadShelf.length !== 1 ? 's' : ''} waiting to be read!`;
+
+    // Create shelves (group books in rows of up to 8)
+    const booksPerShelf = 8;
+    const numShelves = Math.ceil(wantToReadShelf.length / booksPerShelf);
+
+    for (let shelfNum = 0; shelfNum < numShelves; shelfNum++) {
+        const shelfDiv = document.createElement('div');
+        shelfDiv.className = 'shelf-row';
+
+        const booksDiv = document.createElement('div');
+        booksDiv.className = 'shelf-books';
+
+        const startIdx = shelfNum * booksPerShelf;
+        const endIdx = Math.min(startIdx + booksPerShelf, wantToReadShelf.length);
+        const booksOnThisShelf = wantToReadShelf.slice(startIdx, endIdx);
+
+        booksOnThisShelf.forEach(book => {
+            const bookSpine = document.createElement('div');
+            bookSpine.className = 'book-spine';
+
+            // Get color based on genre
+            const color = getGenreColor(book.genres);
+            bookSpine.setAttribute('data-color', color);
+
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'spine-title';
+            titleDiv.textContent = book.title;
+
+            const authorDiv = document.createElement('div');
+            authorDiv.className = 'spine-author';
+            authorDiv.textContent = book.author;
+
+            bookSpine.appendChild(titleDiv);
+            bookSpine.appendChild(authorDiv);
+
+            // Add click handler to remove book from shelf
+            bookSpine.addEventListener('click', () => {
+                if (confirm(`Remove "${book.title}" from your Want to Read shelf?`)) {
+                    wantToReadShelf = wantToReadShelf.filter(b => b.id !== book.id);
+                    saveWantToReadShelf();
+                    displayWantToReadShelf();
+                }
+            });
+
+            booksDiv.appendChild(bookSpine);
+        });
+
+        const shelfBoard = document.createElement('div');
+        shelfBoard.className = 'shelf-board';
+
+        shelfDiv.appendChild(booksDiv);
+        shelfDiv.appendChild(shelfBoard);
+        shelfContainer.appendChild(shelfDiv);
+    }
 }
