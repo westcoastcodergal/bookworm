@@ -610,8 +610,6 @@ async function searchBooks(query) {
                         volumeInfo.description) :
                     'No description available.',
                 thumbnail: thumbnail,
-                averageRating: volumeInfo.averageRating || 0,
-                ratingsCount: volumeInfo.ratingsCount || 0
                 averageRating: volumeInfo.averageRating || null,
                 ratingsCount: volumeInfo.ratingsCount || null,
                 publishedDate: volumeInfo.publishedDate || null
