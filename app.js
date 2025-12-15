@@ -447,6 +447,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
 
     const popularityHTML = book.averageRating && book.ratingsCount ?
         `<div class="popularity-rating">
+            <span class="rating-label-small">Google Books Rating:</span>
             <span class="rating-stars">★ ${book.averageRating.toFixed(1)}</span>
             <span class="rating-count">(${book.ratingsCount.toLocaleString()} ratings)</span>
         </div>` : '';
@@ -690,6 +691,19 @@ async function searchBooks(query) {
             }
         });
 
+        // Filter out books with no rating data or low ratings (< 2 stars)
+        const filteredBooks = uniqueBooks.filter(book => {
+            return book.averageRating && book.ratingsCount && book.averageRating >= 2;
+        });
+
+        // Update status to show filtered count
+        if (filteredBooks.length === 0) {
+            searchStatus.textContent = 'No highly-rated books found. Try a different search term.';
+            return;
+        }
+
+        if (uniqueBooks.length > filteredBooks.length) {
+            searchStatus.textContent = `Found ${filteredBooks.length} highly-rated books (${uniqueBooks.length} total results)`;
         // Sort by popularity (combination of rating and number of ratings)
         uniqueBooks.sort((a, b) => {
             // Handle books without ratings - push them to the end
@@ -710,10 +724,10 @@ async function searchBooks(query) {
         if (uniqueBooks.length < books.length) {
             searchStatus.textContent = `Found ${uniqueBooks.length} unique books (${books.length} total results)`;
         } else {
-            searchStatus.textContent = `Found ${uniqueBooks.length} books`;
+            searchStatus.textContent = `Found ${filteredBooks.length} books`;
         }
 
-        uniqueBooks.forEach(book => {
+        filteredBooks.forEach(book => {
             const bookCard = createBookCard(book, true);
             resultsGrid.appendChild(bookCard);
         });
