@@ -234,10 +234,53 @@ function displayBooks() {
     });
 }
 
+// Genre Color Mapping
+const genreColorMap = {
+    'Romance': 'coral',
+    'LGBTQ': 'coral',
+    'Memoir': 'coral',
+    'Biography': 'coral',
+    'Science Fiction': 'teal',
+    'Science': 'teal',
+    'Thriller': 'teal',
+    'Mystery': 'teal',
+    'Dystopian': 'teal',
+    'Fantasy': 'purple',
+    'Mythology': 'purple',
+    'Self-Help': 'yellow',
+    'Psychology': 'yellow',
+    'Philosophy': 'yellow',
+    'Spirituality': 'yellow',
+    'Productivity': 'yellow',
+    'Non-Fiction': 'green',
+    'History': 'green',
+    'Finance': 'green',
+    'Classic': 'green',
+    'Fiction': 'orange',
+    'Adventure': 'orange',
+    'Humor': 'orange',
+    'Contemporary': 'orange',
+    'Historical': 'orange'
+};
+
+// Get color based on primary genre
+function getGenreColor(genres) {
+    for (const genre of genres) {
+        if (genreColorMap[genre]) {
+            return genreColorMap[genre];
+        }
+    }
+    return 'orange'; // default fallback
+}
+
 // Create Book Card
 function createBookCard(book, matchScore = null) {
     const card = document.createElement('div');
     card.className = 'book-card';
+
+    // Add genre-based color
+    const color = getGenreColor(book.genres);
+    card.setAttribute('data-color', color);
 
     if (ratings[book.id]) {
         card.classList.add('rated');
