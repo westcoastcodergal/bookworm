@@ -533,7 +533,9 @@ async function searchBooks(query) {
                         volumeInfo.description.substring(0, 200) + '...' :
                         volumeInfo.description) :
                     'No description available.',
-                thumbnail: thumbnail
+                thumbnail: thumbnail,
+                averageRating: volumeInfo.averageRating || 0,
+                ratingsCount: volumeInfo.ratingsCount || 0
             };
         });
 
@@ -549,6 +551,13 @@ async function searchBooks(query) {
                 seenPairs.set(key, true);
                 uniqueBooks.push(book);
             }
+        });
+
+        // Sort by popularity (combination of rating and number of ratings)
+        uniqueBooks.sort((a, b) => {
+            const popularityA = a.averageRating * Math.log(a.ratingsCount + 1);
+            const popularityB = b.averageRating * Math.log(b.ratingsCount + 1);
+            return popularityB - popularityA; // Sort descending (most popular first)
         });
 
         // Update status to show deduplicated count
