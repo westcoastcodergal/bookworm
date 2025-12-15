@@ -6,7 +6,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #ffffff;
     min-height: 100vh;
     padding: 20px;
     color: #333;
@@ -20,26 +20,30 @@ body {
 header {
     text-align: center;
     margin-bottom: 40px;
-    color: white;
+    color: #2d3748;
 }
 
 header h1 {
     font-size: 3.5rem;
     font-weight: 700;
     margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f, #f06595, #cc5de8, #845ef7, #5c7cfa, #339af0, #22b8cf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .tagline {
     font-size: 1.2rem;
-    opacity: 0.95;
+    color: #666;
 }
 
 main {
     background: white;
     border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #f0f0f0;
 }
 
 /* Tabs */
@@ -63,12 +67,12 @@ main {
 }
 
 .tab-btn:hover {
-    color: #667eea;
+    color: #ff6b6b;
 }
 
 .tab-btn.active {
-    color: #667eea;
-    border-bottom-color: #667eea;
+    color: #ff6b6b;
+    border-bottom-color: #ff6b6b;
 }
 
 .tab-content {
@@ -92,12 +96,13 @@ main {
     border: 2px solid #e0e0e0;
     border-radius: 12px;
     font-size: 1rem;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 #search-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #a855f7;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
 }
 
 #genre-filter {
@@ -108,6 +113,13 @@ main {
     background: white;
     cursor: pointer;
     min-width: 200px;
+    transition: all 0.3s ease;
+}
+
+#genre-filter:focus {
+    outline: none;
+    border-color: #4ecdc4;
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
 }
 
 /* Books Grid */
@@ -118,24 +130,80 @@ main {
 }
 
 .book-card {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: white;
     border-radius: 15px;
     padding: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     cursor: pointer;
+    border: 3px solid;
+    position: relative;
+}
+
+/* Colorful border variations - will be applied via nth-child in enhanced version */
+.book-card:nth-child(6n+1) {
+    border-color: #ff6b6b;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.book-card:nth-child(6n+2) {
+    border-color: #4ecdc4;
+    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+}
+
+.book-card:nth-child(6n+3) {
+    border-color: #a855f7;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+}
+
+.book-card:nth-child(6n+4) {
+    border-color: #ffd93d;
+    box-shadow: 0 4px 15px rgba(255, 217, 61, 0.3);
+}
+
+.book-card:nth-child(6n+5) {
+    border-color: #6bcf7f;
+    box-shadow: 0 4px 15px rgba(107, 207, 127, 0.3);
+}
+
+.book-card:nth-child(6n+6) {
+    border-color: #ff8a5b;
+    box-shadow: 0 4px 15px rgba(255, 138, 91, 0.3);
 }
 
 .book-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transform: translateY(-8px);
+}
+
+.book-card:nth-child(6n+1):hover {
+    box-shadow: 0 12px 35px rgba(255, 107, 107, 0.5);
+}
+
+.book-card:nth-child(6n+2):hover {
+    box-shadow: 0 12px 35px rgba(78, 205, 196, 0.5);
+}
+
+.book-card:nth-child(6n+3):hover {
+    box-shadow: 0 12px 35px rgba(168, 85, 247, 0.5);
+}
+
+.book-card:nth-child(6n+4):hover {
+    box-shadow: 0 12px 35px rgba(255, 217, 61, 0.5);
+}
+
+.book-card:nth-child(6n+5):hover {
+    box-shadow: 0 12px 35px rgba(107, 207, 127, 0.5);
+}
+
+.book-card:nth-child(6n+6):hover {
+    box-shadow: 0 12px 35px rgba(255, 138, 91, 0.5);
 }
 
 .book-card.rated {
-    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    border-width: 4px;
 }
 
 .book-card.recommended {
-    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+    border-width: 4px;
 }
 
 .book-title {
@@ -159,12 +227,13 @@ main {
 }
 
 .genre-tag {
-    background: white;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 0.85rem;
-    color: #667eea;
+    color: white;
     font-weight: 600;
+    box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
 }
 
 .book-description {
@@ -178,7 +247,7 @@ main {
 .rating-section {
     margin-top: 15px;
     padding-top: 15px;
-    border-top: 2px solid rgba(255,255,255,0.5);
+    border-top: 2px solid rgba(0,0,0,0.08);
 }
 
 .rating-label {
@@ -231,13 +300,14 @@ main {
 
 .match-score {
     display: inline-block;
-    background: #48bb78;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
     color: white;
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 700;
     margin-top: 10px;
+    box-shadow: 0 3px 10px rgba(56, 239, 125, 0.4);
 }
 
 /* Responsive */
