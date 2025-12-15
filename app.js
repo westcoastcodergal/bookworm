@@ -262,9 +262,11 @@ function initializeTabs() {
             });
             document.getElementById(`${tabName}-tab`).classList.add('active');
 
-            // Load recommendations when switching to recommendations tab
+            // Refresh content when switching tabs
             if (tabName === 'recommendations') {
                 displayRecommendations();
+            } else if (tabName === 'library') {
+                displayLibrary();
             }
         });
     });
