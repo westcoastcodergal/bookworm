@@ -426,6 +426,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
 
     const popularityHTML = book.averageRating && book.ratingsCount ?
         `<div class="popularity-rating">
+            <span class="rating-label-small">Google Books Rating:</span>
             <span class="rating-stars">★ ${book.averageRating.toFixed(1)}</span>
             <span class="rating-count">(${book.ratingsCount.toLocaleString()} ratings)</span>
         </div>` : '';
