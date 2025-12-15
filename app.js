@@ -6,7 +6,8 @@ const starterBooks = [
         author: "Matt Haig",
         genres: ["Fiction", "Fantasy", "Philosophy"],
         description: "A dazzling novel about all the choices that go into a life well lived.",
-        thumbnail: "http://books.google.com/books/content?id=1ZxRzgEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=1ZxRzgEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+        publishedDate: "2020"
     },
     {
         id: 'starter-2',
@@ -14,7 +15,8 @@ const starterBooks = [
         author: "James Clear",
         genres: ["Self-Help", "Psychology", "Productivity"],
         description: "An easy and proven way to build good habits and break bad ones.",
-        thumbnail: "http://books.google.com/books/content?id=XfFvDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=XfFvDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        publishedDate: "2018"
     },
     {
         id: 'starter-3',
@@ -22,7 +24,8 @@ const starterBooks = [
         author: "Andy Weir",
         genres: ["Science Fiction", "Adventure", "Thriller"],
         description: "A lone astronaut must save the earth from disaster in this incredible new science-based thriller.",
-        thumbnail: "http://books.google.com/books/content?id=G1lmEAAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=G1lmEAAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        publishedDate: "2021"
     },
     {
         id: 'starter-4',
@@ -30,7 +33,8 @@ const starterBooks = [
         author: "Tara Westover",
         genres: ["Memoir", "Biography", "Non-Fiction"],
         description: "A memoir about a young girl who leaves her survivalist family and goes on to earn a PhD from Cambridge.",
-        thumbnail: "http://books.google.com/books/content?id=2ObWDgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=2ObWDgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        publishedDate: "2018"
     },
     {
         id: 'starter-5',
@@ -38,7 +42,8 @@ const starterBooks = [
         author: "Taylor Jenkins Reid",
         genres: ["Fiction", "Historical", "Romance"],
         description: "Aging Hollywood icon Evelyn Hugo finally tells the story of her glamorous and scandalous life.",
-        thumbnail: "http://books.google.com/books/content?id=y8pLDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=y8pLDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        publishedDate: "2017"
     }
 ];
 
@@ -50,7 +55,8 @@ const recommendedBooksPool = [
         author: "Paulo Coelho",
         genres: ["Fiction", "Philosophy", "Adventure"],
         description: "A magical tale about following your dreams and listening to your heart.",
-        thumbnail: "http://books.google.com/books/content?id=FzVjBgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=FzVjBgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "1988"
     },
     {
         id: 'rec-2',
@@ -58,7 +64,8 @@ const recommendedBooksPool = [
         author: "George Orwell",
         genres: ["Fiction", "Dystopian", "Classic"],
         description: "A dystopian social science fiction novel and cautionary tale about the dangers of totalitarianism.",
-        thumbnail: "http://books.google.com/books/content?id=kotPYEqx7kMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=kotPYEqx7kMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "1949"
     },
     {
         id: 'rec-3',
@@ -66,7 +73,8 @@ const recommendedBooksPool = [
         author: "Yuval Noah Harari",
         genres: ["Non-Fiction", "History", "Science"],
         description: "A brief history of humankind exploring how Homo sapiens came to dominate the world.",
-        thumbnail: "http://books.google.com/books/content?id=1EiJAwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=1EiJAwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "2011"
     },
     {
         id: 'rec-4',
@@ -74,7 +82,8 @@ const recommendedBooksPool = [
         author: "F. Scott Fitzgerald",
         genres: ["Fiction", "Classic", "Romance"],
         description: "A portrait of the Jazz Age in all of its decadence and excess.",
-        thumbnail: "http://books.google.com/books/content?id=iXn5U2IzVH0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=iXn5U2IzVH0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "1925"
     },
     {
         id: 'rec-5',
@@ -82,7 +91,8 @@ const recommendedBooksPool = [
         author: "Frank Herbert",
         genres: ["Science Fiction", "Adventure", "Fantasy"],
         description: "Set in the distant future amidst a sprawling feudal interstellar empire.",
-        thumbnail: "http://books.google.com/books/content?id=B1hSG45JCX4C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=B1hSG45JCX4C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "1965"
     },
     {
         id: 'rec-6',
@@ -90,7 +100,8 @@ const recommendedBooksPool = [
         author: "Daniel Kahneman",
         genres: ["Psychology", "Non-Fiction", "Science"],
         description: "A groundbreaking tour of the mind explaining the two systems that drive the way we think.",
-        thumbnail: "http://books.google.com/books/content?id=ZuKTvERuPG8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=ZuKTvERuPG8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "2011"
     },
     {
         id: 'rec-7',
@@ -98,7 +109,8 @@ const recommendedBooksPool = [
         author: "J.R.R. Tolkien",
         genres: ["Fantasy", "Adventure", "Fiction"],
         description: "A timeless classic about the adventure of Bilbo Baggins.",
-        thumbnail: "http://books.google.com/books/content?id=pD6arNyKyi8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=pD6arNyKyi8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "1937"
     },
     {
         id: 'rec-8',
@@ -106,7 +118,8 @@ const recommendedBooksPool = [
         author: "Michelle Obama",
         genres: ["Memoir", "Biography", "Non-Fiction"],
         description: "The memoir of former United States First Lady Michelle Obama.",
-        thumbnail: "http://books.google.com/books/content?id=ov4vDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=ov4vDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "2018"
     },
     {
         id: 'rec-9',
@@ -114,7 +127,8 @@ const recommendedBooksPool = [
         author: "Suzanne Collins",
         genres: ["Fiction", "Dystopian", "Adventure"],
         description: "In a dark vision of the near future, twelve boys and twelve girls are forced to appear in a live TV show called the Hunger Games.",
-        thumbnail: "http://books.google.com/books/content?id=_zAHKFQeid8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=_zAHKFQeid8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "2008"
     },
     {
         id: 'rec-10',
@@ -122,7 +136,8 @@ const recommendedBooksPool = [
         author: "Eckhart Tolle",
         genres: ["Self-Help", "Philosophy", "Spirituality"],
         description: "A guide to spiritual enlightenment and living in the present moment.",
-        thumbnail: "http://books.google.com/books/content?id=b9jWtEDQp2gC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=b9jWtEDQp2gC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "1997"
     },
     {
         id: 'rec-11',
@@ -130,7 +145,8 @@ const recommendedBooksPool = [
         author: "Dan Brown",
         genres: ["Thriller", "Mystery", "Fiction"],
         description: "A mystery thriller that follows symbologist Robert Langdon as he investigates a murder in Paris.",
-        thumbnail: "http://books.google.com/books/content?id=EjgZknNJLs0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=EjgZknNJLs0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "2003"
     },
     {
         id: 'rec-12',
@@ -138,7 +154,8 @@ const recommendedBooksPool = [
         author: "Trevor Noah",
         genres: ["Memoir", "Biography", "Comedy"],
         description: "Stories from a South African childhood by the host of The Daily Show.",
-        thumbnail: "http://books.google.com/books/content?id=B7fZCwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=B7fZCwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "2016"
     },
     {
         id: 'rec-13',
@@ -146,7 +163,8 @@ const recommendedBooksPool = [
         author: "Andy Weir",
         genres: ["Science Fiction", "Adventure", "Thriller"],
         description: "An astronaut becomes one of the first people to walk on Mars, and now he may be the first person to die there.",
-        thumbnail: "http://books.google.com/books/content?id=EHJCAwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=EHJCAwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "2011"
     },
     {
         id: 'rec-14',
@@ -154,7 +172,8 @@ const recommendedBooksPool = [
         author: "Delia Owens",
         genres: ["Fiction", "Mystery", "Romance"],
         description: "A coming-of-age story with a mystery at its heart in the marshlands of North Carolina.",
-        thumbnail: "http://books.google.com/books/content?id=pZJZDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=pZJZDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        publishedDate: "2018"
     },
     {
         id: 'rec-15',
@@ -162,7 +181,8 @@ const recommendedBooksPool = [
         author: "Timothy Ferriss",
         genres: ["Self-Help", "Business", "Productivity"],
         description: "Escape 9-5, live anywhere, and join the new rich with lifestyle design strategies.",
-        thumbnail: "http://books.google.com/books/content?id=ZuJZmwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=ZuJZmwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        publishedDate: "2007"
     }
 ];
 
@@ -411,6 +431,9 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
     const thumbnailHTML = book.thumbnail ?
         `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
 
+    const publishedDateHTML = book.publishedDate ?
+        `<div class="book-published-date">Published: ${book.publishedDate}</div>` : '';
+
     const addButtonHTML = isSearchResult ?
         `<button class="add-to-library-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>` :
         `<div class="rating-section">
@@ -424,6 +447,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         ${thumbnailHTML}
         <div class="book-title">${book.title}</div>
         <div class="book-author">by ${book.author}</div>
+        ${publishedDateHTML}
         <div class="book-genres">${genreTags}</div>
         <div class="book-description">${book.description}</div>
         ${popularityHTML}
@@ -585,7 +609,8 @@ async function searchBooks(query) {
                     'No description available.',
                 thumbnail: thumbnail,
                 averageRating: volumeInfo.averageRating || null,
-                ratingsCount: volumeInfo.ratingsCount || null
+                ratingsCount: volumeInfo.ratingsCount || null,
+                publishedDate: volumeInfo.publishedDate || null
             };
         });
 
