@@ -704,6 +704,8 @@ async function searchBooks(query) {
 
         if (uniqueBooks.length > filteredBooks.length) {
             searchStatus.textContent = `Found ${filteredBooks.length} highly-rated books (${uniqueBooks.length} total results)`;
+        }
+
         // Sort by popularity (combination of rating and number of ratings)
         uniqueBooks.sort((a, b) => {
             // Handle books without ratings - push them to the end
