@@ -254,7 +254,7 @@ main {
 }
 
 .book-published-date {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     color: #718096;
     margin-bottom: 12px;
     font-style: italic;
@@ -413,6 +413,26 @@ main {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+/* Remove from Library Button */
+.remove-from-library-btn {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.remove-from-library-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+}
+
 .book-cover {
     width: 100%;
     height: 200px;
@@ -429,7 +449,7 @@ main {
     color: white;
     border: none;
     border-radius: 10px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     margin-top: 15px;
@@ -452,29 +472,40 @@ main {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-/* Want to Read Header */
-.want-to-read-header {
-    text-align: center;
+/* Search Result Buttons */
+.search-result-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.search-result-buttons .add-to-library-btn,
+.search-result-buttons .want-to-read-btn {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Want to Read Section in Library */
+.want-to-read-section {
     margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 15px;
 }
 
-.want-to-read-header h2 {
+.want-to-read-title {
     color: #2d3748;
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-
-#wtr-description {
-    color: #666;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
 /* Bookshelf */
 .bookshelf {
-    padding: 20px;
-    background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+    padding: 10px;
+    background: transparent;
     border-radius: 15px;
-    min-height: 300px;
 }
 
 .empty-shelf {
@@ -614,6 +645,99 @@ main {
         transparent 100%);
 }
 
+/* Popup Overlay */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.popup-content {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    border: 3px solid;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.popup-content[data-color="coral"] {
+    border-color: #ff6b6b;
+}
+
+.popup-content[data-color="teal"] {
+    border-color: #4ecdc4;
+}
+
+.popup-content[data-color="purple"] {
+    border-color: #a855f7;
+}
+
+.popup-content[data-color="yellow"] {
+    border-color: #ffd93d;
+}
+
+.popup-content[data-color="green"] {
+    border-color: #6bcf7f;
+}
+
+.popup-content[data-color="orange"] {
+    border-color: #ff8a5b;
+}
+
+.popup-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #666;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.popup-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Remove from Want to Read Button */
+.remove-from-wtr-btn {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.remove-from-wtr-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     header h1 {
@@ -645,5 +769,10 @@ main {
     .spine-author {
         font-size: 0.6rem;
         max-height: 50px;
+    }
+
+    .popup-content {
+        max-width: 95%;
+        padding: 20px;
     }
 }
