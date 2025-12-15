@@ -62,6 +62,7 @@ function saveRatings() {
 document.addEventListener('DOMContentLoaded', () => {
     initializeTabs();
     populateGenreFilter();
+    setupGenreFilter();
     displayLibrary();
     setupLibrarySearch();
     setupAPISearch();
@@ -109,7 +110,11 @@ function populateGenreFilter() {
         option.textContent = genre;
         genreFilter.appendChild(option);
     });
+}
 
+// Setup Genre Filter Event Listener
+function setupGenreFilter() {
+    const genreFilter = document.getElementById('genre-filter');
     genreFilter.addEventListener('change', (e) => {
         currentGenreFilter = e.target.value;
         displayLibrary();
@@ -119,10 +124,12 @@ function populateGenreFilter() {
 // Library Search Functionality
 function setupLibrarySearch() {
     const searchInput = document.getElementById('library-search-input');
-    searchInput.addEventListener('input', (e) => {
-        currentFilter = e.target.value.toLowerCase();
-        displayLibrary();
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentFilter = e.target.value.toLowerCase();
+            displayLibrary();
+        });
+    }
 }
 
 // Display User's Library
@@ -269,6 +276,11 @@ document.addEventListener('click', (e) => {
 function setupAPISearch() {
     const searchInput = document.getElementById('api-search-input');
     const searchButton = document.getElementById('search-btn');
+
+    if (!searchInput || !searchButton) {
+        console.error('Search elements not found');
+        return;
+    }
 
     const performSearch = () => {
         const query = searchInput.value.trim();
