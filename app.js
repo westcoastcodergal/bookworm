@@ -353,6 +353,19 @@ function displayLibrary() {
         return matchesSearch && matchesGenre;
     });
 
+    // Sort books: rated books first, then by rating (highest first)
+    filteredBooks.sort((a, b) => {
+        const ratingA = ratings[a.id] || 0;
+        const ratingB = ratings[b.id] || 0;
+
+        // If one has a rating and the other doesn't, rated goes first
+        if (ratingA > 0 && ratingB === 0) return -1;
+        if (ratingA === 0 && ratingB > 0) return 1;
+
+        // If both rated or both unrated, sort by rating value (highest first)
+        return ratingB - ratingA;
+    });
+
     booksGrid.innerHTML = '';
 
     if (filteredBooks.length === 0) {
@@ -625,7 +638,7 @@ async function searchBooks(query) {
     resultsGrid.innerHTML = '';
 
     try {
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20`);
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20&langRestrict=en`);
         const data = await response.json();
 
         if (!data.items || data.items.length === 0) {
@@ -640,6 +653,12 @@ async function searchBooks(query) {
             if (thumbnail) {
                 thumbnail = thumbnail.replace('zoom=1', 'zoom=5');
             }
+            // Extract year only from published date
+            let publishedYear = null;
+            if (volumeInfo.publishedDate) {
+                publishedYear = volumeInfo.publishedDate.substring(0, 4);
+            }
+
             return {
                 id: item.id,
                 title: volumeInfo.title || 'Unknown Title',
@@ -653,7 +672,7 @@ async function searchBooks(query) {
                 thumbnail: thumbnail,
                 averageRating: volumeInfo.averageRating || null,
                 ratingsCount: volumeInfo.ratingsCount || null,
-                publishedDate: volumeInfo.publishedDate || null
+                publishedDate: publishedYear
             };
         });
 
@@ -673,6 +692,15 @@ async function searchBooks(query) {
 
         // Sort by popularity (combination of rating and number of ratings)
         uniqueBooks.sort((a, b) => {
+            // Handle books without ratings - push them to the end
+            const hasRatingsA = a.averageRating && a.ratingsCount;
+            const hasRatingsB = b.averageRating && b.ratingsCount;
+
+            if (!hasRatingsA && !hasRatingsB) return 0;
+            if (!hasRatingsA) return 1;  // a goes to end
+            if (!hasRatingsB) return -1; // b goes to end
+
+            // For books with ratings, combine rating quality and review count
             const popularityA = a.averageRating * Math.log(a.ratingsCount + 1);
             const popularityB = b.averageRating * Math.log(b.ratingsCount + 1);
             return popularityB - popularityA; // Sort descending (most popular first)
