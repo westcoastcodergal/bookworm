@@ -6,7 +6,7 @@ const starterBooks = [
         author: "Matt Haig",
         genres: ["Fiction", "Fantasy", "Philosophy"],
         description: "A dazzling novel about all the choices that go into a life well lived.",
-        thumbnail: "http://books.google.com/books/content?id=9HJpzQEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=1ZxRzgEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api"
     },
     {
         id: 'starter-2',
@@ -38,7 +38,7 @@ const starterBooks = [
         author: "Taylor Jenkins Reid",
         genres: ["Fiction", "Historical", "Romance"],
         description: "Aging Hollywood icon Evelyn Hugo finally tells the story of her glamorous and scandalous life.",
-        thumbnail: "http://books.google.com/books/content?id=lVsDDgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
+        thumbnail: "http://books.google.com/books/content?id=y8pLDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"
     }
 ];
 
