@@ -183,6 +183,12 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
     const matchScoreHTML = matchScore !== null ?
         `<div class="match-score">${matchScore}% Match</div>` : '';
 
+    const popularityHTML = book.averageRating && book.ratingsCount ?
+        `<div class="popularity-rating">
+            <span class="rating-stars">★ ${book.averageRating.toFixed(1)}</span>
+            <span class="rating-count">(${book.ratingsCount.toLocaleString()} ratings)</span>
+        </div>` : '';
+
     const thumbnailHTML = book.thumbnail ?
         `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
 
@@ -201,6 +207,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         <div class="book-author">by ${book.author}</div>
         <div class="book-genres">${genreTags}</div>
         <div class="book-description">${book.description}</div>
+        ${popularityHTML}
         ${matchScoreHTML}
         ${addButtonHTML}
     `;
@@ -328,7 +335,9 @@ async function searchBooks(query) {
                         volumeInfo.description.substring(0, 200) + '...' :
                         volumeInfo.description) :
                     'No description available.',
-                thumbnail: volumeInfo.imageLinks?.thumbnail || null
+                thumbnail: volumeInfo.imageLinks?.thumbnail || null,
+                averageRating: volumeInfo.averageRating || null,
+                ratingsCount: volumeInfo.ratingsCount || null
             };
         });
 
@@ -421,8 +430,8 @@ function calculateMatchScore(book, preferences) {
     let score = 0;
     let maxScore = 0;
 
-    // Genre matching (70% of score)
-    const genreWeight = 70;
+    // Genre matching (60% of score)
+    const genreWeight = 60;
     book.genres.forEach(genre => {
         if (preferences.genres[genre]) {
             score += preferences.genres[genre] * genreWeight;
@@ -432,14 +441,35 @@ function calculateMatchScore(book, preferences) {
     const maxGenreScore = Math.max(...Object.values(preferences.genres)) * book.genres.length * genreWeight;
     maxScore += maxGenreScore;
 
-    // Author matching (30% of score)
-    const authorWeight = 30;
+    // Author matching (25% of score)
+    const authorWeight = 25;
     if (preferences.authors[book.author]) {
         score += preferences.authors[book.author] * authorWeight;
     }
 
     const maxAuthorScore = Math.max(...Object.values(preferences.authors || {1: 1})) * authorWeight;
     maxScore += maxAuthorScore;
+
+    // Popularity boost (15% of score)
+    const popularityWeight = 15;
+    let popularityScore = 0;
+
+    if (book.averageRating && book.ratingsCount) {
+        // Rating component: Books rated 4+ stars get higher scores
+        // Scale: 0-5 stars -> 0-1
+        const ratingScore = book.averageRating / 5;
+
+        // Ratings count component: More ratings = more popular
+        // Use logarithmic scale so 10,000 ratings isn't 100x better than 100
+        // Scale caps around 10,000+ ratings
+        const countScore = Math.min(Math.log10(book.ratingsCount + 1) / 4, 1);
+
+        // Combine both (60% weight on rating quality, 40% on popularity)
+        popularityScore = (ratingScore * 0.6 + countScore * 0.4) * 5 * popularityWeight;
+    }
+
+    score += popularityScore;
+    maxScore += 5 * popularityWeight; // Max possible popularity score
 
     // Convert to percentage
     const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
