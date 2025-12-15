@@ -631,14 +631,24 @@ async function searchBooks(query) {
             }
         });
 
-        // Update status to show deduplicated count
-        if (uniqueBooks.length < books.length) {
-            searchStatus.textContent = `Found ${uniqueBooks.length} unique books (${books.length} total results)`;
-        } else {
-            searchStatus.textContent = `Found ${uniqueBooks.length} books`;
+        // Filter out books with no rating data or low ratings (< 2 stars)
+        const filteredBooks = uniqueBooks.filter(book => {
+            return book.averageRating && book.ratingsCount && book.averageRating >= 2;
+        });
+
+        // Update status to show filtered count
+        if (filteredBooks.length === 0) {
+            searchStatus.textContent = 'No highly-rated books found. Try a different search term.';
+            return;
         }
 
-        uniqueBooks.forEach(book => {
+        if (uniqueBooks.length > filteredBooks.length) {
+            searchStatus.textContent = `Found ${filteredBooks.length} highly-rated books (${uniqueBooks.length} total results)`;
+        } else {
+            searchStatus.textContent = `Found ${filteredBooks.length} books`;
+        }
+
+        filteredBooks.forEach(book => {
             const bookCard = createBookCard(book, true);
             resultsGrid.appendChild(bookCard);
         });
