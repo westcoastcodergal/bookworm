@@ -42,11 +42,136 @@ const starterBooks = [
     }
 ];
 
+// Pool of books for recommendations (not in user's library by default)
+const recommendedBooksPool = [
+    {
+        id: 'rec-1',
+        title: "The Alchemist",
+        author: "Paulo Coelho",
+        genres: ["Fiction", "Philosophy", "Adventure"],
+        description: "A magical tale about following your dreams and listening to your heart.",
+        thumbnail: "http://books.google.com/books/content?id=FzVjBgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-2',
+        title: "1984",
+        author: "George Orwell",
+        genres: ["Fiction", "Dystopian", "Classic"],
+        description: "A dystopian social science fiction novel and cautionary tale about the dangers of totalitarianism.",
+        thumbnail: "http://books.google.com/books/content?id=kotPYEqx7kMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-3',
+        title: "Sapiens",
+        author: "Yuval Noah Harari",
+        genres: ["Non-Fiction", "History", "Science"],
+        description: "A brief history of humankind exploring how Homo sapiens came to dominate the world.",
+        thumbnail: "http://books.google.com/books/content?id=1EiJAwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-4',
+        title: "The Great Gatsby",
+        author: "F. Scott Fitzgerald",
+        genres: ["Fiction", "Classic", "Romance"],
+        description: "A portrait of the Jazz Age in all of its decadence and excess.",
+        thumbnail: "http://books.google.com/books/content?id=iXn5U2IzVH0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-5',
+        title: "Dune",
+        author: "Frank Herbert",
+        genres: ["Science Fiction", "Adventure", "Fantasy"],
+        description: "Set in the distant future amidst a sprawling feudal interstellar empire.",
+        thumbnail: "http://books.google.com/books/content?id=B1hSG45JCX4C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-6',
+        title: "Thinking, Fast and Slow",
+        author: "Daniel Kahneman",
+        genres: ["Psychology", "Non-Fiction", "Science"],
+        description: "A groundbreaking tour of the mind explaining the two systems that drive the way we think.",
+        thumbnail: "http://books.google.com/books/content?id=ZuKTvERuPG8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-7',
+        title: "The Hobbit",
+        author: "J.R.R. Tolkien",
+        genres: ["Fantasy", "Adventure", "Fiction"],
+        description: "A timeless classic about the adventure of Bilbo Baggins.",
+        thumbnail: "http://books.google.com/books/content?id=pD6arNyKyi8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-8',
+        title: "Becoming",
+        author: "Michelle Obama",
+        genres: ["Memoir", "Biography", "Non-Fiction"],
+        description: "The memoir of former United States First Lady Michelle Obama.",
+        thumbnail: "http://books.google.com/books/content?id=ov4vDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-9',
+        title: "The Hunger Games",
+        author: "Suzanne Collins",
+        genres: ["Fiction", "Dystopian", "Adventure"],
+        description: "In a dark vision of the near future, twelve boys and twelve girls are forced to appear in a live TV show called the Hunger Games.",
+        thumbnail: "http://books.google.com/books/content?id=_zAHKFQeid8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-10',
+        title: "The Power of Now",
+        author: "Eckhart Tolle",
+        genres: ["Self-Help", "Philosophy", "Spirituality"],
+        description: "A guide to spiritual enlightenment and living in the present moment.",
+        thumbnail: "http://books.google.com/books/content?id=b9jWtEDQp2gC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-11',
+        title: "The Da Vinci Code",
+        author: "Dan Brown",
+        genres: ["Thriller", "Mystery", "Fiction"],
+        description: "A mystery thriller that follows symbologist Robert Langdon as he investigates a murder in Paris.",
+        thumbnail: "http://books.google.com/books/content?id=EjgZknNJLs0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-12',
+        title: "Born a Crime",
+        author: "Trevor Noah",
+        genres: ["Memoir", "Biography", "Comedy"],
+        description: "Stories from a South African childhood by the host of The Daily Show.",
+        thumbnail: "http://books.google.com/books/content?id=B7fZCwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-13',
+        title: "The Martian",
+        author: "Andy Weir",
+        genres: ["Science Fiction", "Adventure", "Thriller"],
+        description: "An astronaut becomes one of the first people to walk on Mars, and now he may be the first person to die there.",
+        thumbnail: "http://books.google.com/books/content?id=EHJCAwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-14',
+        title: "Where the Crawdads Sing",
+        author: "Delia Owens",
+        genres: ["Fiction", "Mystery", "Romance"],
+        description: "A coming-of-age story with a mystery at its heart in the marshlands of North Carolina.",
+        thumbnail: "http://books.google.com/books/content?id=pZJZDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    {
+        id: 'rec-15',
+        title: "The 4-Hour Workweek",
+        author: "Timothy Ferriss",
+        genres: ["Self-Help", "Business", "Productivity"],
+        description: "Escape 9-5, live anywhere, and join the new rich with lifestyle design strategies.",
+        thumbnail: "http://books.google.com/books/content?id=ZuJZmwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+    }
+];
+
 // Application State
 let userLibrary = JSON.parse(localStorage.getItem('userLibrary')) || [...starterBooks];
 let ratings = JSON.parse(localStorage.getItem('bookRatings')) || {};
 let currentFilter = '';
 let currentGenreFilter = '';
+let activeRecommendations = JSON.parse(localStorage.getItem('activeRecommendations')) || [];
 
 // Save library to localStorage
 function saveLibrary() {
@@ -58,9 +183,60 @@ function saveRatings() {
     localStorage.setItem('bookRatings', JSON.stringify(ratings));
 }
 
+// Save active recommendations to localStorage
+function saveActiveRecommendations() {
+    localStorage.setItem('activeRecommendations', JSON.stringify(activeRecommendations));
+}
+
+// Initialize active recommendations with 10 books
+function initializeRecommendations() {
+    if (activeRecommendations.length === 0) {
+        // Get books not in library
+        const availableBooks = recommendedBooksPool.filter(book =>
+            !userLibrary.find(libBook => libBook.id === book.id)
+        );
+
+        // Select first 10 available books
+        activeRecommendations = availableBooks.slice(0, 10);
+        saveActiveRecommendations();
+    } else {
+        // Clean up any books that are already in library
+        activeRecommendations = activeRecommendations.filter(book =>
+            !userLibrary.find(libBook => libBook.id === book.id)
+        );
+
+        // Refill to 10 if needed
+        refillRecommendations();
+    }
+}
+
+// Refill recommendations to maintain 10 books
+function refillRecommendations() {
+    const needed = 10 - activeRecommendations.length;
+
+    if (needed > 0) {
+        // Get book IDs already in use
+        const usedIds = new Set([
+            ...userLibrary.map(b => b.id),
+            ...activeRecommendations.map(b => b.id)
+        ]);
+
+        // Find available books
+        const availableBooks = recommendedBooksPool.filter(book =>
+            !usedIds.has(book.id)
+        );
+
+        // Add books to fill the gap
+        const booksToAdd = availableBooks.slice(0, needed);
+        activeRecommendations.push(...booksToAdd);
+        saveActiveRecommendations();
+    }
+}
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     initializeTabs();
+    initializeRecommendations();
     populateGenreFilter();
     setupGenreFilter();
     displayLibrary();
@@ -226,11 +402,37 @@ document.addEventListener('click', (e) => {
         const bookId = starsContainer.dataset.bookId;
         const rating = parseInt(e.target.dataset.rating);
 
+        // Check if this book is in the recommendations tab
+        const recommendationsTab = document.getElementById('recommendations-tab');
+        const isInRecommendations = recommendationsTab.classList.contains('active');
+        const bookInRecommendations = activeRecommendations.find(b => b.id === bookId);
+
         // Update rating
         ratings[bookId] = rating;
         saveRatings();
 
-        // Update star display
+        // If rating a recommended book, move it to library
+        if (isInRecommendations && bookInRecommendations) {
+            // Add to library if not already there
+            const exists = userLibrary.find(b => b.id === bookId);
+            if (!exists) {
+                userLibrary.push(bookInRecommendations);
+                saveLibrary();
+                populateGenreFilter();
+            }
+
+            // Remove from active recommendations
+            activeRecommendations = activeRecommendations.filter(b => b.id !== bookId);
+
+            // Refill recommendations to maintain 10 books
+            refillRecommendations();
+
+            // Refresh the recommendations display
+            displayRecommendations();
+            return;
+        }
+
+        // Update star display for library books
         const stars = starsContainer.querySelectorAll('.star');
         stars.forEach((star, index) => {
             if (index < rating) {
@@ -353,39 +555,36 @@ function displayRecommendations() {
     const recommendationsGrid = document.getElementById('recommendations-grid');
     const recDescription = document.getElementById('rec-description');
 
-    const ratedBooks = Object.entries(ratings).filter(([_, rating]) => rating >= 3);
-
-    if (ratedBooks.length === 0) {
-        recDescription.textContent = 'Rate some books with 3+ stars to get personalized recommendations!';
-        recommendationsGrid.innerHTML = '';
-        return;
+    // Initialize recommendations if needed
+    if (activeRecommendations.length === 0) {
+        initializeRecommendations();
     }
 
-    recDescription.textContent = `Based on ${ratedBooks.length} book${ratedBooks.length > 1 ? 's' : ''} you loved:`;
-
-    // Get user preferences
-    const preferences = analyzePreferences(ratedBooks);
-
-    // Get unrated books from library
-    const unratedBooks = userLibrary.filter(book => !ratings[book.id]);
-
-    // Score and sort recommendations
-    const recommendations = unratedBooks.map(book => {
-        const score = calculateMatchScore(book, preferences);
-        return { book, score };
-    }).filter(rec => rec.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 10);
+    recDescription.textContent = `Discover your next great read:`;
 
     recommendationsGrid.innerHTML = '';
 
-    if (recommendations.length === 0) {
-        recommendationsGrid.innerHTML = '<p style="text-align: center; color: #666;">No recommendations available. Try rating more books or adding more books to your library!</p>';
+    if (activeRecommendations.length === 0) {
+        recommendationsGrid.innerHTML = '<p style="text-align: center; color: #666;">No more recommendations available at this time.</p>';
         return;
     }
 
-    recommendations.forEach(({ book, score }) => {
-        const bookCard = createBookCard(book, false, score);
+    // Display all active recommendations
+    activeRecommendations.forEach(book => {
+        // Calculate a simple match score based on genre overlap with library
+        let matchScore = 50; // Base score
+
+        // Boost score if genres match books in user's library
+        const libraryGenres = new Set();
+        userLibrary.forEach(libBook => {
+            libBook.genres.forEach(genre => libraryGenres.add(genre));
+        });
+
+        const matchingGenres = book.genres.filter(genre => libraryGenres.has(genre)).length;
+        matchScore += matchingGenres * 10;
+        matchScore = Math.min(matchScore, 99);
+
+        const bookCard = createBookCard(book, false, matchScore);
         recommendationsGrid.appendChild(bookCard);
     });
 }
