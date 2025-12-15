@@ -192,6 +192,7 @@ let ratings = JSON.parse(localStorage.getItem('bookRatings')) || {};
 let currentFilter = '';
 let currentGenreFilter = '';
 let activeRecommendations = JSON.parse(localStorage.getItem('activeRecommendations')) || [];
+let wantToReadShelf = JSON.parse(localStorage.getItem('wantToReadShelf')) || [];
 
 // Save library to localStorage
 function saveLibrary() {
@@ -206,6 +207,11 @@ function saveRatings() {
 // Save active recommendations to localStorage
 function saveActiveRecommendations() {
     localStorage.setItem('activeRecommendations', JSON.stringify(activeRecommendations));
+}
+
+// Save want to read shelf to localStorage
+function saveWantToReadShelf() {
+    localStorage.setItem('wantToReadShelf', JSON.stringify(wantToReadShelf));
 }
 
 // Initialize active recommendations with 10 books
@@ -287,6 +293,8 @@ function initializeTabs() {
                 displayRecommendations();
             } else if (tabName === 'library') {
                 displayLibrary();
+            } else if (tabName === 'want-to-read') {
+                displayWantToReadShelf();
             }
         });
     });
@@ -343,6 +351,19 @@ function displayLibrary() {
             book.genres.includes(currentGenreFilter);
 
         return matchesSearch && matchesGenre;
+    });
+
+    // Sort books: rated books first, then by rating (highest first)
+    filteredBooks.sort((a, b) => {
+        const ratingA = ratings[a.id] || 0;
+        const ratingB = ratings[b.id] || 0;
+
+        // If one has a rating and the other doesn't, rated goes first
+        if (ratingA > 0 && ratingB === 0) return -1;
+        if (ratingA === 0 && ratingB > 0) return 1;
+
+        // If both rated or both unrated, sort by rating value (highest first)
+        return ratingB - ratingA;
     });
 
     booksGrid.innerHTML = '';
@@ -437,6 +458,10 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
     const publishedDateHTML = book.publishedDate ?
         `<div class="book-published-date">Published: ${book.publishedDate}</div>` : '';
 
+    // For recommendations, add a "want to read" button
+    const wantToReadButtonHTML = matchScore !== null ?
+        `<button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>🐛 Want to Read</button>` : '';
+
     const addButtonHTML = isSearchResult ?
         `<button class="add-to-library-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>` :
         `<div class="rating-section">
@@ -455,6 +480,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         <div class="book-description">${book.description}</div>
         ${popularityHTML}
         ${matchScoreHTML}
+        ${wantToReadButtonHTML}
         ${addButtonHTML}
     `;
 
@@ -549,6 +575,34 @@ document.addEventListener('click', (e) => {
         button.classList.add('added');
         button.disabled = true;
     }
+
+    // Want to read button
+    if (e.target.classList.contains('want-to-read-btn')) {
+        const button = e.target;
+        const bookData = JSON.parse(button.dataset.book.replace(/&apos;/g, "'"));
+
+        // Check if already in want to read shelf
+        const exists = wantToReadShelf.find(b => b.id === bookData.id);
+        if (exists) {
+            button.textContent = '✓ Already Added';
+            button.disabled = true;
+            return;
+        }
+
+        // Add to want to read shelf
+        wantToReadShelf.push(bookData);
+        saveWantToReadShelf();
+
+        // Update button
+        button.textContent = '✓ Added to Shelf!';
+        button.classList.add('added');
+        button.disabled = true;
+
+        // Show a quick visual feedback
+        setTimeout(() => {
+            button.textContent = '🐛 On Your Shelf';
+        }, 1500);
+    }
 });
 
 // API Search Setup
@@ -585,7 +639,7 @@ async function searchBooks(query) {
     resultsGrid.innerHTML = '';
 
     try {
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20`);
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20&langRestrict=en`);
         const data = await response.json();
 
         if (!data.items || data.items.length === 0) {
@@ -600,6 +654,12 @@ async function searchBooks(query) {
             if (thumbnail) {
                 thumbnail = thumbnail.replace('zoom=1', 'zoom=5');
             }
+            // Extract year only from published date
+            let publishedYear = null;
+            if (volumeInfo.publishedDate) {
+                publishedYear = volumeInfo.publishedDate.substring(0, 4);
+            }
+
             return {
                 id: item.id,
                 title: volumeInfo.title || 'Unknown Title',
@@ -613,7 +673,7 @@ async function searchBooks(query) {
                 thumbnail: thumbnail,
                 averageRating: volumeInfo.averageRating || null,
                 ratingsCount: volumeInfo.ratingsCount || null,
-                publishedDate: volumeInfo.publishedDate || null
+                publishedDate: publishedYear
             };
         });
 
@@ -644,6 +704,25 @@ async function searchBooks(query) {
 
         if (uniqueBooks.length > filteredBooks.length) {
             searchStatus.textContent = `Found ${filteredBooks.length} highly-rated books (${uniqueBooks.length} total results)`;
+        // Sort by popularity (combination of rating and number of ratings)
+        uniqueBooks.sort((a, b) => {
+            // Handle books without ratings - push them to the end
+            const hasRatingsA = a.averageRating && a.ratingsCount;
+            const hasRatingsB = b.averageRating && b.ratingsCount;
+
+            if (!hasRatingsA && !hasRatingsB) return 0;
+            if (!hasRatingsA) return 1;  // a goes to end
+            if (!hasRatingsB) return -1; // b goes to end
+
+            // For books with ratings, combine rating quality and review count
+            const popularityA = a.averageRating * Math.log(a.ratingsCount + 1);
+            const popularityB = b.averageRating * Math.log(b.ratingsCount + 1);
+            return popularityB - popularityA; // Sort descending (most popular first)
+        });
+
+        // Update status to show deduplicated count
+        if (uniqueBooks.length < books.length) {
+            searchStatus.textContent = `Found ${uniqueBooks.length} unique books (${books.length} total results)`;
         } else {
             searchStatus.textContent = `Found ${filteredBooks.length} books`;
         }
@@ -779,4 +858,74 @@ function calculateMatchScore(book, preferences) {
     const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
 
     return Math.min(percentage, 99);
+}
+
+// Display Want to Read Shelf
+function displayWantToReadShelf() {
+    const shelfContainer = document.getElementById('want-to-read-shelf');
+    const wtrDescription = document.getElementById('wtr-description');
+
+    shelfContainer.innerHTML = '';
+
+    if (wantToReadShelf.length === 0) {
+        wtrDescription.textContent = 'No books on your shelf yet. Add some from the Recommendations tab!';
+        shelfContainer.innerHTML = '<div class="empty-shelf"><p>Your bookshelf is empty! 📚</p><p>Browse recommendations and click "🐛 Want to Read" to add books here.</p></div>';
+        return;
+    }
+
+    wtrDescription.textContent = `You have ${wantToReadShelf.length} book${wantToReadShelf.length !== 1 ? 's' : ''} waiting to be read!`;
+
+    // Create shelves (group books in rows of up to 8)
+    const booksPerShelf = 8;
+    const numShelves = Math.ceil(wantToReadShelf.length / booksPerShelf);
+
+    for (let shelfNum = 0; shelfNum < numShelves; shelfNum++) {
+        const shelfDiv = document.createElement('div');
+        shelfDiv.className = 'shelf-row';
+
+        const booksDiv = document.createElement('div');
+        booksDiv.className = 'shelf-books';
+
+        const startIdx = shelfNum * booksPerShelf;
+        const endIdx = Math.min(startIdx + booksPerShelf, wantToReadShelf.length);
+        const booksOnThisShelf = wantToReadShelf.slice(startIdx, endIdx);
+
+        booksOnThisShelf.forEach(book => {
+            const bookSpine = document.createElement('div');
+            bookSpine.className = 'book-spine';
+
+            // Get color based on genre
+            const color = getGenreColor(book.genres);
+            bookSpine.setAttribute('data-color', color);
+
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'spine-title';
+            titleDiv.textContent = book.title;
+
+            const authorDiv = document.createElement('div');
+            authorDiv.className = 'spine-author';
+            authorDiv.textContent = book.author;
+
+            bookSpine.appendChild(titleDiv);
+            bookSpine.appendChild(authorDiv);
+
+            // Add click handler to remove book from shelf
+            bookSpine.addEventListener('click', () => {
+                if (confirm(`Remove "${book.title}" from your Want to Read shelf?`)) {
+                    wantToReadShelf = wantToReadShelf.filter(b => b.id !== book.id);
+                    saveWantToReadShelf();
+                    displayWantToReadShelf();
+                }
+            });
+
+            booksDiv.appendChild(bookSpine);
+        });
+
+        const shelfBoard = document.createElement('div');
+        shelfBoard.className = 'shelf-board';
+
+        shelfDiv.appendChild(booksDiv);
+        shelfDiv.appendChild(shelfBoard);
+        shelfContainer.appendChild(shelfDiv);
+    }
 }

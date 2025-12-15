@@ -421,6 +421,199 @@ main {
     margin-bottom: 15px;
 }
 
+/* Want to Read Button */
+.want-to-read-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.want-to-read-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+}
+
+.want-to-read-btn:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.want-to-read-btn.added {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Want to Read Header */
+.want-to-read-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.want-to-read-header h2 {
+    color: #2d3748;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+#wtr-description {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Bookshelf */
+.bookshelf {
+    padding: 20px;
+    background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    min-height: 300px;
+}
+
+.empty-shelf {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.empty-shelf p:first-child {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #2d3748;
+}
+
+.empty-shelf p:last-child {
+    font-size: 1.1rem;
+}
+
+.shelf-row {
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.shelf-books {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    margin-bottom: 0;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+
+.book-spine {
+    width: 60px;
+    height: 220px;
+    border-radius: 4px;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    box-shadow:
+        2px 0 4px rgba(0,0,0,0.2),
+        inset 2px 0 2px rgba(255,255,255,0.3),
+        inset -1px 0 2px rgba(0,0,0,0.2);
+    border-left: 3px solid rgba(255,255,255,0.4);
+    border-right: 2px solid rgba(0,0,0,0.2);
+}
+
+/* Colorful book spine variations based on genre */
+.book-spine[data-color="coral"] {
+    background: linear-gradient(to right, #ff6b6b, #ff8787);
+}
+
+.book-spine[data-color="teal"] {
+    background: linear-gradient(to right, #4ecdc4, #6ee7dd);
+}
+
+.book-spine[data-color="purple"] {
+    background: linear-gradient(to right, #a855f7, #c084fc);
+}
+
+.book-spine[data-color="yellow"] {
+    background: linear-gradient(to right, #ffd93d, #ffe066);
+}
+
+.book-spine[data-color="green"] {
+    background: linear-gradient(to right, #6bcf7f, #8aeea0);
+}
+
+.book-spine[data-color="orange"] {
+    background: linear-gradient(to right, #ff8a5b, #ffa07a);
+}
+
+.book-spine:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow:
+        2px 5px 15px rgba(0,0,0,0.4),
+        inset 2px 0 2px rgba(255,255,255,0.3),
+        inset -1px 0 2px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.spine-title {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-height: 140px;
+    flex-shrink: 1;
+}
+
+.spine-author {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.9);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-height: 60px;
+    flex-shrink: 0;
+}
+
+.shelf-board {
+    width: 100%;
+    height: 12px;
+    background: linear-gradient(to bottom, #8b7355, #6b5644);
+    border-radius: 2px;
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.2),
+        0 4px 8px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.shelf-board::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right,
+        transparent 0%,
+        rgba(139,115,85,0.5) 10%,
+        rgba(139,115,85,0.5) 90%,
+        transparent 100%);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     header h1 {
@@ -437,5 +630,20 @@ main {
 
     .tabs {
         flex-direction: column;
+    }
+
+    .book-spine {
+        width: 50px;
+        height: 200px;
+    }
+
+    .spine-title {
+        font-size: 0.7rem;
+        max-height: 120px;
+    }
+
+    .spine-author {
+        font-size: 0.6rem;
+        max-height: 50px;
     }
 }
