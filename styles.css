@@ -150,6 +150,23 @@ main {
     box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
 }
 
+#rating-filter {
+    padding: 15px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+    min-width: 200px;
+    transition: all 0.3s ease;
+}
+
+#rating-filter:focus {
+    outline: none;
+    border-color: #4ecdc4;
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+}
+
 /* Books Grid */
 .books-grid {
     display: grid;
@@ -286,13 +303,13 @@ main {
 }
 
 .genre-tag {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    color: white;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+    background: #e2e8f0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 500;
+    box-shadow: none;
 }
 
 .book-description {
