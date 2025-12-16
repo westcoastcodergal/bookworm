@@ -3,6 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Content Security Policy for XSS protection -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self';
+                   script-src 'self' 'unsafe-inline';
+                   style-src 'self' 'unsafe-inline';
+                   img-src 'self' data: https://books.google.com https://covers.openlibrary.org http://books.google.com http://covers.openlibrary.org;
+                   connect-src 'self' https://www.googleapis.com https://openlibrary.org;
+                   font-src 'self';
+                   object-src 'none';
+                   base-uri 'self';
+                   form-action 'self';">
+
     <title>Bookworm - Book Recommendations</title>
     <link rel="stylesheet" href="styles.css">
 </head>
