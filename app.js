@@ -1499,11 +1499,22 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
     const wantToReadBadgeHTML = isInWantToRead ?
         `<div class="want-to-read-badge">🐛 Want to Read</div>` : '';
 
+    // Add quality badge for search results
+    let qualityBadgeHTML = '';
+    if (isSearchResult) {
+        if (book.validation?.validated) {
+            qualityBadgeHTML = `<div class="quality-badge validated">✓ Validated</div>`;
+        } else if (book.isbn13 || book.isbn10) {
+            qualityBadgeHTML = `<div class="quality-badge isbn">ISBN</div>`;
+        }
+    }
+
     card.innerHTML = `
         ${thumbnailHTML}
         ${removeButtonHTML}
         ${removeRecommendationHTML}
         ${wantToReadBadgeHTML}
+        ${qualityBadgeHTML}
         <div class="book-title">${book.title}</div>
         <div class="book-author">by ${book.author}</div>
         ${publishedDateHTML}
@@ -1949,22 +1960,73 @@ async function searchBooks(query) {
         // Wait for all validations (with timeout protection)
         await Promise.allSettled(validationPromises);
 
-        // Quality Filter: Remove low-quality books
-        const qualityBooks = books.filter(book => {
-            // Keep books that meet at least one of these criteria:
-            // 1. Has ISBN (basic quality signal)
-            // 2. Has good ratings (4+ stars with 100+ reviews)
-            // 3. Published by major publisher
-            // 4. Validated by Open Library
+        // Detect if query is likely an author search
+        const isAuthorSearch = books.some(book =>
+            book.author.toLowerCase().includes(query.toLowerCase())
+        );
 
+        // Helper function for better publisher matching
+        function matchesPublisher(publisher) {
+            if (!publisher) return false;
+            const pubLower = publisher.toLowerCase();
+            return majorPublishers.some(majorPub => {
+                // Match word boundaries to catch variations like "Bloomsbury Publishing"
+                const regex = new RegExp('\\b' + majorPub + '\\b', 'i');
+                return regex.test(pubLower);
+            });
+        }
+
+        // Three-tier quality filtering with adaptive selection
+
+        // Tier 1: Strict filter - highest quality only
+        const strictFilter = (book) => {
             const hasISBN = !!(book.isbn13 || book.isbn10);
-            const hasGoodRatings = book.averageRating >= 4.0 && book.ratingsCount >= 100;
-            const isMajorPublisher = book.publisher &&
-                majorPublishers.some(pub => book.publisher.toLowerCase().includes(pub));
+            const hasGoodRatings = book.averageRating && book.averageRating >= 4.0 && book.ratingsCount >= 100;
+            const isMajorPublisher = matchesPublisher(book.publisher);
             const isValidated = book.validation?.validated;
 
-            return hasISBN || hasGoodRatings || isMajorPublisher || isValidated;
-        });
+            // For author searches, be more lenient
+            if (isAuthorSearch && book.author.toLowerCase().includes(query.toLowerCase())) {
+                return hasISBN || hasGoodRatings || isMajorPublisher || isValidated ||
+                       (book.averageRating && book.averageRating >= 3.5);
+            }
+
+            return (hasISBN && (hasGoodRatings || isMajorPublisher || isValidated));
+        };
+
+        // Tier 2: Medium filter - good quality
+        const mediumFilter = (book) => {
+            const hasISBN = !!(book.isbn13 || book.isbn10);
+            const hasAnyRatings = book.averageRating && book.averageRating >= 3.5;
+            const isMajorPublisher = matchesPublisher(book.publisher);
+            const isValidated = book.validation?.validated;
+
+            return hasISBN || hasAnyRatings || isMajorPublisher || isValidated;
+        };
+
+        // Tier 3: Lenient filter - basic quality
+        const lenientFilter = (book) => {
+            const hasBasicMetadata = book.title && book.author && book.description;
+            const notSpam = book.title !== book.title.toUpperCase() && // Not all caps
+                           book.author !== 'Unknown Author';
+            const hasPublisher = !!book.publisher;
+
+            return hasBasicMetadata && notSpam && hasPublisher;
+        };
+
+        // Apply adaptive filtering
+        let qualityBooks = books.filter(strictFilter);
+        let filterLevel = 'strict';
+
+        if (qualityBooks.length < 5) {
+            qualityBooks = books.filter(mediumFilter);
+            filterLevel = 'medium';
+        }
+
+        if (qualityBooks.length < 3) {
+            qualityBooks = books.filter(lenientFilter);
+            filterLevel = 'lenient';
+        }
 
         // Deduplicate books by title and author pair
         const uniqueBooks = [];
@@ -1994,9 +2056,22 @@ async function searchBooks(query) {
         // Limit to top 20 results
         const topBooks = uniqueBooks.slice(0, 20);
 
-        // Update status
+        // Update status with filter level and validation info
         const validatedCount = topBooks.filter(b => b.validation?.validated).length;
-        searchStatus.textContent = `Found ${topBooks.length} high-quality book${topBooks.length !== 1 ? 's' : ''} (${validatedCount} validated)`;
+        const withISBN = topBooks.filter(b => b.isbn13 || b.isbn10).length;
+
+        let statusText = `Found ${topBooks.length} book${topBooks.length !== 1 ? 's' : ''}`;
+        if (validatedCount > 0) {
+            statusText += ` (${validatedCount} validated`;
+            if (withISBN > validatedCount) {
+                statusText += `, ${withISBN} with ISBN`;
+            }
+            statusText += ')';
+        } else if (withISBN > 0) {
+            statusText += ` (${withISBN} with ISBN)`;
+        }
+
+        searchStatus.textContent = statusText;
 
         topBooks.forEach(book => {
             const bookCard = createBookCard(book, true);
