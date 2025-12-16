@@ -1225,7 +1225,8 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         if (e.target.classList.contains('star') ||
             e.target.classList.contains('add-to-library-btn') ||
             e.target.classList.contains('want-to-read-btn') ||
-            e.target.classList.contains('remove-from-library-btn')) {
+            e.target.classList.contains('remove-from-library-btn') ||
+            e.target.classList.contains('remove-from-library-btn-x')) {
             return;
         }
         showBookDetailsPopup(book, isSearchResult, matchScore);
@@ -1356,6 +1357,13 @@ document.addEventListener('click', (e) => {
         // Update rating
         ratings[bookId] = rating;
         saveRatings();
+
+        // Remove from want-to-read shelf when rating is given
+        const wasInWantToRead = wantToReadShelf.find(b => b.id === bookId);
+        if (wasInWantToRead) {
+            wantToReadShelf = wantToReadShelf.filter(b => b.id !== bookId);
+            saveWantToReadShelf();
+        }
 
         // If rating a recommended book, move it to library
         if (isInRecommendations && bookInRecommendations) {
@@ -1685,8 +1693,18 @@ function analyzePreferences(ratedBooks) {
         const book = userLibrary.find(b => b.id === bookId);
         if (!book) return;
 
-        // Weight by rating
-        const weight = rating;
+        // Improved weighting algorithm:
+        // - 5 stars: +3 weight (love it!)
+        // - 4 stars: +1.5 weight (really liked it)
+        // - 3 stars: +0.5 weight (it was okay)
+        // - 2 stars: -0.5 weight (didn't like it)
+        // - 1 star: -2 weight (hated it)
+        let weight;
+        if (rating === 5) weight = 3;
+        else if (rating === 4) weight = 1.5;
+        else if (rating === 3) weight = 0.5;
+        else if (rating === 2) weight = -0.5;
+        else weight = -2; // 1 star
 
         // Analyze genres
         book.genres.forEach(genre => {
@@ -1710,22 +1728,42 @@ function calculateMatchScore(book, preferences) {
 
     // Genre matching (60% of score)
     const genreWeight = 60;
+    let genreScore = 0;
     book.genres.forEach(genre => {
         if (preferences.genres[genre]) {
-            score += preferences.genres[genre] * genreWeight;
+            genreScore += preferences.genres[genre] * genreWeight;
         }
     });
 
-    const maxGenreScore = Math.max(...Object.values(preferences.genres)) * book.genres.length * genreWeight;
+    // Find max positive genre preference for normalization
+    const maxGenrePreference = Math.max(...Object.values(preferences.genres).filter(v => v > 0), 0.1);
+    const maxGenreScore = maxGenrePreference * book.genres.length * genreWeight;
+
+    // Only add positive genre scores, penalize negative ones more heavily
+    if (genreScore > 0) {
+        score += genreScore;
+    } else if (genreScore < 0) {
+        score += genreScore * 2; // Double penalty for disliked genres
+    }
     maxScore += maxGenreScore;
 
     // Author matching (25% of score)
     const authorWeight = 25;
+    let authorScore = 0;
     if (preferences.authors[book.author]) {
-        score += preferences.authors[book.author] * authorWeight;
+        authorScore = preferences.authors[book.author] * authorWeight;
     }
 
-    const maxAuthorScore = Math.max(...Object.values(preferences.authors || {1: 1})) * authorWeight;
+    // Find max positive author preference for normalization
+    const maxAuthorPreference = Math.max(...Object.values(preferences.authors).filter(v => v > 0), 0.1);
+    const maxAuthorScore = maxAuthorPreference * authorWeight;
+
+    // Only add positive author scores, penalize negative ones
+    if (authorScore > 0) {
+        score += authorScore;
+    } else if (authorScore < 0) {
+        score += authorScore * 2; // Double penalty for disliked authors
+    }
     maxScore += maxAuthorScore;
 
     // Popularity boost (15% of score)
@@ -1742,15 +1780,16 @@ function calculateMatchScore(book, preferences) {
         // Scale caps around 10,000+ ratings
         const countScore = Math.min(Math.log10(book.ratingsCount + 1) / 4, 1);
 
-        // Combine both (60% weight on rating quality, 40% on popularity)
-        popularityScore = (ratingScore * 0.6 + countScore * 0.4) * 5 * popularityWeight;
+        // Combine both (70% weight on rating quality, 30% on popularity)
+        // Give more weight to actual rating quality
+        popularityScore = (ratingScore * 0.7 + countScore * 0.3) * 5 * popularityWeight;
     }
 
     score += popularityScore;
     maxScore += 5 * popularityWeight; // Max possible popularity score
 
-    // Convert to percentage
-    const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+    // Convert to percentage, ensuring it's never negative
+    const percentage = maxScore > 0 ? Math.round((Math.max(score, 0) / maxScore) * 100) : 0;
 
     return Math.min(percentage, 99);
 }
@@ -1771,24 +1810,22 @@ function displayLibraryShelf() {
     // Show the section
     librarySection.style.display = 'block';
 
-    // Create shelves (group books in rows of up to 8)
-    const booksPerShelf = 8;
-    const numShelves = Math.ceil(userLibrary.length / booksPerShelf);
+    // Create one shelf that wraps across the screen
+    const shelfDiv = document.createElement('div');
+    shelfDiv.className = 'shelf-row';
 
-    for (let shelfNum = 0; shelfNum < numShelves; shelfNum++) {
-        const shelfDiv = document.createElement('div');
-        shelfDiv.className = 'shelf-row';
+    const booksDiv = document.createElement('div');
+    booksDiv.className = 'shelf-books';
 
-        const booksDiv = document.createElement('div');
-        booksDiv.className = 'shelf-books';
-
-        const startIdx = shelfNum * booksPerShelf;
-        const endIdx = Math.min(startIdx + booksPerShelf, userLibrary.length);
-        const booksOnThisShelf = userLibrary.slice(startIdx, endIdx);
-
-        booksOnThisShelf.forEach(book => {
+    userLibrary.forEach(book => {
             const bookSpine = document.createElement('div');
             bookSpine.className = 'book-spine';
+
+            // Check if book is in want-to-read shelf
+            const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
+            if (isWantToRead) {
+                bookSpine.classList.add('want-to-read-book');
+            }
 
             // Get color based on genre
             const color = getGenreColor(book.genres);
@@ -1817,19 +1854,18 @@ function displayLibraryShelf() {
 
             // Add click handler to show book details popup
             bookSpine.addEventListener('click', () => {
-                showBookDetailsPopup(book, false, null);
+                showBookDetailsPopup(book, false, null, true);
             });
 
             booksDiv.appendChild(bookSpine);
-        });
+    });
 
-        const shelfBoard = document.createElement('div');
-        shelfBoard.className = 'shelf-board';
+    const shelfBoard = document.createElement('div');
+    shelfBoard.className = 'shelf-board';
 
-        shelfDiv.appendChild(booksDiv);
-        shelfDiv.appendChild(shelfBoard);
-        shelfContainer.appendChild(shelfDiv);
-    }
+    shelfDiv.appendChild(booksDiv);
+    shelfDiv.appendChild(shelfBoard);
+    shelfContainer.appendChild(shelfDiv);
 }
 
 // Display Want to Read Shelf
@@ -1910,7 +1946,7 @@ function displayWantToReadShelf() {
 }
 
 // Show book details popup
-function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
+function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, fromShelf = false) {
     // Create popup overlay
     const overlay = document.createElement('div');
     overlay.className = 'popup-overlay';
@@ -1950,7 +1986,10 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
     // Build action buttons based on book status
     let actionButtons = '';
 
-    if (isInWantToRead) {
+    // If opened from shelf, don't show any action buttons
+    if (fromShelf) {
+        actionButtons = '';
+    } else if (isInWantToRead) {
         actionButtons = `
             <button class="add-to-library-btn popup-action-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>
             <button class="remove-from-wtr-btn popup-action-btn" data-book-id="${book.id}">Remove from Want to Read</button>

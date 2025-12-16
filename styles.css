@@ -598,8 +598,7 @@ main {
     padding: 10px;
     margin-bottom: 0;
     justify-content: flex-start;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-wrap: wrap;
     align-items: flex-end;
     background: white;
 }
@@ -646,6 +645,12 @@ main {
 
 .book-spine[data-color="orange"] {
     background: linear-gradient(to right, #ff8a5b, #ffa07a);
+}
+
+/* Want to read books get a special lavender/purple gradient */
+.book-spine.want-to-read-book {
+    background: linear-gradient(to right, #c084fc, #e0b3ff) !important;
+    border-left: 3px solid rgba(192, 132, 252, 0.6);
 }
 
 .book-spine:hover {
