@@ -1653,6 +1653,66 @@ function calculateRelevanceScore(book, query) {
     return Math.min(score, 100);
 }
 
+// Detect if query is likely a person's name
+function isLikelyPersonName(query) {
+    const trimmed = query.trim();
+    const words = trimmed.split(/\s+/);
+
+    // Check if 2-4 words, each starting with capital letter
+    if (words.length < 2 || words.length > 4) return false;
+
+    // Check if each word starts with a capital letter
+    const allCapitalized = words.every(word => {
+        return word.length > 0 && word[0] === word[0].toUpperCase() &&
+               word[0] !== word[0].toLowerCase(); // Must be a letter
+    });
+
+    return allCapitalized;
+}
+
+// Parse book data from Google Books API response
+function parseBookData(item) {
+    const volumeInfo = item.volumeInfo;
+    const industryIdentifiers = volumeInfo.industryIdentifiers || [];
+
+    // Extract ISBNs
+    const isbn13 = industryIdentifiers.find(id => id.type === 'ISBN_13')?.identifier;
+    const isbn10 = industryIdentifiers.find(id => id.type === 'ISBN_10')?.identifier;
+
+    // Get higher resolution thumbnail
+    let thumbnail = volumeInfo.imageLinks?.thumbnail || null;
+    if (thumbnail) {
+        thumbnail = thumbnail.replace('zoom=1', 'zoom=5');
+    }
+
+    // Extract year only from published date
+    let publishedYear = null;
+    if (volumeInfo.publishedDate) {
+        publishedYear = volumeInfo.publishedDate.substring(0, 4);
+    }
+
+    return {
+        id: item.id,
+        title: volumeInfo.title || 'Unknown Title',
+        author: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown Author',
+        genres: volumeInfo.categories || ['General'],
+        description: volumeInfo.description ?
+            (volumeInfo.description.length > 200 ?
+                volumeInfo.description.substring(0, 200) + '...' :
+                volumeInfo.description) :
+            'No description available.',
+        thumbnail: thumbnail,
+        averageRating: volumeInfo.averageRating || null,
+        ratingsCount: volumeInfo.ratingsCount || null,
+        publishedDate: publishedYear,
+        publisher: volumeInfo.publisher || null,
+        isbn13: isbn13,
+        isbn10: isbn10,
+        language: volumeInfo.language || null,
+        validation: null
+    };
+}
+
 // Search Books using Google Books API with validation
 async function searchBooks(query) {
     const searchStatus = document.getElementById('search-status');
@@ -1662,62 +1722,49 @@ async function searchBooks(query) {
     resultsGrid.innerHTML = '';
 
     try {
-        // Fetch more results for better quality filtering (40 instead of 20)
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=40&langRestrict=en`);
-        const data = await response.json();
+        const isPersonName = isLikelyPersonName(query);
+        let allBooks = [];
 
-        if (!data.items || data.items.length === 0) {
+        // Fetch general search results
+        const generalResponse = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=40&langRestrict=en`);
+        const generalData = await generalResponse.json();
+
+        if (generalData.items) {
+            allBooks = generalData.items.map(parseBookData);
+        }
+
+        // If query looks like a person's name, also search specifically by author
+        if (isPersonName) {
+            searchStatus.textContent = 'Searching for books by this author...';
+
+            const authorResponse = await fetch(`https://www.googleapis.com/books/v1/volumes?q=inauthor:"${encodeURIComponent(query)}"&maxResults=30&langRestrict=en`);
+            const authorData = await authorResponse.json();
+
+            if (authorData.items) {
+                const authorBooks = authorData.items.map(parseBookData);
+                // Mark these as author-matched for priority scoring
+                authorBooks.forEach(book => book.isAuthorMatch = true);
+                allBooks = [...authorBooks, ...allBooks];
+            }
+        }
+
+        // Filter to English only (client-side backup)
+        const englishBooks = allBooks.filter(book => {
+            // Keep if language is explicitly English or not specified (API should have filtered)
+            return !book.language || book.language === 'en' || book.language === 'en-US' ||
+                   book.language === 'en-GB' || book.language.startsWith('en');
+        });
+
+        if (englishBooks.length === 0) {
             searchStatus.textContent = 'No books found. Try a different search term.';
             return;
         }
 
         searchStatus.textContent = 'Validating book quality...';
 
-        // Parse books and extract metadata including ISBNs
-        const books = data.items.map(item => {
-            const volumeInfo = item.volumeInfo;
-            const industryIdentifiers = volumeInfo.industryIdentifiers || [];
-
-            // Extract ISBNs
-            const isbn13 = industryIdentifiers.find(id => id.type === 'ISBN_13')?.identifier;
-            const isbn10 = industryIdentifiers.find(id => id.type === 'ISBN_10')?.identifier;
-
-            // Get higher resolution thumbnail
-            let thumbnail = volumeInfo.imageLinks?.thumbnail || null;
-            if (thumbnail) {
-                thumbnail = thumbnail.replace('zoom=1', 'zoom=5');
-            }
-
-            // Extract year only from published date
-            let publishedYear = null;
-            if (volumeInfo.publishedDate) {
-                publishedYear = volumeInfo.publishedDate.substring(0, 4);
-            }
-
-            return {
-                id: item.id,
-                title: volumeInfo.title || 'Unknown Title',
-                author: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown Author',
-                genres: volumeInfo.categories || ['General'],
-                description: volumeInfo.description ?
-                    (volumeInfo.description.length > 200 ?
-                        volumeInfo.description.substring(0, 200) + '...' :
-                        volumeInfo.description) :
-                    'No description available.',
-                thumbnail: thumbnail,
-                averageRating: volumeInfo.averageRating || null,
-                ratingsCount: volumeInfo.ratingsCount || null,
-                publishedDate: publishedYear,
-                publisher: volumeInfo.publisher || null,
-                isbn13: isbn13,
-                isbn10: isbn10,
-                validation: null
-            };
-        });
-
         // Validate books with ISBNs against Open Library
         // Use a sample of books to avoid overwhelming the API
-        const booksToValidate = books.filter(b => b.isbn13 || b.isbn10).slice(0, 15);
+        const booksToValidate = englishBooks.filter(b => b.isbn13 || b.isbn10).slice(0, 15);
         const validationPromises = booksToValidate.map(async book => {
             const isbn = book.isbn13 || book.isbn10;
             book.validation = await validateBookWithOpenLibrary(isbn);
@@ -1726,8 +1773,8 @@ async function searchBooks(query) {
         // Wait for all validations (with timeout protection)
         await Promise.allSettled(validationPromises);
 
-        // Detect if query is likely an author search
-        const isAuthorSearch = books.some(book =>
+        // Use person name detection from earlier
+        const isAuthorSearch = isPersonName || englishBooks.some(book =>
             book.author.toLowerCase().includes(query.toLowerCase())
         );
 
@@ -1781,16 +1828,16 @@ async function searchBooks(query) {
         };
 
         // Apply adaptive filtering
-        let qualityBooks = books.filter(strictFilter);
+        let qualityBooks = englishBooks.filter(strictFilter);
         let filterLevel = 'strict';
 
         if (qualityBooks.length < 5) {
-            qualityBooks = books.filter(mediumFilter);
+            qualityBooks = englishBooks.filter(mediumFilter);
             filterLevel = 'medium';
         }
 
         if (qualityBooks.length < 3) {
-            qualityBooks = books.filter(lenientFilter);
+            qualityBooks = englishBooks.filter(lenientFilter);
             filterLevel = 'lenient';
         }
 
@@ -1815,6 +1862,10 @@ async function searchBooks(query) {
         // Calculate relevance scores and sort
         uniqueBooks.forEach(book => {
             book.relevanceScore = calculateRelevanceScore(book, query);
+            // Bonus for books from author-specific search
+            if (book.isAuthorMatch) {
+                book.relevanceScore += 20; // Significant boost for author matches
+            }
         });
 
         uniqueBooks.sort((a, b) => b.relevanceScore - a.relevanceScore);
