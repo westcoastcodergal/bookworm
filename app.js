@@ -974,18 +974,26 @@ function saveWantToReadShelf() {
 // Initialize active recommendations with 99 books
 function initializeRecommendations() {
     if (activeRecommendations.length === 0) {
-        // Get books not in library
+        // Get books not in library or want-to-read shelf
+        const usedIds = new Set([
+            ...userLibrary.map(b => b.id),
+            ...wantToReadShelf.map(b => b.id)
+        ]);
         const availableBooks = recommendedBooksPool.filter(book =>
-            !userLibrary.find(libBook => libBook.id === book.id)
+            !usedIds.has(book.id)
         );
 
         // Select first 99 available books
         activeRecommendations = availableBooks.slice(0, 99);
         saveActiveRecommendations();
     } else {
-        // Clean up any books that are already in library
+        // Clean up any books that are already in library or want-to-read shelf
+        const usedIds = new Set([
+            ...userLibrary.map(b => b.id),
+            ...wantToReadShelf.map(b => b.id)
+        ]);
         activeRecommendations = activeRecommendations.filter(book =>
-            !userLibrary.find(libBook => libBook.id === book.id)
+            !usedIds.has(book.id)
         );
 
         // Refill to 99 if needed
@@ -998,9 +1006,10 @@ function refillRecommendations() {
     const needed = 99 - activeRecommendations.length;
 
     if (needed > 0) {
-        // Get book IDs already in use
+        // Get book IDs already in use (library, want-to-read, and active recommendations)
         const usedIds = new Set([
             ...userLibrary.map(b => b.id),
+            ...wantToReadShelf.map(b => b.id),
             ...activeRecommendations.map(b => b.id)
         ]);
 
@@ -1167,8 +1176,9 @@ function displayLibrary() {
     displayLibraryShelf();
 
     // Ensure all want-to-read books are also in the library
+    const libraryIds = new Set(userLibrary.map(b => b.id));
     wantToReadShelf.forEach(book => {
-        if (!userLibrary.find(b => b.id === book.id)) {
+        if (!libraryIds.has(book.id)) {
             userLibrary.push(book);
         }
     });
@@ -1200,20 +1210,13 @@ function displayLibrary() {
             (currentRatingFilter === '1+' && bookRating >= 1) ||
             (currentRatingFilter === 'unrated' && bookRating === 0);
 
-        // Enforce constraint: book must have rating OR be in want-to-read
-        const hasRating = ratings[book.id] && ratings[book.id] > 0;
-        const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
-        const meetsConstraint = hasRating || isWantToRead;
-
-        return matchesSearch && matchesGenre && matchesRating && meetsConstraint;
+        return matchesSearch && matchesGenre && matchesRating;
     });
 
-    // Sort books: rated books first (by rating), then want-to-read books
+    // Sort books: rated books first (by rating), then unrated books
     filteredBooks.sort((a, b) => {
         const ratingA = ratings[a.id] || 0;
         const ratingB = ratings[b.id] || 0;
-        const isWantToReadA = wantToReadShelf.find(book => book.id === a.id);
-        const isWantToReadB = wantToReadShelf.find(book => book.id === b.id);
 
         // Rated books come first
         if (ratingA > 0 && ratingB === 0) return -1;
@@ -1224,8 +1227,7 @@ function displayLibrary() {
             return ratingB - ratingA;
         }
 
-        // If neither rated, want-to-read books stay, others get filtered
-        // Both are want-to-read, maintain order
+        // Both unrated, maintain order
         return 0;
     });
 
@@ -1363,7 +1365,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         `<button class="remove-recommendation-btn-x" data-book-id="${book.id}" title="Not interested">&times;</button>` : '';
 
     // Add "want to read" badge if book is in want-to-read shelf
-    const wantToReadBadgeHTML = wantToReadShelf.find(b => b.id === book.id) ?
+    const wantToReadBadgeHTML = isInWantToRead ?
         `<div class="want-to-read-badge">🐛 Want to Read</div>` : '';
 
     card.innerHTML = `
@@ -1527,6 +1529,17 @@ document.addEventListener('click', (e) => {
             userLibrary.push(bookData);
             saveLibrary();
             populateGenreFilter();
+        }
+
+        // Remove from active recommendations if present
+        activeRecommendations = activeRecommendations.filter(b => b.id !== bookData.id);
+        saveActiveRecommendations();
+        refillRecommendations();
+
+        // Refresh recommendations display if on recommendations tab
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab && activeTab.dataset.tab === 'recommendations') {
+            displayRecommendations();
         }
 
         // Update button
@@ -1729,8 +1742,11 @@ function displayRecommendations() {
         return;
     }
 
-    // Filter out books that have been rated
-    const unratedRecommendations = activeRecommendations.filter(book => !ratings[book.id]);
+    // Filter out books that have been rated or are in want-to-read shelf
+    const wantToReadIds = new Set(wantToReadShelf.map(b => b.id));
+    const unratedRecommendations = activeRecommendations.filter(book =>
+        !ratings[book.id] && !wantToReadIds.has(book.id)
+    );
 
     // Calculate match scores and prepare for sorting
     const libraryGenres = new Set();
