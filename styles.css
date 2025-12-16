@@ -554,15 +554,15 @@ main {
 /* Library Shelf Section */
 .library-shelf-section {
     margin-bottom: 30px;
-    padding: 20px;
+    padding: 15px;
     background: white;
     border-radius: 15px;
 }
 
 .library-shelf-title {
     color: #2d3748;
-    font-size: 1.5rem;
-    margin-bottom: 15px;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
     text-align: center;
 }
 
@@ -605,7 +605,7 @@ main {
 }
 
 .shelf-row {
-    margin-bottom: 40px;
+    margin-bottom: 25px;
     position: relative;
 }
 
@@ -621,10 +621,10 @@ main {
 }
 
 .book-spine {
-    width: 60px;
-    height: 220px;
+    width: 50px;
+    height: 160px;
     border-radius: 0;
-    padding: 12px 8px;
+    padding: 10px 6px;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
@@ -632,42 +632,43 @@ main {
     justify-content: space-between;
     position: relative;
     box-shadow:
-        2px 0 4px rgba(0,0,0,0.2),
-        inset 2px 0 2px rgba(255,255,255,0.3),
-        inset -1px 0 2px rgba(0,0,0,0.2);
-    border-left: 3px solid rgba(255,255,255,0.4);
-    border-right: 2px solid rgba(0,0,0,0.2);
+        2px 0 5px rgba(0,0,0,0.3),
+        inset 2px 0 3px rgba(255,255,255,0.2),
+        inset -2px 0 3px rgba(0,0,0,0.3);
+    border-left: 2px solid rgba(255,255,255,0.25);
+    border-right: 2px solid rgba(0,0,0,0.3);
+    background-size: 100% 100%;
 }
 
-/* Colorful book spine variations based on genre */
+/* Realistic book spine colors with muted, library-like tones */
 .book-spine[data-color="coral"] {
-    background: linear-gradient(to right, #ff6b6b, #ff8787);
+    background: linear-gradient(to right, #8b4a4a, #a15a5a);
 }
 
 .book-spine[data-color="teal"] {
-    background: linear-gradient(to right, #4ecdc4, #6ee7dd);
+    background: linear-gradient(to right, #4a6b7c, #5a7b8c);
 }
 
 .book-spine[data-color="purple"] {
-    background: linear-gradient(to right, #a855f7, #c084fc);
+    background: linear-gradient(to right, #6b5b7b, #7b6b8b);
 }
 
 .book-spine[data-color="yellow"] {
-    background: linear-gradient(to right, #ffd93d, #ffe066);
+    background: linear-gradient(to right, #b8965f, #c8a66f);
 }
 
 .book-spine[data-color="green"] {
-    background: linear-gradient(to right, #6bcf7f, #8aeea0);
+    background: linear-gradient(to right, #5a6b4a, #6a7b5a);
 }
 
 .book-spine[data-color="orange"] {
-    background: linear-gradient(to right, #ff8a5b, #ffa07a);
+    background: linear-gradient(to right, #a67350, #b68360);
 }
 
-/* Want to read books get a unique bright pink gradient */
+/* Want to read books get a muted rose/mauve tone */
 .book-spine.want-to-read-book {
-    background: linear-gradient(to right, #ff69b4, #ffb6d9) !important;
-    border-left: 3px solid rgba(255, 105, 180, 0.6);
+    background: linear-gradient(to right, #9b6b7b, #ab7b8b) !important;
+    border-left: 3px solid rgba(155, 107, 123, 0.6);
 }
 
 .book-spine:hover {
@@ -682,27 +683,27 @@ main {
 .spine-title {
     writing-mode: vertical-lr;
     text-orientation: mixed;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     font-weight: 700;
     color: white;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-height: 140px;
+    max-height: 100px;
     flex-shrink: 1;
 }
 
 .spine-author {
     writing-mode: vertical-lr;
     text-orientation: mixed;
-    font-size: 0.65rem;
+    font-size: 0.55rem;
     color: rgba(255,255,255,0.9);
     text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-height: 60px;
+    max-height: 45px;
     flex-shrink: 0;
 }
 
@@ -937,18 +938,18 @@ main {
     }
 
     .book-spine {
-        width: 50px;
-        height: 200px;
+        width: 40px;
+        height: 140px;
     }
 
     .spine-title {
-        font-size: 0.7rem;
-        max-height: 120px;
+        font-size: 0.6rem;
+        max-height: 90px;
     }
 
     .spine-author {
-        font-size: 0.6rem;
-        max-height: 50px;
+        font-size: 0.5rem;
+        max-height: 40px;
     }
 
     .popup-content {
