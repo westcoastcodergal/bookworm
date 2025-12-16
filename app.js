@@ -1425,7 +1425,7 @@ document.addEventListener('click', (e) => {
         const bookId = button.dataset.bookId;
         const book = userLibrary.find(b => b.id === bookId);
 
-        if (book && confirm(`Remove "${book.title}" from your library?`)) {
+        if (book) {
             userLibrary = userLibrary.filter(b => b.id !== bookId);
             saveLibrary();
             populateGenreFilter();
@@ -1574,21 +1574,31 @@ function displayRecommendations() {
         return;
     }
 
-    // Display all active recommendations
-    activeRecommendations.forEach(book => {
+    // Filter out books that have been rated
+    const unratedRecommendations = activeRecommendations.filter(book => !ratings[book.id]);
+
+    // Calculate match scores and prepare for sorting
+    const libraryGenres = new Set();
+    userLibrary.forEach(libBook => {
+        libBook.genres.forEach(genre => libraryGenres.add(genre));
+    });
+
+    const booksWithScores = unratedRecommendations.map(book => {
         // Calculate a simple match score based on genre overlap with library
         let matchScore = 50; // Base score
-
-        // Boost score if genres match books in user's library
-        const libraryGenres = new Set();
-        userLibrary.forEach(libBook => {
-            libBook.genres.forEach(genre => libraryGenres.add(genre));
-        });
 
         const matchingGenres = book.genres.filter(genre => libraryGenres.has(genre)).length;
         matchScore += matchingGenres * 10;
         matchScore = Math.min(matchScore, 99);
 
+        return { book, matchScore };
+    });
+
+    // Sort by match score in descending order
+    booksWithScores.sort((a, b) => b.matchScore - a.matchScore);
+
+    // Display sorted recommendations
+    booksWithScores.forEach(({ book, matchScore }) => {
         const bookCard = createBookCard(book, false, matchScore);
         recommendationsGrid.appendChild(bookCard);
     });
@@ -1716,11 +1726,13 @@ function displayLibraryShelf() {
             const color = getGenreColor(book.genres);
             bookSpine.setAttribute('data-color', color);
 
-            // Add random width and height variations
+            // Add random width and height variations with wider range
             const baseWidth = 60;
             const baseHeight = 220;
-            const widthVariation = Math.random() * 20 - 10; // -10 to +10px
-            const heightVariation = Math.random() * 40 - 20; // -20 to +20px
+            // Vary widths more: from 35px (skinny) to 95px (thick)
+            const widthVariation = Math.random() * 60 - 25; // -25 to +35px
+            // Vary heights more for better visual variety
+            const heightVariation = Math.random() * 80 - 20; // -20 to +60px
             bookSpine.style.width = `${baseWidth + widthVariation}px`;
             bookSpine.style.height = `${baseHeight + heightVariation}px`;
 
@@ -1791,11 +1803,13 @@ function displayWantToReadShelf() {
             const color = getGenreColor(book.genres);
             bookSpine.setAttribute('data-color', color);
 
-            // Add random width and height variations
+            // Add random width and height variations with wider range
             const baseWidth = 60;
             const baseHeight = 220;
-            const widthVariation = Math.random() * 20 - 10; // -10 to +10px
-            const heightVariation = Math.random() * 40 - 20; // -20 to +20px
+            // Vary widths more: from 35px (skinny) to 95px (thick)
+            const widthVariation = Math.random() * 60 - 25; // -25 to +35px
+            // Vary heights more for better visual variety
+            const heightVariation = Math.random() * 80 - 20; // -20 to +60px
             bookSpine.style.width = `${baseWidth + widthVariation}px`;
             bookSpine.style.height = `${baseHeight + heightVariation}px`;
 

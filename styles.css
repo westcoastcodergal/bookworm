@@ -490,7 +490,7 @@ main {
 .library-shelf-section {
     margin-bottom: 30px;
     padding: 20px;
-    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    background: white;
     border-radius: 15px;
 }
 
@@ -505,7 +505,7 @@ main {
 .want-to-read-section {
     margin-bottom: 30px;
     padding: 20px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: white;
     border-radius: 15px;
 }
 
@@ -552,6 +552,8 @@ main {
     justify-content: flex-start;
     flex-wrap: nowrap;
     overflow-x: auto;
+    align-items: flex-end;
+    background: white;
 }
 
 .book-spine {
@@ -608,7 +610,7 @@ main {
 }
 
 .spine-title {
-    writing-mode: vertical-rl;
+    writing-mode: vertical-lr;
     text-orientation: mixed;
     font-size: 0.75rem;
     font-weight: 700;
@@ -622,7 +624,7 @@ main {
 }
 
 .spine-author {
-    writing-mode: vertical-rl;
+    writing-mode: vertical-lr;
     text-orientation: mixed;
     font-size: 0.65rem;
     color: rgba(255,255,255,0.9);
