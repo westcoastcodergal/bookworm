@@ -258,6 +258,32 @@ main {
     gap: 4px;
 }
 
+/* Quality Badge for Search Results */
+.quality-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    z-index: 5;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.quality-badge.validated {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+}
+
+.quality-badge.isbn {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+}
+
 .book-title {
     font-size: 1.3rem;
     font-weight: 700;
