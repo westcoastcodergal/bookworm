@@ -240,6 +240,24 @@ main {
     border-width: 4px;
 }
 
+/* Want to Read Badge */
+.want-to-read-badge {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 5;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 .book-title {
     font-size: 1.3rem;
     font-weight: 700;

@@ -1097,8 +1097,19 @@ function displayLibrary() {
     // First display library shelf
     displayLibraryShelf();
 
-    // Then display want to read shelf
-    displayWantToReadShelf();
+    // Ensure all want-to-read books are also in the library
+    wantToReadShelf.forEach(book => {
+        if (!userLibrary.find(b => b.id === book.id)) {
+            userLibrary.push(book);
+        }
+    });
+    saveLibrary();
+
+    // Hide the want-to-read section since books are now in the main library
+    const wtrSection = document.getElementById('want-to-read-section');
+    if (wtrSection) {
+        wtrSection.style.display = 'none';
+    }
 
     const booksGrid = document.getElementById('books-grid');
     const filteredBooks = userLibrary.filter(book => {
@@ -1110,20 +1121,33 @@ function displayLibrary() {
         const matchesGenre = !currentGenreFilter ||
             book.genres.includes(currentGenreFilter);
 
-        return matchesSearch && matchesGenre;
+        // Enforce constraint: book must have rating OR be in want-to-read
+        const hasRating = ratings[book.id] && ratings[book.id] > 0;
+        const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
+        const meetsConstraint = hasRating || isWantToRead;
+
+        return matchesSearch && matchesGenre && meetsConstraint;
     });
 
-    // Sort books: rated books first, then by rating (highest first)
+    // Sort books: rated books first (by rating), then want-to-read books
     filteredBooks.sort((a, b) => {
         const ratingA = ratings[a.id] || 0;
         const ratingB = ratings[b.id] || 0;
+        const isWantToReadA = wantToReadShelf.find(book => book.id === a.id);
+        const isWantToReadB = wantToReadShelf.find(book => book.id === b.id);
 
-        // If one has a rating and the other doesn't, rated goes first
+        // Rated books come first
         if (ratingA > 0 && ratingB === 0) return -1;
         if (ratingA === 0 && ratingB > 0) return 1;
 
-        // If both rated or both unrated, sort by rating value (highest first)
-        return ratingB - ratingA;
+        // If both rated, sort by rating (highest first)
+        if (ratingA > 0 && ratingB > 0) {
+            return ratingB - ratingA;
+        }
+
+        // If neither rated, want-to-read books stay, others get filtered
+        // Both are want-to-read, maintain order
+        return 0;
     });
 
     booksGrid.innerHTML = '';
@@ -1258,10 +1282,15 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
     const removeRecommendationHTML = matchScore !== null ?
         `<button class="remove-recommendation-btn-x" data-book-id="${book.id}" title="Not interested">&times;</button>` : '';
 
+    // Add "want to read" badge if book is in want-to-read shelf
+    const wantToReadBadgeHTML = wantToReadShelf.find(b => b.id === book.id) ?
+        `<div class="want-to-read-badge">🐛 Want to Read</div>` : '';
+
     card.innerHTML = `
         ${thumbnailHTML}
         ${removeButtonHTML}
         ${removeRecommendationHTML}
+        ${wantToReadBadgeHTML}
         <div class="book-title">${book.title}</div>
         <div class="book-author">by ${book.author}</div>
         ${publishedDateHTML}
@@ -1406,6 +1435,13 @@ document.addEventListener('click', (e) => {
         wantToReadShelf.push(bookData);
         saveWantToReadShelf();
 
+        // Also add to library (since all want-to-read books should be in library)
+        if (!userLibrary.find(b => b.id === bookData.id)) {
+            userLibrary.push(bookData);
+            saveLibrary();
+            populateGenreFilter();
+        }
+
         // Update button
         button.textContent = '✓ Added to Shelf!';
         button.classList.add('added');
@@ -1424,8 +1460,20 @@ document.addEventListener('click', (e) => {
         const book = userLibrary.find(b => b.id === bookId);
 
         if (book && confirm(`Remove "${book.title}" from your library?`)) {
+            // Remove from library
             userLibrary = userLibrary.filter(b => b.id !== bookId);
             saveLibrary();
+
+            // Also remove from want-to-read shelf
+            wantToReadShelf = wantToReadShelf.filter(b => b.id !== bookId);
+            saveWantToReadShelf();
+
+            // Remove rating
+            if (ratings[bookId]) {
+                delete ratings[bookId];
+                saveRatings();
+            }
+
             populateGenreFilter();
             displayLibrary();
         }
