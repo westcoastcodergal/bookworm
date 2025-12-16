@@ -1021,6 +1021,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeRecommendations();
     populateGenreFilter();
     setupGenreFilter();
+    populateRecGenreFilter();
+    setupRecGenreFilter();
     displayLibrary();
     setupLibrarySearch();
     setupAPISearch();
@@ -1064,6 +1066,12 @@ function populateGenreFilter() {
     const genreFilter = document.getElementById('genre-filter');
     genreFilter.innerHTML = '<option value="">All Genres</option>';
 
+    // Add "Want to Read" option
+    const wtrOption = document.createElement('option');
+    wtrOption.value = 'Want to Read';
+    wtrOption.textContent = 'Want to Read';
+    genreFilter.appendChild(wtrOption);
+
     Array.from(genres).sort().forEach(genre => {
         const option = document.createElement('option');
         option.value = genre;
@@ -1078,6 +1086,34 @@ function setupGenreFilter() {
     genreFilter.addEventListener('change', (e) => {
         currentGenreFilter = e.target.value;
         displayLibrary();
+    });
+}
+
+// Populate Recommendations Genre Filter
+let currentRecGenreFilter = '';
+function populateRecGenreFilter() {
+    const genres = new Set();
+    activeRecommendations.forEach(book => {
+        book.genres.forEach(genre => genres.add(genre));
+    });
+
+    const recGenreFilter = document.getElementById('rec-genre-filter');
+    recGenreFilter.innerHTML = '<option value="">All Genres</option>';
+
+    Array.from(genres).sort().forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre;
+        option.textContent = genre;
+        recGenreFilter.appendChild(option);
+    });
+}
+
+// Setup Recommendations Genre Filter Event Listener
+function setupRecGenreFilter() {
+    const recGenreFilter = document.getElementById('rec-genre-filter');
+    recGenreFilter.addEventListener('change', (e) => {
+        currentRecGenreFilter = e.target.value;
+        displayRecommendations();
     });
 }
 
@@ -1118,12 +1154,18 @@ function displayLibrary() {
             book.author.toLowerCase().includes(currentFilter) ||
             book.genres.some(g => g.toLowerCase().includes(currentFilter));
 
-        const matchesGenre = !currentGenreFilter ||
-            book.genres.includes(currentGenreFilter);
+        const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
+
+        // Handle "Want to Read" filter
+        let matchesGenre;
+        if (currentGenreFilter === 'Want to Read') {
+            matchesGenre = isWantToRead;
+        } else {
+            matchesGenre = !currentGenreFilter || book.genres.includes(currentGenreFilter);
+        }
 
         // Enforce constraint: book must have rating OR be in want-to-read
         const hasRating = ratings[book.id] && ratings[book.id] > 0;
-        const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
         const meetsConstraint = hasRating || isWantToRead;
 
         return matchesSearch && matchesGenre && meetsConstraint;
@@ -1651,7 +1693,17 @@ function displayRecommendations() {
     }
 
     // Filter out books that have been rated
-    const unratedRecommendations = activeRecommendations.filter(book => !ratings[book.id]);
+    const unratedRecommendations = activeRecommendations.filter(book => {
+        const notRated = !ratings[book.id];
+
+        // Apply genre filter if set
+        const matchesGenre = !currentRecGenreFilter || book.genres.includes(currentRecGenreFilter);
+
+        return notRated && matchesGenre;
+    });
+
+    // Repopulate genre filter to reflect available genres
+    populateRecGenreFilter();
 
     // Calculate match scores and prepare for sorting
     const libraryGenres = new Set();
@@ -1807,8 +1859,51 @@ function displayLibraryShelf() {
         return;
     }
 
+    // Filter books based on search and genre filters
+    const filteredLibrary = userLibrary.filter(book => {
+        const matchesSearch = !currentFilter ||
+            book.title.toLowerCase().includes(currentFilter) ||
+            book.author.toLowerCase().includes(currentFilter) ||
+            book.genres.some(g => g.toLowerCase().includes(currentFilter));
+
+        const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
+
+        // Handle "Want to Read" filter
+        let matchesGenre;
+        if (currentGenreFilter === 'Want to Read') {
+            matchesGenre = isWantToRead;
+        } else {
+            matchesGenre = !currentGenreFilter || book.genres.includes(currentGenreFilter);
+        }
+
+        // Enforce constraint: book must have rating OR be in want-to-read
+        const hasRating = ratings[book.id] && ratings[book.id] > 0;
+        const meetsConstraint = hasRating || isWantToRead;
+
+        return matchesSearch && matchesGenre && meetsConstraint;
+    });
+
+    if (filteredLibrary.length === 0) {
+        // Hide the entire section if no books match filter
+        librarySection.style.display = 'none';
+        return;
+    }
+
     // Show the section
     librarySection.style.display = 'block';
+
+    // Sort books: rated books first, then want-to-read books at the bottom
+    const sortedLibrary = [...filteredLibrary].sort((a, b) => {
+        const isWantToReadA = wantToReadShelf.find(book => book.id === a.id);
+        const isWantToReadB = wantToReadShelf.find(book => book.id === b.id);
+
+        // Want-to-read books go to the bottom
+        if (isWantToReadA && !isWantToReadB) return 1;
+        if (!isWantToReadA && isWantToReadB) return -1;
+
+        // Within each group, maintain current order
+        return 0;
+    });
 
     // Create one shelf that wraps across the screen
     const shelfDiv = document.createElement('div');
@@ -1817,7 +1912,7 @@ function displayLibraryShelf() {
     const booksDiv = document.createElement('div');
     booksDiv.className = 'shelf-books';
 
-    userLibrary.forEach(book => {
+    sortedLibrary.forEach(book => {
             const bookSpine = document.createElement('div');
             bookSpine.className = 'book-spine';
 
@@ -1986,8 +2081,9 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, f
     // Build action buttons based on book status
     let actionButtons = '';
 
-    // If opened from shelf, don't show any action buttons
-    if (fromShelf) {
+    // If opened from shelf and it's a want-to-read book, show want-to-read actions
+    // If opened from shelf and it's a rated book, show nothing
+    if (fromShelf && !isInWantToRead) {
         actionButtons = '';
     } else if (isInWantToRead) {
         actionButtons = `
