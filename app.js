@@ -2320,7 +2320,7 @@ function displayLibraryShelf() {
 
     // Calculate books per shelf based on container width
     const containerWidth = shelfContainer.offsetWidth || 1000;
-    const averageBookWidth = 50 + 12 + 8; // base width + page width + gap
+    const averageBookWidth = 50 + 8; // base width + gap
     const booksPerShelf = Math.max(8, Math.floor(containerWidth / averageBookWidth));
     const numShelves = Math.ceil(sortedLibrary.length / booksPerShelf);
 
@@ -2405,7 +2405,7 @@ function displayWantToReadShelf() {
 
     // Calculate books per shelf based on container width
     const containerWidth = shelfContainer.offsetWidth || 1000;
-    const averageBookWidth = 50 + 12 + 8; // base width + page width + gap
+    const averageBookWidth = 50 + 8; // base width + gap
     const booksPerShelf = Math.max(8, Math.floor(containerWidth / averageBookWidth));
     const numShelves = Math.ceil(wantToReadShelf.length / booksPerShelf);
 
@@ -2511,16 +2511,16 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, f
     // Build action buttons based on book status
     let actionButtons = '';
 
-    // If opened from shelf and it's a want-to-read book, show want-to-read actions
-    // If opened from shelf and it's a rated book, show nothing
-    if (fromShelf && !isInWantToRead) {
-        actionButtons = '';
-    } else if (fromWantToRead && isInWantToRead) {
-        // Clicking from Want to Read shelf - show only remove button, no add to library
+    // If opened from any shelf and it's a want-to-read book, show only remove button
+    if ((fromShelf || fromWantToRead) && isInWantToRead) {
         actionButtons = `
             <button class="remove-from-wtr-btn popup-action-btn" data-book-id="${book.id}">Remove from Want to Read</button>
         `;
+    } else if (fromShelf && !isInWantToRead) {
+        // Rated books from library shelf - show nothing
+        actionButtons = '';
     } else if (isInWantToRead) {
+        // Want to read books from search/recommendations - show both buttons
         actionButtons = `
             <button class="add-to-library-btn popup-action-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>
             <button class="remove-from-wtr-btn popup-action-btn" data-book-id="${book.id}">Remove from Want to Read</button>
