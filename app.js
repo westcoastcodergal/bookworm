@@ -47,6 +47,54 @@ const starterBooks = [
     }
 ];
 
+// ===== SECURITY: HTML Sanitization =====
+// Sanitize HTML to prevent XSS attacks from untrusted API data
+function sanitizeHTML(str) {
+    if (typeof str !== 'string') return '';
+
+    // Create a temporary div element to use browser's built-in HTML parser
+    const temp = document.createElement('div');
+    temp.textContent = str; // textContent automatically escapes HTML
+    return temp.innerHTML;
+}
+
+// Validate and sanitize book data from external APIs
+function sanitizeBookData(book) {
+    return {
+        id: String(book.id || ''),
+        title: sanitizeHTML(book.title || 'Unknown Title'),
+        author: sanitizeHTML(book.author || 'Unknown Author'),
+        genres: Array.isArray(book.genres) ? book.genres.map(g => sanitizeHTML(String(g))) : ['General'],
+        description: sanitizeHTML(book.description || 'No description available.'),
+        thumbnail: book.thumbnail || null, // URLs are validated by browser
+        averageRating: typeof book.averageRating === 'number' ? book.averageRating : null,
+        ratingsCount: typeof book.ratingsCount === 'number' ? book.ratingsCount : null,
+        publishedDate: book.publishedDate ? sanitizeHTML(String(book.publishedDate)) : null
+    };
+}
+
+// Validate data loaded from localStorage to prevent tampering
+function validateStoredData(data, expectedType = 'array') {
+    try {
+        if (expectedType === 'array' && Array.isArray(data)) {
+            return data.map(item => sanitizeBookData(item));
+        } else if (expectedType === 'object' && typeof data === 'object' && data !== null) {
+            // For ratings object, validate structure
+            const validated = {};
+            for (const [key, value] of Object.entries(data)) {
+                if (typeof value === 'number' && value >= 1 && value <= 5) {
+                    validated[String(key)] = value;
+                }
+            }
+            return validated;
+        }
+        return expectedType === 'array' ? [] : {};
+    } catch (error) {
+        console.error('Data validation failed:', error);
+        return expectedType === 'array' ? [] : {};
+    }
+}
+
 // Pool of books for recommendations (not in user's library by default)
 const recommendedBooksPool = [
     {
@@ -942,14 +990,50 @@ const recommendedBooksPool = [
     }
 ];
 
-// Application State
-let userLibrary = JSON.parse(localStorage.getItem('userLibrary')) || [...starterBooks];
-let ratings = JSON.parse(localStorage.getItem('bookRatings')) || {};
+// Application State - Load and validate data from localStorage
+let userLibrary = (() => {
+    try {
+        const stored = localStorage.getItem('userLibrary');
+        return stored ? validateStoredData(JSON.parse(stored), 'array') : [...starterBooks];
+    } catch (error) {
+        console.error('Failed to load user library:', error);
+        return [...starterBooks];
+    }
+})();
+
+let ratings = (() => {
+    try {
+        const stored = localStorage.getItem('bookRatings');
+        return stored ? validateStoredData(JSON.parse(stored), 'object') : {};
+    } catch (error) {
+        console.error('Failed to load ratings:', error);
+        return {};
+    }
+})();
+
 let currentFilter = '';
 let currentGenreFilter = '';
 let currentRatingFilter = '';
-let activeRecommendations = JSON.parse(localStorage.getItem('activeRecommendations')) || [];
-let wantToReadShelf = JSON.parse(localStorage.getItem('wantToReadShelf')) || [];
+
+let activeRecommendations = (() => {
+    try {
+        const stored = localStorage.getItem('activeRecommendations');
+        return stored ? validateStoredData(JSON.parse(stored), 'array') : [];
+    } catch (error) {
+        console.error('Failed to load active recommendations:', error);
+        return [];
+    }
+})();
+
+let wantToReadShelf = (() => {
+    try {
+        const stored = localStorage.getItem('wantToReadShelf');
+        return stored ? validateStoredData(JSON.parse(stored), 'array') : [];
+    } catch (error) {
+        console.error('Failed to load want to read shelf:', error);
+        return [];
+    }
+})();
 
 // Save library to localStorage
 function saveLibrary() {
@@ -1695,7 +1779,8 @@ async function searchBooks(query) {
                 publishedYear = volumeInfo.publishedDate.substring(0, 4);
             }
 
-            return {
+            // Create book object and sanitize all text fields to prevent XSS
+            const rawBook = {
                 id: item.id,
                 title: volumeInfo.title || 'Unknown Title',
                 author: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown Author',
@@ -1710,6 +1795,9 @@ async function searchBooks(query) {
                 ratingsCount: volumeInfo.ratingsCount || null,
                 publishedDate: publishedYear
             };
+
+            // Sanitize the book data before returning
+            return sanitizeBookData(rawBook);
         });
 
         // Deduplicate books by title and author pair
