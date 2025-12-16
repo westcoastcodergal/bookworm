@@ -947,6 +947,7 @@ let userLibrary = JSON.parse(localStorage.getItem('userLibrary')) || [...starter
 let ratings = JSON.parse(localStorage.getItem('bookRatings')) || {};
 let currentFilter = '';
 let currentGenreFilter = '';
+let currentRatingFilter = '';
 let activeRecommendations = JSON.parse(localStorage.getItem('activeRecommendations')) || [];
 let wantToReadShelf = JSON.parse(localStorage.getItem('wantToReadShelf')) || [];
 
@@ -1016,11 +1017,26 @@ function refillRecommendations() {
 }
 
 // Initialize App
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initializeTabs();
     initializeRecommendations();
+
+    // Enhance book covers for all books without images
+    const booksToEnhance = [...userLibrary, ...wantToReadShelf, ...activeRecommendations]
+        .filter(book => !book.thumbnail || book.thumbnail.includes('zoom=1'));
+
+    for (const book of booksToEnhance) {
+        await enhanceBookCover(book);
+    }
+
+    // Save enhanced library
+    if (booksToEnhance.some(b => userLibrary.includes(b))) {
+        saveLibrary();
+    }
+
     populateGenreFilter();
     setupGenreFilter();
+    setupRatingFilter();
     displayLibrary();
     setupLibrarySearch();
     setupAPISearch();
@@ -1072,6 +1088,48 @@ function populateGenreFilter() {
     });
 }
 
+// Enhance book covers with higher resolution images from public sources
+async function enhanceBookCover(book) {
+    // If book already has a high-res thumbnail, ensure it's maximum quality
+    if (book.thumbnail) {
+        // Upgrade Google Books thumbnails to highest resolution
+        if (book.thumbnail.includes('books.google.com')) {
+            book.thumbnail = book.thumbnail.replace('zoom=1', 'zoom=5').replace('zoom=2', 'zoom=5').replace('zoom=3', 'zoom=5');
+        }
+        return book.thumbnail;
+    }
+
+    // Try to fetch from Open Library API
+    try {
+        const title = encodeURIComponent(book.title);
+        const author = encodeURIComponent(book.author);
+
+        // Try Open Library Search API
+        const response = await fetch(`https://openlibrary.org/search.json?title=${title}&author=${author}&limit=1`);
+        const data = await response.json();
+
+        if (data.docs && data.docs.length > 0) {
+            const doc = data.docs[0];
+
+            // Open Library provides cover IDs, fetch the large version
+            if (doc.cover_i) {
+                book.thumbnail = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
+                return book.thumbnail;
+            }
+
+            // Try ISBN if available
+            if (doc.isbn && doc.isbn.length > 0) {
+                book.thumbnail = `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-L.jpg`;
+                return book.thumbnail;
+            }
+        }
+    } catch (error) {
+        console.log('Could not fetch cover from Open Library:', error);
+    }
+
+    return null;
+}
+
 // Setup Genre Filter Event Listener
 function setupGenreFilter() {
     const genreFilter = document.getElementById('genre-filter');
@@ -1087,6 +1145,17 @@ function setupLibrarySearch() {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             currentFilter = e.target.value.toLowerCase();
+            displayLibrary();
+        });
+    }
+}
+
+// Setup Rating Filter Event Listener
+function setupRatingFilter() {
+    const ratingFilter = document.getElementById('rating-filter');
+    if (ratingFilter) {
+        ratingFilter.addEventListener('change', (e) => {
+            currentRatingFilter = e.target.value;
             displayLibrary();
         });
     }
@@ -1121,12 +1190,22 @@ function displayLibrary() {
         const matchesGenre = !currentGenreFilter ||
             book.genres.includes(currentGenreFilter);
 
+        // Rating filter: check if book meets minimum rating requirement
+        const bookRating = ratings[book.id] || 0;
+        const matchesRating = !currentRatingFilter ||
+            (currentRatingFilter === '5' && bookRating === 5) ||
+            (currentRatingFilter === '4+' && bookRating >= 4) ||
+            (currentRatingFilter === '3+' && bookRating >= 3) ||
+            (currentRatingFilter === '2+' && bookRating >= 2) ||
+            (currentRatingFilter === '1+' && bookRating >= 1) ||
+            (currentRatingFilter === 'unrated' && bookRating === 0);
+
         // Enforce constraint: book must have rating OR be in want-to-read
         const hasRating = ratings[book.id] && ratings[book.id] > 0;
         const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
         const meetsConstraint = hasRating || isWantToRead;
 
-        return matchesSearch && matchesGenre && meetsConstraint;
+        return matchesSearch && matchesGenre && matchesRating && meetsConstraint;
     });
 
     // Sort books: rated books first (by rating), then want-to-read books
@@ -1252,7 +1331,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
 
     const publishedDateHTML = book.publishedDate ?
-        `<div class="book-published-date">published ${book.publishedDate}</div>` : '';
+        `<div class="book-published-date">${book.publishedDate}</div>` : '';
 
     // Check if book is already in want to read shelf
     const isInWantToRead = wantToReadShelf.find(b => b.id === book.id);
@@ -1930,7 +2009,7 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
         `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
 
     const publishedDateHTML = book.publishedDate ?
-        `<div class="book-published-date">published ${book.publishedDate}</div>` : '';
+        `<div class="book-published-date">${book.publishedDate}</div>` : '';
 
     const popularityHTML = book.averageRating && book.ratingsCount ?
         `<div class="popularity-rating">
