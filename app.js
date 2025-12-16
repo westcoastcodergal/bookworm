@@ -2004,8 +2004,10 @@ function displayLibraryShelf() {
         return 0;
     });
 
-    // Create multiple shelves (group books in rows of up to 12)
-    const booksPerShelf = 12;
+    // Calculate books per shelf based on container width
+    const containerWidth = shelfContainer.offsetWidth || 1000;
+    const averageBookWidth = 50 + 12 + 8; // base width + page width + gap
+    const booksPerShelf = Math.max(8, Math.floor(containerWidth / averageBookWidth));
     const numShelves = Math.ceil(sortedLibrary.length / booksPerShelf);
 
     for (let shelfNum = 0; shelfNum < numShelves; shelfNum++) {
@@ -2087,8 +2089,10 @@ function displayWantToReadShelf() {
     // Show the section
     wtrSection.style.display = 'block';
 
-    // Create shelves (group books in rows of up to 8)
-    const booksPerShelf = 8;
+    // Calculate books per shelf based on container width
+    const containerWidth = shelfContainer.offsetWidth || 1000;
+    const averageBookWidth = 50 + 12 + 8; // base width + page width + gap
+    const booksPerShelf = Math.max(8, Math.floor(containerWidth / averageBookWidth));
     const numShelves = Math.ceil(wantToReadShelf.length / booksPerShelf);
 
     for (let shelfNum = 0; shelfNum < numShelves; shelfNum++) {
@@ -2133,7 +2137,7 @@ function displayWantToReadShelf() {
 
             // Add click handler to show book details popup
             bookSpine.addEventListener('click', () => {
-                showBookDetailsPopup(book);
+                showBookDetailsPopup(book, false, null, false, true);
             });
 
             booksDiv.appendChild(bookSpine);
@@ -2149,7 +2153,7 @@ function displayWantToReadShelf() {
 }
 
 // Show book details popup
-function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, fromShelf = false) {
+function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, fromShelf = false, fromWantToRead = false) {
     // Create popup overlay
     const overlay = document.createElement('div');
     overlay.className = 'popup-overlay';
@@ -2186,6 +2190,10 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, f
     const isInWantToRead = wantToReadShelf.find(b => b.id === book.id);
     const isRecommendation = matchScore !== null;
 
+    // Add Want to Read badge if applicable
+    const wantToReadBadgeHTML = isInWantToRead ?
+        `<div class="want-to-read-badge">🐛 Want to Read</div>` : '';
+
     // Build action buttons based on book status
     let actionButtons = '';
 
@@ -2193,6 +2201,11 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, f
     // If opened from shelf and it's a rated book, show nothing
     if (fromShelf && !isInWantToRead) {
         actionButtons = '';
+    } else if (fromWantToRead && isInWantToRead) {
+        // Clicking from Want to Read shelf - show only remove button, no add to library
+        actionButtons = `
+            <button class="remove-from-wtr-btn popup-action-btn" data-book-id="${book.id}">Remove from Want to Read</button>
+        `;
     } else if (isInWantToRead) {
         actionButtons = `
             <button class="add-to-library-btn popup-action-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>
@@ -2227,6 +2240,7 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, f
         <div class="book-title">${book.title}</div>
         <div class="book-author">by ${book.author}</div>
         ${publishedDateHTML}
+        ${wantToReadBadgeHTML}
         <div class="book-genres">${genreTags}</div>
         <div class="book-description">${book.description}</div>
         ${popularityHTML}
