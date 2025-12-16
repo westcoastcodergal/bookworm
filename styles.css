@@ -321,6 +321,18 @@ main {
     font-style: italic;
 }
 
+.want-to-read-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #9b6b7b, #ab7b8b);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(155, 107, 123, 0.3);
+}
+
 .book-genres {
     display: flex;
     flex-wrap: wrap;
@@ -637,13 +649,14 @@ main {
 
 .shelf-books {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     padding: 10px;
     margin-bottom: 0;
     justify-content: flex-start;
     flex-wrap: wrap;
     align-items: flex-end;
     background: white;
+    width: 100%;
 }
 
 .book-spine {
@@ -658,12 +671,52 @@ main {
     justify-content: space-between;
     position: relative;
     box-shadow:
-        2px 0 5px rgba(0,0,0,0.3),
+        3px 0 8px rgba(0,0,0,0.4),
         inset 2px 0 3px rgba(255,255,255,0.2),
         inset -2px 0 3px rgba(0,0,0,0.3);
     border-left: 2px solid rgba(255,255,255,0.25);
     border-right: 2px solid rgba(0,0,0,0.3);
     background-size: 100% 100%;
+    transform-style: preserve-3d;
+}
+
+/* 3D page effect - shows the pages on the right side */
+.book-spine::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 2px;
+    bottom: 2px;
+    width: 8px;
+    background: linear-gradient(to right,
+        #f8f8f8 0%,
+        #e8e8e8 50%,
+        #d8d8d8 100%);
+    box-shadow:
+        1px 0 2px rgba(0,0,0,0.2),
+        inset -1px 0 1px rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(0,0,0,0.15);
+}
+
+/* Add subtle page lines for more realism */
+.book-spine::before {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 2px;
+    bottom: 2px;
+    width: 8px;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 1px,
+        rgba(0,0,0,0.03) 1px,
+        rgba(0,0,0,0.03) 2px
+    );
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* Realistic book spine colors with muted, library-like tones */
@@ -698,12 +751,18 @@ main {
 }
 
 .book-spine:hover {
-    transform: translateY(-10px) scale(1.05);
+    transform: translateY(-12px) scale(1.05);
     box-shadow:
-        2px 5px 15px rgba(0,0,0,0.4),
-        inset 2px 0 2px rgba(255,255,255,0.3),
-        inset -1px 0 2px rgba(0,0,0,0.2);
+        4px 8px 20px rgba(0,0,0,0.5),
+        inset 2px 0 3px rgba(255,255,255,0.3),
+        inset -2px 0 3px rgba(0,0,0,0.3);
     z-index: 10;
+}
+
+.book-spine:hover::after {
+    box-shadow:
+        2px 8px 15px rgba(0,0,0,0.4),
+        inset -1px 0 1px rgba(0,0,0,0.1);
 }
 
 .spine-title {
