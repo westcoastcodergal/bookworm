@@ -1665,16 +1665,140 @@ function setupAPISearch() {
     });
 }
 
-// Search Books using Google Books API
+// Major Publishers List for Quality Scoring
+const majorPublishers = [
+    'penguin', 'random house', 'hachette', 'harpercollins', 'simon & schuster',
+    'macmillan', 'scholastic', 'oxford university press', 'cambridge university press',
+    'pearson', 'wiley', 'springer', 'norton', 'knopf', 'viking', 'doubleday',
+    'farrar straus', 'grove press', 'vintage', 'pantheon', 'little brown',
+    'crown', 'ballantine', 'del rey', 'bantam', 'tor', 'bloomsbury'
+];
+
+// Validate book against Open Library
+async function validateBookWithOpenLibrary(isbn) {
+    if (!isbn) return null;
+
+    try {
+        const response = await fetch(`https://openlibrary.org/isbn/${isbn}.json`, {
+            signal: AbortSignal.timeout(3000) // 3 second timeout
+        });
+        if (response.ok) {
+            const data = await response.json();
+            return {
+                validated: true,
+                hasLCCN: !!data.lccn,
+                openLibraryKey: data.key
+            };
+        }
+    } catch (error) {
+        // Silently fail - book may still be valid even if not in Open Library
+    }
+    return null;
+}
+
+// Calculate relevance score for a book
+function calculateRelevanceScore(book, query) {
+    let score = 0;
+    const queryLower = query.toLowerCase();
+    const titleLower = book.title.toLowerCase();
+    const authorLower = book.author.toLowerCase();
+    const queryTerms = queryLower.split(/\s+/).filter(t => t.length > 2);
+
+    // 1. Query-Term Match Score (40 points)
+    if (titleLower === queryLower) {
+        score += 40; // Exact title match
+    } else if (titleLower.includes(queryLower)) {
+        score += 30; // Title contains full query
+    } else {
+        // Check how many query terms are in title
+        const matchedTerms = queryTerms.filter(term => titleLower.includes(term));
+        score += (matchedTerms.length / Math.max(queryTerms.length, 1)) * 25;
+
+        // Bonus if terms appear in same order
+        if (matchedTerms.length === queryTerms.length && queryTerms.length > 0) {
+            let lastIndex = -1;
+            let inOrder = true;
+            for (const term of queryTerms) {
+                const index = titleLower.indexOf(term);
+                if (index <= lastIndex) {
+                    inOrder = false;
+                    break;
+                }
+                lastIndex = index;
+            }
+            if (inOrder) score += 5;
+        }
+    }
+
+    // Author match bonus
+    if (authorLower === queryLower) {
+        score += 35;
+    } else if (authorLower.includes(queryLower)) {
+        score += 25;
+    }
+
+    // 2. Authority & Quality Score (30 points)
+    if (book.isbn13 || book.isbn10) {
+        score += 10; // Has valid ISBN
+    }
+
+    if (book.validation?.validated) {
+        score += 5; // In Open Library
+    }
+
+    if (book.validation?.hasLCCN) {
+        score += 10; // Has Library of Congress Number
+    }
+
+    // Publisher quality
+    if (book.publisher) {
+        const pubLower = book.publisher.toLowerCase();
+        if (majorPublishers.some(pub => pubLower.includes(pub))) {
+            score += 5; // Major publisher
+        } else if (pubLower.length > 3 && !pubLower.includes('self') && !pubLower.includes('createspace')) {
+            score += 3; // Medium publisher
+        }
+    }
+
+    // 3. Popularity & Reception Score (20 points)
+    if (book.averageRating && book.ratingsCount) {
+        // Rating quality: 0-10 points
+        score += (book.averageRating / 5) * 10;
+
+        // Review count (logarithmic): 0-10 points
+        const reviewScore = Math.min(Math.log10(book.ratingsCount + 1) / 4, 1) * 10;
+        score += reviewScore;
+    }
+
+    // 4. Recency & Relevance (10 points)
+    if (book.publishedDate) {
+        const year = parseInt(book.publishedDate);
+        const currentYear = new Date().getFullYear();
+        const age = currentYear - year;
+
+        if (age <= 5) {
+            score += 10; // Recent book
+        } else if (age >= 50 && book.averageRating && book.averageRating >= 4.0) {
+            score += 10; // Classic book
+        } else if (age <= 10) {
+            score += 5;
+        }
+    }
+
+    return Math.min(score, 100);
+}
+
+// Search Books using Google Books API with validation
 async function searchBooks(query) {
     const searchStatus = document.getElementById('search-status');
     const resultsGrid = document.getElementById('search-results-grid');
 
-    searchStatus.textContent = 'Searching...';
+    searchStatus.textContent = 'Searching high-quality book sources...';
     resultsGrid.innerHTML = '';
 
     try {
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20&langRestrict=en`);
+        // Fetch more results for better quality filtering (40 instead of 20)
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=40&langRestrict=en`);
         const data = await response.json();
 
         if (!data.items || data.items.length === 0) {
@@ -1682,13 +1806,23 @@ async function searchBooks(query) {
             return;
         }
 
+        searchStatus.textContent = 'Validating book quality...';
+
+        // Parse books and extract metadata including ISBNs
         const books = data.items.map(item => {
             const volumeInfo = item.volumeInfo;
-            // Get higher resolution thumbnail by replacing zoom=1 with zoom=5
+            const industryIdentifiers = volumeInfo.industryIdentifiers || [];
+
+            // Extract ISBNs
+            const isbn13 = industryIdentifiers.find(id => id.type === 'ISBN_13')?.identifier;
+            const isbn10 = industryIdentifiers.find(id => id.type === 'ISBN_10')?.identifier;
+
+            // Get higher resolution thumbnail
             let thumbnail = volumeInfo.imageLinks?.thumbnail || null;
             if (thumbnail) {
                 thumbnail = thumbnail.replace('zoom=1', 'zoom=5');
             }
+
             // Extract year only from published date
             let publishedYear = null;
             if (volumeInfo.publishedDate) {
@@ -1708,16 +1842,47 @@ async function searchBooks(query) {
                 thumbnail: thumbnail,
                 averageRating: volumeInfo.averageRating || null,
                 ratingsCount: volumeInfo.ratingsCount || null,
-                publishedDate: publishedYear
+                publishedDate: publishedYear,
+                publisher: volumeInfo.publisher || null,
+                isbn13: isbn13,
+                isbn10: isbn10,
+                validation: null
             };
+        });
+
+        // Validate books with ISBNs against Open Library
+        // Use a sample of books to avoid overwhelming the API
+        const booksToValidate = books.filter(b => b.isbn13 || b.isbn10).slice(0, 15);
+        const validationPromises = booksToValidate.map(async book => {
+            const isbn = book.isbn13 || book.isbn10;
+            book.validation = await validateBookWithOpenLibrary(isbn);
+        });
+
+        // Wait for all validations (with timeout protection)
+        await Promise.allSettled(validationPromises);
+
+        // Quality Filter: Remove low-quality books
+        const qualityBooks = books.filter(book => {
+            // Keep books that meet at least one of these criteria:
+            // 1. Has ISBN (basic quality signal)
+            // 2. Has good ratings (4+ stars with 100+ reviews)
+            // 3. Published by major publisher
+            // 4. Validated by Open Library
+
+            const hasISBN = !!(book.isbn13 || book.isbn10);
+            const hasGoodRatings = book.averageRating >= 4.0 && book.ratingsCount >= 100;
+            const isMajorPublisher = book.publisher &&
+                majorPublishers.some(pub => book.publisher.toLowerCase().includes(pub));
+            const isValidated = book.validation?.validated;
+
+            return hasISBN || hasGoodRatings || isMajorPublisher || isValidated;
         });
 
         // Deduplicate books by title and author pair
         const uniqueBooks = [];
         const seenPairs = new Map();
 
-        books.forEach(book => {
-            // Create a normalized key for book/author pair
+        qualityBooks.forEach(book => {
             const key = `${book.title.toLowerCase()}||${book.author.toLowerCase()}`;
 
             if (!seenPairs.has(key)) {
@@ -1727,39 +1892,25 @@ async function searchBooks(query) {
         });
 
         if (uniqueBooks.length === 0) {
-            searchStatus.textContent = 'No books found. Try a different search term.';
+            searchStatus.textContent = 'No high-quality books found. Try a different search term.';
             return;
         }
 
-        // Sort by popularity (combination of rating and number of ratings)
-        // But first prioritize author matches if the search query matches an author
-        uniqueBooks.sort((a, b) => {
-            const queryLower = query.toLowerCase();
-            const aAuthorMatch = a.author.toLowerCase().includes(queryLower);
-            const bAuthorMatch = b.author.toLowerCase().includes(queryLower);
-
-            // If one matches author and other doesn't, author match goes first
-            if (aAuthorMatch && !bAuthorMatch) return -1;
-            if (!aAuthorMatch && bAuthorMatch) return 1;
-
-            // Both match author or both don't - sort by popularity
-            const hasRatingsA = a.averageRating && a.ratingsCount;
-            const hasRatingsB = b.averageRating && b.ratingsCount;
-
-            if (!hasRatingsA && !hasRatingsB) return 0;
-            if (!hasRatingsA) return 1;  // a goes to end
-            if (!hasRatingsB) return -1; // b goes to end
-
-            // For books with ratings, combine rating quality and review count
-            const popularityA = a.averageRating * Math.log(a.ratingsCount + 1);
-            const popularityB = b.averageRating * Math.log(b.ratingsCount + 1);
-            return popularityB - popularityA; // Sort descending (most popular first)
+        // Calculate relevance scores and sort
+        uniqueBooks.forEach(book => {
+            book.relevanceScore = calculateRelevanceScore(book, query);
         });
 
-        // Update status to show count
-        searchStatus.textContent = `Found ${uniqueBooks.length} book${uniqueBooks.length !== 1 ? 's' : ''}`;
+        uniqueBooks.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
-        uniqueBooks.forEach(book => {
+        // Limit to top 20 results
+        const topBooks = uniqueBooks.slice(0, 20);
+
+        // Update status
+        const validatedCount = topBooks.filter(b => b.validation?.validated).length;
+        searchStatus.textContent = `Found ${topBooks.length} high-quality book${topBooks.length !== 1 ? 's' : ''} (${validatedCount} validated)`;
+
+        topBooks.forEach(book => {
             const bookCard = createBookCard(book, true);
             resultsGrid.appendChild(bookCard);
         });
