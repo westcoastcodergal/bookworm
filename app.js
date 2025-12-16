@@ -2004,62 +2004,71 @@ function displayLibraryShelf() {
         return 0;
     });
 
-    // Create one shelf that wraps across the screen
-    const shelfDiv = document.createElement('div');
-    shelfDiv.className = 'shelf-row';
+    // Create multiple shelves (group books in rows of up to 12)
+    const booksPerShelf = 12;
+    const numShelves = Math.ceil(sortedLibrary.length / booksPerShelf);
 
-    const booksDiv = document.createElement('div');
-    booksDiv.className = 'shelf-books';
+    for (let shelfNum = 0; shelfNum < numShelves; shelfNum++) {
+        const shelfDiv = document.createElement('div');
+        shelfDiv.className = 'shelf-row';
 
-    sortedLibrary.forEach(book => {
-            const bookSpine = document.createElement('div');
-            bookSpine.className = 'book-spine';
+        const booksDiv = document.createElement('div');
+        booksDiv.className = 'shelf-books';
 
-            // Check if book is in want-to-read shelf
-            const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
-            if (isWantToRead) {
-                bookSpine.classList.add('want-to-read-book');
-            }
+        const startIdx = shelfNum * booksPerShelf;
+        const endIdx = Math.min(startIdx + booksPerShelf, sortedLibrary.length);
+        const booksOnThisShelf = sortedLibrary.slice(startIdx, endIdx);
 
-            // Get color based on genre
-            const color = getGenreColor(book.genres);
-            bookSpine.setAttribute('data-color', color);
+        booksOnThisShelf.forEach(book => {
+                const bookSpine = document.createElement('div');
+                bookSpine.className = 'book-spine';
 
-            // Add random width and height variations with wider range
-            const baseWidth = 60;
-            const baseHeight = 220;
-            // Vary widths more: from 35px (skinny) to 95px (thick)
-            const widthVariation = Math.random() * 60 - 25; // -25 to +35px
-            // Vary heights more for better visual variety
-            const heightVariation = Math.random() * 80 - 20; // -20 to +60px
-            bookSpine.style.width = `${baseWidth + widthVariation}px`;
-            bookSpine.style.height = `${baseHeight + heightVariation}px`;
+                // Check if book is in want-to-read shelf
+                const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
+                if (isWantToRead) {
+                    bookSpine.classList.add('want-to-read-book');
+                }
 
-            const titleDiv = document.createElement('div');
-            titleDiv.className = 'spine-title';
-            titleDiv.textContent = book.title;
+                // Get color based on genre
+                const color = getGenreColor(book.genres);
+                bookSpine.setAttribute('data-color', color);
 
-            const authorDiv = document.createElement('div');
-            authorDiv.className = 'spine-author';
-            authorDiv.textContent = book.author;
+                // Add random width and height variations with wider range
+                const baseWidth = 50;
+                const baseHeight = 160;
+                // Vary widths more: from 30px (skinny) to 75px (thick)
+                const widthVariation = Math.random() * 45 - 20; // -20 to +25px
+                // Vary heights more for better visual variety
+                const heightVariation = Math.random() * 60 - 15; // -15 to +45px
+                bookSpine.style.width = `${baseWidth + widthVariation}px`;
+                bookSpine.style.height = `${baseHeight + heightVariation}px`;
 
-            bookSpine.appendChild(titleDiv);
-            bookSpine.appendChild(authorDiv);
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'spine-title';
+                titleDiv.textContent = book.title;
 
-            // Add click handler to show book details popup
-            bookSpine.addEventListener('click', () => {
-                showBookDetailsPopup(book, false, null, true);
-            });
+                const authorDiv = document.createElement('div');
+                authorDiv.className = 'spine-author';
+                authorDiv.textContent = book.author;
 
-            booksDiv.appendChild(bookSpine);
-    });
+                bookSpine.appendChild(titleDiv);
+                bookSpine.appendChild(authorDiv);
 
-    const shelfBoard = document.createElement('div');
-    shelfBoard.className = 'shelf-board';
+                // Add click handler to show book details popup
+                bookSpine.addEventListener('click', () => {
+                    showBookDetailsPopup(book, false, null, true);
+                });
 
-    shelfDiv.appendChild(booksDiv);
-    shelfDiv.appendChild(shelfBoard);
-    shelfContainer.appendChild(shelfDiv);
+                booksDiv.appendChild(bookSpine);
+        });
+
+        const shelfBoard = document.createElement('div');
+        shelfBoard.className = 'shelf-board';
+
+        shelfDiv.appendChild(booksDiv);
+        shelfDiv.appendChild(shelfBoard);
+        shelfContainer.appendChild(shelfDiv);
+    }
 }
 
 // Display Want to Read Shelf
@@ -2102,12 +2111,12 @@ function displayWantToReadShelf() {
             bookSpine.setAttribute('data-color', color);
 
             // Add random width and height variations with wider range
-            const baseWidth = 60;
-            const baseHeight = 220;
-            // Vary widths more: from 35px (skinny) to 95px (thick)
-            const widthVariation = Math.random() * 60 - 25; // -25 to +35px
+            const baseWidth = 50;
+            const baseHeight = 160;
+            // Vary widths more: from 30px (skinny) to 75px (thick)
+            const widthVariation = Math.random() * 45 - 20; // -20 to +25px
             // Vary heights more for better visual variety
-            const heightVariation = Math.random() * 80 - 20; // -20 to +60px
+            const heightVariation = Math.random() * 60 - 15; // -15 to +45px
             bookSpine.style.width = `${baseWidth + widthVariation}px`;
             bookSpine.style.height = `${baseHeight + heightVariation}px`;
 
