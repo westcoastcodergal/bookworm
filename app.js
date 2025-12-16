@@ -947,6 +947,7 @@ let userLibrary = JSON.parse(localStorage.getItem('userLibrary')) || [...starter
 let ratings = JSON.parse(localStorage.getItem('bookRatings')) || {};
 let currentFilter = '';
 let currentGenreFilter = '';
+let currentRatingFilter = '';
 let activeRecommendations = JSON.parse(localStorage.getItem('activeRecommendations')) || [];
 let wantToReadShelf = JSON.parse(localStorage.getItem('wantToReadShelf')) || [];
 
@@ -973,18 +974,26 @@ function saveWantToReadShelf() {
 // Initialize active recommendations with 99 books
 function initializeRecommendations() {
     if (activeRecommendations.length === 0) {
-        // Get books not in library
+        // Get books not in library or want-to-read shelf
+        const usedIds = new Set([
+            ...userLibrary.map(b => b.id),
+            ...wantToReadShelf.map(b => b.id)
+        ]);
         const availableBooks = recommendedBooksPool.filter(book =>
-            !userLibrary.find(libBook => libBook.id === book.id)
+            !usedIds.has(book.id)
         );
 
         // Select first 99 available books
         activeRecommendations = availableBooks.slice(0, 99);
         saveActiveRecommendations();
     } else {
-        // Clean up any books that are already in library
+        // Clean up any books that are already in library or want-to-read shelf
+        const usedIds = new Set([
+            ...userLibrary.map(b => b.id),
+            ...wantToReadShelf.map(b => b.id)
+        ]);
         activeRecommendations = activeRecommendations.filter(book =>
-            !userLibrary.find(libBook => libBook.id === book.id)
+            !usedIds.has(book.id)
         );
 
         // Refill to 99 if needed
@@ -997,9 +1006,10 @@ function refillRecommendations() {
     const needed = 99 - activeRecommendations.length;
 
     if (needed > 0) {
-        // Get book IDs already in use
+        // Get book IDs already in use (library, want-to-read, and active recommendations)
         const usedIds = new Set([
             ...userLibrary.map(b => b.id),
+            ...wantToReadShelf.map(b => b.id),
             ...activeRecommendations.map(b => b.id)
         ]);
 
@@ -1016,13 +1026,28 @@ function refillRecommendations() {
 }
 
 // Initialize App
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initializeTabs();
     initializeRecommendations();
+
+    // Enhance book covers for all books without images
+    const booksToEnhance = [...userLibrary, ...wantToReadShelf, ...activeRecommendations]
+        .filter(book => !book.thumbnail || book.thumbnail.includes('zoom=1'));
+
+    for (const book of booksToEnhance) {
+        await enhanceBookCover(book);
+    }
+
+    // Save enhanced library
+    if (booksToEnhance.some(b => userLibrary.includes(b))) {
+        saveLibrary();
+    }
+
     populateGenreFilter();
     setupGenreFilter();
     populateRecGenreFilter();
     setupRecGenreFilter();
+    setupRatingFilter();
     displayLibrary();
     setupLibrarySearch();
     setupAPISearch();
@@ -1080,6 +1105,48 @@ function populateGenreFilter() {
     });
 }
 
+// Enhance book covers with higher resolution images from public sources
+async function enhanceBookCover(book) {
+    // If book already has a high-res thumbnail, ensure it's maximum quality
+    if (book.thumbnail) {
+        // Upgrade Google Books thumbnails to highest resolution
+        if (book.thumbnail.includes('books.google.com')) {
+            book.thumbnail = book.thumbnail.replace('zoom=1', 'zoom=5').replace('zoom=2', 'zoom=5').replace('zoom=3', 'zoom=5');
+        }
+        return book.thumbnail;
+    }
+
+    // Try to fetch from Open Library API
+    try {
+        const title = encodeURIComponent(book.title);
+        const author = encodeURIComponent(book.author);
+
+        // Try Open Library Search API
+        const response = await fetch(`https://openlibrary.org/search.json?title=${title}&author=${author}&limit=1`);
+        const data = await response.json();
+
+        if (data.docs && data.docs.length > 0) {
+            const doc = data.docs[0];
+
+            // Open Library provides cover IDs, fetch the large version
+            if (doc.cover_i) {
+                book.thumbnail = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
+                return book.thumbnail;
+            }
+
+            // Try ISBN if available
+            if (doc.isbn && doc.isbn.length > 0) {
+                book.thumbnail = `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-L.jpg`;
+                return book.thumbnail;
+            }
+        }
+    } catch (error) {
+        console.log('Could not fetch cover from Open Library:', error);
+    }
+
+    return null;
+}
+
 // Setup Genre Filter Event Listener
 function setupGenreFilter() {
     const genreFilter = document.getElementById('genre-filter');
@@ -1128,14 +1195,26 @@ function setupLibrarySearch() {
     }
 }
 
+// Setup Rating Filter Event Listener
+function setupRatingFilter() {
+    const ratingFilter = document.getElementById('rating-filter');
+    if (ratingFilter) {
+        ratingFilter.addEventListener('change', (e) => {
+            currentRatingFilter = e.target.value;
+            displayLibrary();
+        });
+    }
+}
+
 // Display User's Library
 function displayLibrary() {
     // First display library shelf
     displayLibraryShelf();
 
     // Ensure all want-to-read books are also in the library
+    const libraryIds = new Set(userLibrary.map(b => b.id));
     wantToReadShelf.forEach(book => {
-        if (!userLibrary.find(b => b.id === book.id)) {
+        if (!libraryIds.has(book.id)) {
             userLibrary.push(book);
         }
     });
@@ -1168,15 +1247,23 @@ function displayLibrary() {
         const hasRating = ratings[book.id] && ratings[book.id] > 0;
         const meetsConstraint = hasRating || isWantToRead;
 
-        return matchesSearch && matchesGenre && meetsConstraint;
+        // Rating filter: check if book meets minimum rating requirement
+        const bookRating = ratings[book.id] || 0;
+        const matchesRating = !currentRatingFilter ||
+            (currentRatingFilter === '5' && bookRating === 5) ||
+            (currentRatingFilter === '4+' && bookRating >= 4) ||
+            (currentRatingFilter === '3+' && bookRating >= 3) ||
+            (currentRatingFilter === '2+' && bookRating >= 2) ||
+            (currentRatingFilter === '1+' && bookRating >= 1) ||
+            (currentRatingFilter === 'unrated' && bookRating === 0);
+
+        return matchesSearch && matchesGenre && meetsConstraint && matchesRating;
     });
 
-    // Sort books: rated books first (by rating), then want-to-read books
+    // Sort books: rated books first (by rating), then unrated books
     filteredBooks.sort((a, b) => {
         const ratingA = ratings[a.id] || 0;
         const ratingB = ratings[b.id] || 0;
-        const isWantToReadA = wantToReadShelf.find(book => book.id === a.id);
-        const isWantToReadB = wantToReadShelf.find(book => book.id === b.id);
 
         // Rated books come first
         if (ratingA > 0 && ratingB === 0) return -1;
@@ -1187,8 +1274,7 @@ function displayLibrary() {
             return ratingB - ratingA;
         }
 
-        // If neither rated, want-to-read books stay, others get filtered
-        // Both are want-to-read, maintain order
+        // Both unrated, maintain order
         return 0;
     });
 
@@ -1295,7 +1381,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
 
     const publishedDateHTML = book.publishedDate ?
-        `<div class="book-published-date">published ${book.publishedDate}</div>` : '';
+        `<div class="book-published-date">${book.publishedDate}</div>` : '';
 
     // Check if book is already in want to read shelf
     const isInWantToRead = wantToReadShelf.find(b => b.id === book.id);
@@ -1326,7 +1412,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         `<button class="remove-recommendation-btn-x" data-book-id="${book.id}" title="Not interested">&times;</button>` : '';
 
     // Add "want to read" badge if book is in want-to-read shelf
-    const wantToReadBadgeHTML = wantToReadShelf.find(b => b.id === book.id) ?
+    const wantToReadBadgeHTML = isInWantToRead ?
         `<div class="want-to-read-badge">🐛 Want to Read</div>` : '';
 
     card.innerHTML = `
@@ -1490,6 +1576,17 @@ document.addEventListener('click', (e) => {
             userLibrary.push(bookData);
             saveLibrary();
             populateGenreFilter();
+        }
+
+        // Remove from active recommendations if present
+        activeRecommendations = activeRecommendations.filter(b => b.id !== bookData.id);
+        saveActiveRecommendations();
+        refillRecommendations();
+
+        // Refresh recommendations display if on recommendations tab
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab && activeTab.dataset.tab === 'recommendations') {
+            displayRecommendations();
         }
 
         // Update button
@@ -1692,14 +1789,16 @@ function displayRecommendations() {
         return;
     }
 
-    // Filter out books that have been rated
+    // Filter out books that have been rated or are in want-to-read shelf
+    const wantToReadIds = new Set(wantToReadShelf.map(b => b.id));
     const unratedRecommendations = activeRecommendations.filter(book => {
         const notRated = !ratings[book.id];
+        const notInWantToRead = !wantToReadIds.has(book.id);
 
         // Apply genre filter if set
         const matchesGenre = !currentRecGenreFilter || book.genres.includes(currentRecGenreFilter);
 
-        return notRated && matchesGenre;
+        return notRated && notInWantToRead && matchesGenre;
     });
 
     // Repopulate genre filter to reflect available genres
@@ -2061,7 +2160,7 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, f
         `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
 
     const publishedDateHTML = book.publishedDate ?
-        `<div class="book-published-date">published ${book.publishedDate}</div>` : '';
+        `<div class="book-published-date">${book.publishedDate}</div>` : '';
 
     const popularityHTML = book.averageRating && book.ratingsCount ?
         `<div class="popularity-rating">
