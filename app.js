@@ -1755,11 +1755,28 @@ document.addEventListener('click', (e) => {
         const bookId = button.dataset.bookId;
         const book = activeRecommendations.find(b => b.id === bookId);
 
-        if (book && confirm(`Remove "${book.title}" from recommendations?`)) {
+        if (book) {
+            // Remove immediately without confirmation
             activeRecommendations = activeRecommendations.filter(b => b.id !== bookId);
             refillRecommendations();
             saveActiveRecommendations();
-            displayRecommendations();
+
+            // Animate removal
+            const bookCard = button.closest('.book-card');
+            if (bookCard) {
+                bookCard.style.opacity = '0';
+                bookCard.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    bookCard.remove();
+                    // Re-render if grid is empty
+                    const grid = document.getElementById('recommendations-grid');
+                    if (grid && grid.children.length === 0) {
+                        displayRecommendations();
+                    }
+                }, 300);
+            } else {
+                displayRecommendations();
+            }
         }
     }
 });
