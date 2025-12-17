@@ -1167,12 +1167,14 @@ function initializeTabs() {
 
 // Populate Genre Filter
 function populateGenreFilter() {
+    const genreFilter = document.getElementById('genre-filter');
+    if (!genreFilter) return; // Element doesn't exist
+
     const genres = new Set();
     userLibrary.forEach(book => {
         book.genres.forEach(genre => genres.add(genre));
     });
 
-    const genreFilter = document.getElementById('genre-filter');
     genreFilter.innerHTML = '<option value="">All Genres</option>';
 
     // Add "Want to Read" option
@@ -1234,6 +1236,8 @@ async function enhanceBookCover(book) {
 // Setup Genre Filter Event Listener
 function setupGenreFilter() {
     const genreFilter = document.getElementById('genre-filter');
+    if (!genreFilter) return; // Element doesn't exist
+
     genreFilter.addEventListener('change', (e) => {
         currentGenreFilter = e.target.value;
         displayLibrary();
@@ -1243,12 +1247,14 @@ function setupGenreFilter() {
 // Populate Recommendations Genre Filter
 let currentRecGenreFilter = '';
 function populateRecGenreFilter() {
+    const recGenreFilter = document.getElementById('rec-genre-filter');
+    if (!recGenreFilter) return; // Element doesn't exist
+
     const genres = new Set();
     activeRecommendations.forEach(book => {
         book.genres.forEach(genre => genres.add(genre));
     });
 
-    const recGenreFilter = document.getElementById('rec-genre-filter');
     recGenreFilter.innerHTML = '<option value="">All Genres</option>';
 
     Array.from(genres).sort().forEach(genre => {
@@ -1262,6 +1268,8 @@ function populateRecGenreFilter() {
 // Setup Recommendations Genre Filter Event Listener
 function setupRecGenreFilter() {
     const recGenreFilter = document.getElementById('rec-genre-filter');
+    if (!recGenreFilter) return; // Element doesn't exist
+
     recGenreFilter.addEventListener('change', (e) => {
         currentRecGenreFilter = e.target.value;
         displayRecommendations();
