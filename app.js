@@ -1478,23 +1478,37 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
     // Check if book is already in want to read shelf
     const isInWantToRead = wantToReadShelf.find(b => b.id === book.id);
 
-    // For recommendations, add a "want to read" button
-    const wantToReadButtonHTML = matchScore !== null ?
-        `<button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>${isInWantToRead ? 'Already on your want to read shelf' : '🐛 Want to Read'}</button>` : '';
-
     const isInLibrary = !isSearchResult && matchScore === null;
+    const isRecommendation = matchScore !== null;
 
-    const addButtonHTML = isSearchResult ?
-        `<div class="search-result-buttons">
+    // Build buttons based on context
+    let addButtonHTML = '';
+    let wantToReadButtonHTML = '';
+
+    if (isSearchResult) {
+        // Search results: show add to library + want to read buttons
+        addButtonHTML = `<div class="search-result-buttons">
             <button class="add-to-library-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>
             <button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>${isInWantToRead ? 'Already on your want to read shelf' : '🐛 Want to Read'}</button>
-        </div>` :
-        `<div class="rating-section">
+        </div>`;
+    } else if (isRecommendation) {
+        // Recommendations: show star rating + want to read button
+        addButtonHTML = `<div class="rating-section">
             <div class="rating-label">Your Rating:</div>
             <div class="stars" data-book-id="${book.id}">
                 ${stars}
             </div>
         </div>`;
+        wantToReadButtonHTML = `<button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>${isInWantToRead ? 'Already on your want to read shelf' : '🐛 Want to Read'}</button>`;
+    } else {
+        // Library items: show star rating only
+        addButtonHTML = `<div class="rating-section">
+            <div class="rating-label">Your Rating:</div>
+            <div class="stars" data-book-id="${book.id}">
+                ${stars}
+            </div>
+        </div>`;
+    }
 
     const removeButtonHTML = isInLibrary ?
         `<button class="remove-from-library-btn-x" data-book-id="${book.id}" title="Remove from library">&times;</button>` : '';
@@ -1681,26 +1695,33 @@ document.addEventListener('click', (e) => {
             populateGenreFilter();
         }
 
+        // Update button immediately for visual feedback
+        button.textContent = '✓ Added to Shelf!';
+        button.classList.add('added');
+        button.disabled = true;
+
         // Remove from active recommendations if present
         activeRecommendations = activeRecommendations.filter(b => b.id !== bookData.id);
         saveActiveRecommendations();
         refillRecommendations();
 
-        // Refresh recommendations display if on recommendations tab
+        // For recommendations tab, remove the card with animation instead of re-rendering
         const activeTab = document.querySelector('.tab-btn.active');
         if (activeTab && activeTab.dataset.tab === 'recommendations') {
-            displayRecommendations();
+            const bookCard = button.closest('.book-card');
+            if (bookCard) {
+                bookCard.style.opacity = '0';
+                bookCard.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    bookCard.remove();
+                    // Only re-render if grid is empty to show empty message
+                    const grid = document.getElementById('recommendations-grid');
+                    if (grid && grid.children.length === 0) {
+                        displayRecommendations();
+                    }
+                }, 300);
+            }
         }
-
-        // Update button
-        button.textContent = '✓ Added to Shelf!';
-        button.classList.add('added');
-        button.disabled = true;
-
-        // Show a quick visual feedback
-        setTimeout(() => {
-            button.textContent = '🐛 On Your Shelf';
-        }, 1500);
     }
 
     // Remove from library button

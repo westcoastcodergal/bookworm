@@ -103,7 +103,6 @@ main {
         -8px -8px 0px rgba(78, 205, 196, 0.3),
         0 15px 40px rgba(0,0,0,0.15);
     border: 5px solid #2a2a2a;
-    transform: rotate(0.5deg);
     position: relative;
 }
 
@@ -301,7 +300,7 @@ main::after {
     background: white;
     border-radius: 0;
     padding: 20px;
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease, transform 0.3s ease;
     cursor: pointer;
     border: 5px solid;
     position: relative;
