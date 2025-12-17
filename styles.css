@@ -114,6 +114,7 @@ main::before {
     right: 40px;
     font-size: 3rem;
     animation: bounce 2s ease-in-out infinite;
+    pointer-events: none;
 }
 
 main::after {
@@ -123,6 +124,7 @@ main::after {
     left: 40px;
     font-size: 3rem;
     animation: bounce 2s ease-in-out infinite 1s;
+    pointer-events: none;
 }
 
 @keyframes bounce {
