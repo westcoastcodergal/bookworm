@@ -105,6 +105,7 @@ main {
     border: 5px solid #2a2a2a;
     transform: rotate(0.5deg);
     position: relative;
+    overflow: visible;
 }
 
 main::before {
@@ -114,6 +115,7 @@ main::before {
     right: 40px;
     font-size: 3rem;
     animation: bounce 2s ease-in-out infinite;
+    pointer-events: none;
 }
 
 main::after {
@@ -123,6 +125,7 @@ main::after {
     left: 40px;
     font-size: 3rem;
     animation: bounce 2s ease-in-out infinite 1s;
+    pointer-events: none;
 }
 
 @keyframes bounce {
@@ -293,13 +296,15 @@ main::after {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 30px;
+    padding-right: 20px;
+    overflow: visible;
 }
 
 .book-card {
     background: white;
     border-radius: 0;
     padding: 20px;
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease, transform 0.3s ease;
     cursor: pointer;
     border: 5px solid;
     position: relative;
