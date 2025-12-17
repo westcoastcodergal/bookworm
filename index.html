@@ -3,7 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Content Security Policy for XSS protection -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self';
+                   script-src 'self' 'unsafe-inline';
+                   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+                   img-src 'self' data: https://books.google.com https://covers.openlibrary.org http://books.google.com http://covers.openlibrary.org;
+                   connect-src 'self' https://www.googleapis.com https://openlibrary.org;
+                   font-src 'self' https://fonts.gstatic.com;
+                   object-src 'none';
+                   base-uri 'self';
+                   form-action 'self';">
+
     <title>Bookworm - Book Recommendations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Fredoka:wght@300;400;500;600;700&family=Lobster&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -33,8 +49,8 @@
 
             <!-- My Library Tab -->
             <div id="library-tab" class="tab-content">
+                <!-- Genre Filter for Library -->
                 <div class="search-section">
-                    <input type="text" id="library-search-input" placeholder="Filter your books...">
                     <select id="genre-filter">
                         <option value="">All Genres</option>
                     </select>
@@ -60,6 +76,11 @@
                 <div class="recommendations-header">
                     <h2>Recommended for You</h2>
                     <p id="rec-description">Rate some books to get personalized recommendations!</p>
+                </div>
+                <div class="search-section">
+                    <select id="rec-genre-filter">
+                        <option value="">All Genres</option>
+                    </select>
                 </div>
                 <div id="recommendations-grid" class="books-grid"></div>
             </div>

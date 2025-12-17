@@ -47,6 +47,54 @@ const starterBooks = [
     }
 ];
 
+// ===== SECURITY: HTML Sanitization =====
+// Sanitize HTML to prevent XSS attacks from untrusted API data
+function sanitizeHTML(str) {
+    if (typeof str !== 'string') return '';
+
+    // Create a temporary div element to use browser's built-in HTML parser
+    const temp = document.createElement('div');
+    temp.textContent = str; // textContent automatically escapes HTML
+    return temp.innerHTML;
+}
+
+// Validate and sanitize book data from external APIs
+function sanitizeBookData(book) {
+    return {
+        id: String(book.id || ''),
+        title: sanitizeHTML(book.title || 'Unknown Title'),
+        author: sanitizeHTML(book.author || 'Unknown Author'),
+        genres: Array.isArray(book.genres) ? book.genres.map(g => sanitizeHTML(String(g))) : ['General'],
+        description: sanitizeHTML(book.description || 'No description available.'),
+        thumbnail: book.thumbnail || null, // URLs are validated by browser
+        averageRating: typeof book.averageRating === 'number' ? book.averageRating : null,
+        ratingsCount: typeof book.ratingsCount === 'number' ? book.ratingsCount : null,
+        publishedDate: book.publishedDate ? sanitizeHTML(String(book.publishedDate)) : null
+    };
+}
+
+// Validate data loaded from localStorage to prevent tampering
+function validateStoredData(data, expectedType = 'array') {
+    try {
+        if (expectedType === 'array' && Array.isArray(data)) {
+            return data.map(item => sanitizeBookData(item));
+        } else if (expectedType === 'object' && typeof data === 'object' && data !== null) {
+            // For ratings object, validate structure
+            const validated = {};
+            for (const [key, value] of Object.entries(data)) {
+                if (typeof value === 'number' && value >= 1 && value <= 5) {
+                    validated[String(key)] = value;
+                }
+            }
+            return validated;
+        }
+        return expectedType === 'array' ? [] : {};
+    } catch (error) {
+        console.error('Data validation failed:', error);
+        return expectedType === 'array' ? [] : {};
+    }
+}
+
 // Pool of books for recommendations (not in user's library by default)
 const recommendedBooksPool = [
     {
@@ -942,13 +990,50 @@ const recommendedBooksPool = [
     }
 ];
 
-// Application State
-let userLibrary = JSON.parse(localStorage.getItem('userLibrary')) || [...starterBooks];
-let ratings = JSON.parse(localStorage.getItem('bookRatings')) || {};
+// Application State - Load and validate data from localStorage
+let userLibrary = (() => {
+    try {
+        const stored = localStorage.getItem('userLibrary');
+        return stored ? validateStoredData(JSON.parse(stored), 'array') : [...starterBooks];
+    } catch (error) {
+        console.error('Failed to load user library:', error);
+        return [...starterBooks];
+    }
+})();
+
+let ratings = (() => {
+    try {
+        const stored = localStorage.getItem('bookRatings');
+        return stored ? validateStoredData(JSON.parse(stored), 'object') : {};
+    } catch (error) {
+        console.error('Failed to load ratings:', error);
+        return {};
+    }
+})();
+
 let currentFilter = '';
 let currentGenreFilter = '';
-let activeRecommendations = JSON.parse(localStorage.getItem('activeRecommendations')) || [];
-let wantToReadShelf = JSON.parse(localStorage.getItem('wantToReadShelf')) || [];
+let currentRatingFilter = '';
+
+let activeRecommendations = (() => {
+    try {
+        const stored = localStorage.getItem('activeRecommendations');
+        return stored ? validateStoredData(JSON.parse(stored), 'array') : [];
+    } catch (error) {
+        console.error('Failed to load active recommendations:', error);
+        return [];
+    }
+})();
+
+let wantToReadShelf = (() => {
+    try {
+        const stored = localStorage.getItem('wantToReadShelf');
+        return stored ? validateStoredData(JSON.parse(stored), 'array') : [];
+    } catch (error) {
+        console.error('Failed to load want to read shelf:', error);
+        return [];
+    }
+})();
 
 // Save library to localStorage
 function saveLibrary() {
@@ -973,18 +1058,26 @@ function saveWantToReadShelf() {
 // Initialize active recommendations with 99 books
 function initializeRecommendations() {
     if (activeRecommendations.length === 0) {
-        // Get books not in library
+        // Get books not in library or want-to-read shelf
+        const usedIds = new Set([
+            ...userLibrary.map(b => b.id),
+            ...wantToReadShelf.map(b => b.id)
+        ]);
         const availableBooks = recommendedBooksPool.filter(book =>
-            !userLibrary.find(libBook => libBook.id === book.id)
+            !usedIds.has(book.id)
         );
 
         // Select first 99 available books
         activeRecommendations = availableBooks.slice(0, 99);
         saveActiveRecommendations();
     } else {
-        // Clean up any books that are already in library
+        // Clean up any books that are already in library or want-to-read shelf
+        const usedIds = new Set([
+            ...userLibrary.map(b => b.id),
+            ...wantToReadShelf.map(b => b.id)
+        ]);
         activeRecommendations = activeRecommendations.filter(book =>
-            !userLibrary.find(libBook => libBook.id === book.id)
+            !usedIds.has(book.id)
         );
 
         // Refill to 99 if needed
@@ -997,9 +1090,10 @@ function refillRecommendations() {
     const needed = 99 - activeRecommendations.length;
 
     if (needed > 0) {
-        // Get book IDs already in use
+        // Get book IDs already in use (library, want-to-read, and active recommendations)
         const usedIds = new Set([
             ...userLibrary.map(b => b.id),
+            ...wantToReadShelf.map(b => b.id),
             ...activeRecommendations.map(b => b.id)
         ]);
 
@@ -1016,11 +1110,28 @@ function refillRecommendations() {
 }
 
 // Initialize App
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initializeTabs();
     initializeRecommendations();
+
+    // Enhance book covers for all books without images
+    const booksToEnhance = [...userLibrary, ...wantToReadShelf, ...activeRecommendations]
+        .filter(book => !book.thumbnail || book.thumbnail.includes('zoom=1'));
+
+    for (const book of booksToEnhance) {
+        await enhanceBookCover(book);
+    }
+
+    // Save enhanced library
+    if (booksToEnhance.some(b => userLibrary.includes(b))) {
+        saveLibrary();
+    }
+
     populateGenreFilter();
     setupGenreFilter();
+    populateRecGenreFilter();
+    setupRecGenreFilter();
+    setupRatingFilter();
     displayLibrary();
     setupLibrarySearch();
     setupAPISearch();
@@ -1056,13 +1167,21 @@ function initializeTabs() {
 
 // Populate Genre Filter
 function populateGenreFilter() {
+    const genreFilter = document.getElementById('genre-filter');
+    if (!genreFilter) return; // Element doesn't exist
+
     const genres = new Set();
     userLibrary.forEach(book => {
         book.genres.forEach(genre => genres.add(genre));
     });
 
-    const genreFilter = document.getElementById('genre-filter');
     genreFilter.innerHTML = '<option value="">All Genres</option>';
+
+    // Add "Want to Read" option
+    const wtrOption = document.createElement('option');
+    wtrOption.value = 'Want to Read';
+    wtrOption.textContent = 'Want to Read';
+    genreFilter.appendChild(wtrOption);
 
     Array.from(genres).sort().forEach(genre => {
         const option = document.createElement('option');
@@ -1072,12 +1191,88 @@ function populateGenreFilter() {
     });
 }
 
+// Enhance book covers with higher resolution images from public sources
+async function enhanceBookCover(book) {
+    // If book already has a high-res thumbnail, ensure it's maximum quality
+    if (book.thumbnail) {
+        // Upgrade Google Books thumbnails to highest resolution
+        if (book.thumbnail.includes('books.google.com')) {
+            book.thumbnail = book.thumbnail.replace('zoom=1', 'zoom=5').replace('zoom=2', 'zoom=5').replace('zoom=3', 'zoom=5');
+        }
+        return book.thumbnail;
+    }
+
+    // Try to fetch from Open Library API
+    try {
+        const title = encodeURIComponent(book.title);
+        const author = encodeURIComponent(book.author);
+
+        // Try Open Library Search API
+        const response = await fetch(`https://openlibrary.org/search.json?title=${title}&author=${author}&limit=1`);
+        const data = await response.json();
+
+        if (data.docs && data.docs.length > 0) {
+            const doc = data.docs[0];
+
+            // Open Library provides cover IDs, fetch the large version
+            if (doc.cover_i) {
+                book.thumbnail = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
+                return book.thumbnail;
+            }
+
+            // Try ISBN if available
+            if (doc.isbn && doc.isbn.length > 0) {
+                book.thumbnail = `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-L.jpg`;
+                return book.thumbnail;
+            }
+        }
+    } catch (error) {
+        console.log('Could not fetch cover from Open Library:', error);
+    }
+
+    return null;
+}
+
 // Setup Genre Filter Event Listener
 function setupGenreFilter() {
     const genreFilter = document.getElementById('genre-filter');
+    if (!genreFilter) return; // Element doesn't exist
+
     genreFilter.addEventListener('change', (e) => {
         currentGenreFilter = e.target.value;
         displayLibrary();
+    });
+}
+
+// Populate Recommendations Genre Filter
+let currentRecGenreFilter = '';
+function populateRecGenreFilter() {
+    const recGenreFilter = document.getElementById('rec-genre-filter');
+    if (!recGenreFilter) return; // Element doesn't exist
+
+    const genres = new Set();
+    activeRecommendations.forEach(book => {
+        book.genres.forEach(genre => genres.add(genre));
+    });
+
+    recGenreFilter.innerHTML = '<option value="">All Genres</option>';
+
+    Array.from(genres).sort().forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre;
+        option.textContent = genre;
+        recGenreFilter.appendChild(option);
+    });
+}
+
+// Setup Recommendations Genre Filter Event Listener
+function setupRecGenreFilter() {
+    const recGenreFilter = document.getElementById('rec-genre-filter');
+    if (!recGenreFilter) return; // Element doesn't exist
+
+    recGenreFilter.addEventListener('change', (e) => {
+        currentRecGenreFilter = e.target.value;
+        displayRecommendations();
     });
 }
 
@@ -1092,13 +1287,36 @@ function setupLibrarySearch() {
     }
 }
 
+// Setup Rating Filter Event Listener
+function setupRatingFilter() {
+    const ratingFilter = document.getElementById('rating-filter');
+    if (ratingFilter) {
+        ratingFilter.addEventListener('change', (e) => {
+            currentRatingFilter = e.target.value;
+            displayLibrary();
+        });
+    }
+}
+
 // Display User's Library
 function displayLibrary() {
     // First display library shelf
     displayLibraryShelf();
 
-    // Then display want to read shelf
-    displayWantToReadShelf();
+    // Ensure all want-to-read books are also in the library
+    const libraryIds = new Set(userLibrary.map(b => b.id));
+    wantToReadShelf.forEach(book => {
+        if (!libraryIds.has(book.id)) {
+            userLibrary.push(book);
+        }
+    });
+    saveLibrary();
+
+    // Hide the want-to-read section since books are now in the main library
+    const wtrSection = document.getElementById('want-to-read-section');
+    if (wtrSection) {
+        wtrSection.style.display = 'none';
+    }
 
     const booksGrid = document.getElementById('books-grid');
     const filteredBooks = userLibrary.filter(book => {
@@ -1107,23 +1325,49 @@ function displayLibrary() {
             book.author.toLowerCase().includes(currentFilter) ||
             book.genres.some(g => g.toLowerCase().includes(currentFilter));
 
-        const matchesGenre = !currentGenreFilter ||
-            book.genres.includes(currentGenreFilter);
+        const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
 
-        return matchesSearch && matchesGenre;
+        // Handle "Want to Read" filter
+        let matchesGenre;
+        if (currentGenreFilter === 'Want to Read') {
+            matchesGenre = isWantToRead;
+        } else {
+            matchesGenre = !currentGenreFilter || book.genres.includes(currentGenreFilter);
+        }
+
+        // Enforce constraint: book must have rating OR be in want-to-read
+        const hasRating = ratings[book.id] && ratings[book.id] > 0;
+        const meetsConstraint = hasRating || isWantToRead;
+
+        // Rating filter: check if book meets minimum rating requirement
+        const bookRating = ratings[book.id] || 0;
+        const matchesRating = !currentRatingFilter ||
+            (currentRatingFilter === '5' && bookRating === 5) ||
+            (currentRatingFilter === '4+' && bookRating >= 4) ||
+            (currentRatingFilter === '3+' && bookRating >= 3) ||
+            (currentRatingFilter === '2+' && bookRating >= 2) ||
+            (currentRatingFilter === '1+' && bookRating >= 1) ||
+            (currentRatingFilter === 'unrated' && bookRating === 0);
+
+        return matchesSearch && matchesGenre && meetsConstraint && matchesRating;
     });
 
-    // Sort books: rated books first, then by rating (highest first)
+    // Sort books: rated books first (by rating), then unrated books
     filteredBooks.sort((a, b) => {
         const ratingA = ratings[a.id] || 0;
         const ratingB = ratings[b.id] || 0;
 
-        // If one has a rating and the other doesn't, rated goes first
+        // Rated books come first
         if (ratingA > 0 && ratingB === 0) return -1;
         if (ratingA === 0 && ratingB > 0) return 1;
 
-        // If both rated or both unrated, sort by rating value (highest first)
-        return ratingB - ratingA;
+        // If both rated, sort by rating (highest first)
+        if (ratingA > 0 && ratingB > 0) {
+            return ratingB - ratingA;
+        }
+
+        // Both unrated, maintain order
+        return 0;
     });
 
     booksGrid.innerHTML = '';
@@ -1201,7 +1445,8 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         if (e.target.classList.contains('star') ||
             e.target.classList.contains('add-to-library-btn') ||
             e.target.classList.contains('want-to-read-btn') ||
-            e.target.classList.contains('remove-from-library-btn')) {
+            e.target.classList.contains('remove-from-library-btn') ||
+            e.target.classList.contains('remove-from-library-btn-x')) {
             return;
         }
         showBookDetailsPopup(book, isSearchResult, matchScore);
@@ -1228,28 +1473,42 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
 
     const publishedDateHTML = book.publishedDate ?
-        `<div class="book-published-date">published ${book.publishedDate}</div>` : '';
+        `<div class="book-published-date">${book.publishedDate}</div>` : '';
 
     // Check if book is already in want to read shelf
     const isInWantToRead = wantToReadShelf.find(b => b.id === book.id);
 
-    // For recommendations, add a "want to read" button
-    const wantToReadButtonHTML = matchScore !== null ?
-        `<button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>${isInWantToRead ? 'Already on your want to read shelf' : '🐛 Want to Read'}</button>` : '';
-
     const isInLibrary = !isSearchResult && matchScore === null;
+    const isRecommendation = matchScore !== null;
 
-    const addButtonHTML = isSearchResult ?
-        `<div class="search-result-buttons">
+    // Build buttons based on context
+    let addButtonHTML = '';
+    let wantToReadButtonHTML = '';
+
+    if (isSearchResult) {
+        // Search results: show add to library + want to read buttons
+        addButtonHTML = `<div class="search-result-buttons">
             <button class="add-to-library-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>
             <button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>${isInWantToRead ? 'Already on your want to read shelf' : '🐛 Want to Read'}</button>
-        </div>` :
-        `<div class="rating-section">
+        </div>`;
+    } else if (isRecommendation) {
+        // Recommendations: show star rating + want to read button
+        addButtonHTML = `<div class="rating-section">
             <div class="rating-label">Your Rating:</div>
             <div class="stars" data-book-id="${book.id}">
                 ${stars}
             </div>
         </div>`;
+        wantToReadButtonHTML = `<button class="want-to-read-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>${isInWantToRead ? 'Already on your want to read shelf' : '🐛 Want to Read'}</button>`;
+    } else {
+        // Library items: show star rating only
+        addButtonHTML = `<div class="rating-section">
+            <div class="rating-label">Your Rating:</div>
+            <div class="stars" data-book-id="${book.id}">
+                ${stars}
+            </div>
+        </div>`;
+    }
 
     const removeButtonHTML = isInLibrary ?
         `<button class="remove-from-library-btn-x" data-book-id="${book.id}" title="Remove from library">&times;</button>` : '';
@@ -1258,10 +1517,26 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
     const removeRecommendationHTML = matchScore !== null ?
         `<button class="remove-recommendation-btn-x" data-book-id="${book.id}" title="Not interested">&times;</button>` : '';
 
+    // Add "want to read" badge if book is in want-to-read shelf
+    const wantToReadBadgeHTML = isInWantToRead ?
+        `<div class="want-to-read-badge">🐛 Want to Read</div>` : '';
+
+    // Add quality badge for search results
+    let qualityBadgeHTML = '';
+    if (isSearchResult) {
+        if (book.validation?.validated) {
+            qualityBadgeHTML = `<div class="quality-badge validated">✓ Validated</div>`;
+        } else if (book.isbn13 || book.isbn10) {
+            qualityBadgeHTML = `<div class="quality-badge isbn">ISBN</div>`;
+        }
+    }
+
     card.innerHTML = `
         ${thumbnailHTML}
         ${removeButtonHTML}
         ${removeRecommendationHTML}
+        ${wantToReadBadgeHTML}
+        ${qualityBadgeHTML}
         <div class="book-title">${book.title}</div>
         <div class="book-author">by ${book.author}</div>
         ${publishedDateHTML}
@@ -1327,6 +1602,13 @@ document.addEventListener('click', (e) => {
         // Update rating
         ratings[bookId] = rating;
         saveRatings();
+
+        // Remove from want-to-read shelf when rating is given
+        const wasInWantToRead = wantToReadShelf.find(b => b.id === bookId);
+        if (wasInWantToRead) {
+            wantToReadShelf = wantToReadShelf.filter(b => b.id !== bookId);
+            saveWantToReadShelf();
+        }
 
         // If rating a recommended book, move it to library
         if (isInRecommendations && bookInRecommendations) {
@@ -1406,15 +1688,40 @@ document.addEventListener('click', (e) => {
         wantToReadShelf.push(bookData);
         saveWantToReadShelf();
 
-        // Update button
+        // Also add to library (since all want-to-read books should be in library)
+        if (!userLibrary.find(b => b.id === bookData.id)) {
+            userLibrary.push(bookData);
+            saveLibrary();
+            populateGenreFilter();
+        }
+
+        // Update button immediately for visual feedback
         button.textContent = '✓ Added to Shelf!';
         button.classList.add('added');
         button.disabled = true;
 
-        // Show a quick visual feedback
-        setTimeout(() => {
-            button.textContent = '🐛 On Your Shelf';
-        }, 1500);
+        // Remove from active recommendations if present
+        activeRecommendations = activeRecommendations.filter(b => b.id !== bookData.id);
+        saveActiveRecommendations();
+        refillRecommendations();
+
+        // For recommendations tab, remove the card with animation instead of re-rendering
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab && activeTab.dataset.tab === 'recommendations') {
+            const bookCard = button.closest('.book-card');
+            if (bookCard) {
+                bookCard.style.opacity = '0';
+                bookCard.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    bookCard.remove();
+                    // Only re-render if grid is empty to show empty message
+                    const grid = document.getElementById('recommendations-grid');
+                    if (grid && grid.children.length === 0) {
+                        displayRecommendations();
+                    }
+                }, 300);
+            }
+        }
     }
 
     // Remove from library button
@@ -1423,9 +1730,20 @@ document.addEventListener('click', (e) => {
         const bookId = button.dataset.bookId;
         const book = userLibrary.find(b => b.id === bookId);
 
-        if (book && confirm(`Remove "${book.title}" from your library?`)) {
+        if (book) {
             userLibrary = userLibrary.filter(b => b.id !== bookId);
             saveLibrary();
+
+            // Also remove from want-to-read shelf
+            wantToReadShelf = wantToReadShelf.filter(b => b.id !== bookId);
+            saveWantToReadShelf();
+
+            // Remove rating
+            if (ratings[bookId]) {
+                delete ratings[bookId];
+                saveRatings();
+            }
+
             populateGenreFilter();
             displayLibrary();
         }
@@ -1471,16 +1789,140 @@ function setupAPISearch() {
     });
 }
 
-// Search Books using Google Books API
+// Major Publishers List for Quality Scoring
+const majorPublishers = [
+    'penguin', 'random house', 'hachette', 'harpercollins', 'simon & schuster',
+    'macmillan', 'scholastic', 'oxford university press', 'cambridge university press',
+    'pearson', 'wiley', 'springer', 'norton', 'knopf', 'viking', 'doubleday',
+    'farrar straus', 'grove press', 'vintage', 'pantheon', 'little brown',
+    'crown', 'ballantine', 'del rey', 'bantam', 'tor', 'bloomsbury'
+];
+
+// Validate book against Open Library
+async function validateBookWithOpenLibrary(isbn) {
+    if (!isbn) return null;
+
+    try {
+        const response = await fetch(`https://openlibrary.org/isbn/${isbn}.json`, {
+            signal: AbortSignal.timeout(3000) // 3 second timeout
+        });
+        if (response.ok) {
+            const data = await response.json();
+            return {
+                validated: true,
+                hasLCCN: !!data.lccn,
+                openLibraryKey: data.key
+            };
+        }
+    } catch (error) {
+        // Silently fail - book may still be valid even if not in Open Library
+    }
+    return null;
+}
+
+// Calculate relevance score for a book
+function calculateRelevanceScore(book, query) {
+    let score = 0;
+    const queryLower = query.toLowerCase();
+    const titleLower = book.title.toLowerCase();
+    const authorLower = book.author.toLowerCase();
+    const queryTerms = queryLower.split(/\s+/).filter(t => t.length > 2);
+
+    // 1. Query-Term Match Score (40 points)
+    if (titleLower === queryLower) {
+        score += 40; // Exact title match
+    } else if (titleLower.includes(queryLower)) {
+        score += 30; // Title contains full query
+    } else {
+        // Check how many query terms are in title
+        const matchedTerms = queryTerms.filter(term => titleLower.includes(term));
+        score += (matchedTerms.length / Math.max(queryTerms.length, 1)) * 25;
+
+        // Bonus if terms appear in same order
+        if (matchedTerms.length === queryTerms.length && queryTerms.length > 0) {
+            let lastIndex = -1;
+            let inOrder = true;
+            for (const term of queryTerms) {
+                const index = titleLower.indexOf(term);
+                if (index <= lastIndex) {
+                    inOrder = false;
+                    break;
+                }
+                lastIndex = index;
+            }
+            if (inOrder) score += 5;
+        }
+    }
+
+    // Author match bonus
+    if (authorLower === queryLower) {
+        score += 35;
+    } else if (authorLower.includes(queryLower)) {
+        score += 25;
+    }
+
+    // 2. Authority & Quality Score (30 points)
+    if (book.isbn13 || book.isbn10) {
+        score += 10; // Has valid ISBN
+    }
+
+    if (book.validation?.validated) {
+        score += 5; // In Open Library
+    }
+
+    if (book.validation?.hasLCCN) {
+        score += 10; // Has Library of Congress Number
+    }
+
+    // Publisher quality
+    if (book.publisher) {
+        const pubLower = book.publisher.toLowerCase();
+        if (majorPublishers.some(pub => pubLower.includes(pub))) {
+            score += 5; // Major publisher
+        } else if (pubLower.length > 3 && !pubLower.includes('self') && !pubLower.includes('createspace')) {
+            score += 3; // Medium publisher
+        }
+    }
+
+    // 3. Popularity & Reception Score (20 points)
+    if (book.averageRating && book.ratingsCount) {
+        // Rating quality: 0-10 points
+        score += (book.averageRating / 5) * 10;
+
+        // Review count (logarithmic): 0-10 points
+        const reviewScore = Math.min(Math.log10(book.ratingsCount + 1) / 4, 1) * 10;
+        score += reviewScore;
+    }
+
+    // 4. Recency & Relevance (10 points)
+    if (book.publishedDate) {
+        const year = parseInt(book.publishedDate);
+        const currentYear = new Date().getFullYear();
+        const age = currentYear - year;
+
+        if (age <= 5) {
+            score += 10; // Recent book
+        } else if (age >= 50 && book.averageRating && book.averageRating >= 4.0) {
+            score += 10; // Classic book
+        } else if (age <= 10) {
+            score += 5;
+        }
+    }
+
+    return Math.min(score, 100);
+}
+
+// Search Books using Google Books API with validation
 async function searchBooks(query) {
     const searchStatus = document.getElementById('search-status');
     const resultsGrid = document.getElementById('search-results-grid');
 
-    searchStatus.textContent = 'Searching...';
+    searchStatus.textContent = 'Searching high-quality book sources...';
     resultsGrid.innerHTML = '';
 
     try {
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20&langRestrict=en`);
+        // Fetch more results for better quality filtering (40 instead of 20)
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=40&langRestrict=en`);
         const data = await response.json();
 
         if (!data.items || data.items.length === 0) {
@@ -1488,20 +1930,31 @@ async function searchBooks(query) {
             return;
         }
 
+        searchStatus.textContent = 'Validating book quality...';
+
+        // Parse books and extract metadata including ISBNs
         const books = data.items.map(item => {
             const volumeInfo = item.volumeInfo;
-            // Get higher resolution thumbnail by replacing zoom=1 with zoom=5
+            const industryIdentifiers = volumeInfo.industryIdentifiers || [];
+
+            // Extract ISBNs
+            const isbn13 = industryIdentifiers.find(id => id.type === 'ISBN_13')?.identifier;
+            const isbn10 = industryIdentifiers.find(id => id.type === 'ISBN_10')?.identifier;
+
+            // Get higher resolution thumbnail
             let thumbnail = volumeInfo.imageLinks?.thumbnail || null;
             if (thumbnail) {
                 thumbnail = thumbnail.replace('zoom=1', 'zoom=5');
             }
+
             // Extract year only from published date
             let publishedYear = null;
             if (volumeInfo.publishedDate) {
                 publishedYear = volumeInfo.publishedDate.substring(0, 4);
             }
 
-            return {
+            // Create book object and sanitize all text fields to prevent XSS
+            const rawBook = {
                 id: item.id,
                 title: volumeInfo.title || 'Unknown Title',
                 author: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown Author',
@@ -1514,16 +1967,101 @@ async function searchBooks(query) {
                 thumbnail: thumbnail,
                 averageRating: volumeInfo.averageRating || null,
                 ratingsCount: volumeInfo.ratingsCount || null,
-                publishedDate: publishedYear
+                publishedDate: publishedYear,
+                publisher: volumeInfo.publisher || null,
+                isbn13: isbn13,
+                isbn10: isbn10,
+                validation: null
             };
+
+            // Sanitize the book data before returning
+            return sanitizeBookData(rawBook);
         });
+
+        // Validate books with ISBNs against Open Library
+        // Use a sample of books to avoid overwhelming the API
+        const booksToValidate = books.filter(b => b.isbn13 || b.isbn10).slice(0, 15);
+        const validationPromises = booksToValidate.map(async book => {
+            const isbn = book.isbn13 || book.isbn10;
+            book.validation = await validateBookWithOpenLibrary(isbn);
+        });
+
+        // Wait for all validations (with timeout protection)
+        await Promise.allSettled(validationPromises);
+
+        // Detect if query is likely an author search
+        const isAuthorSearch = books.some(book =>
+            book.author.toLowerCase().includes(query.toLowerCase())
+        );
+
+        // Helper function for better publisher matching
+        function matchesPublisher(publisher) {
+            if (!publisher) return false;
+            const pubLower = publisher.toLowerCase();
+            return majorPublishers.some(majorPub => {
+                // Match word boundaries to catch variations like "Bloomsbury Publishing"
+                const regex = new RegExp('\\b' + majorPub + '\\b', 'i');
+                return regex.test(pubLower);
+            });
+        }
+
+        // Three-tier quality filtering with adaptive selection
+
+        // Tier 1: Strict filter - highest quality only
+        const strictFilter = (book) => {
+            const hasISBN = !!(book.isbn13 || book.isbn10);
+            const hasGoodRatings = book.averageRating && book.averageRating >= 4.0 && book.ratingsCount >= 100;
+            const isMajorPublisher = matchesPublisher(book.publisher);
+            const isValidated = book.validation?.validated;
+
+            // For author searches, be more lenient
+            if (isAuthorSearch && book.author.toLowerCase().includes(query.toLowerCase())) {
+                return hasISBN || hasGoodRatings || isMajorPublisher || isValidated ||
+                       (book.averageRating && book.averageRating >= 3.5);
+            }
+
+            return (hasISBN && (hasGoodRatings || isMajorPublisher || isValidated));
+        };
+
+        // Tier 2: Medium filter - good quality
+        const mediumFilter = (book) => {
+            const hasISBN = !!(book.isbn13 || book.isbn10);
+            const hasAnyRatings = book.averageRating && book.averageRating >= 3.5;
+            const isMajorPublisher = matchesPublisher(book.publisher);
+            const isValidated = book.validation?.validated;
+
+            return hasISBN || hasAnyRatings || isMajorPublisher || isValidated;
+        };
+
+        // Tier 3: Lenient filter - basic quality
+        const lenientFilter = (book) => {
+            const hasBasicMetadata = book.title && book.author && book.description;
+            const notSpam = book.title !== book.title.toUpperCase() && // Not all caps
+                           book.author !== 'Unknown Author';
+            const hasPublisher = !!book.publisher;
+
+            return hasBasicMetadata && notSpam && hasPublisher;
+        };
+
+        // Apply adaptive filtering
+        let qualityBooks = books.filter(strictFilter);
+        let filterLevel = 'strict';
+
+        if (qualityBooks.length < 5) {
+            qualityBooks = books.filter(mediumFilter);
+            filterLevel = 'medium';
+        }
+
+        if (qualityBooks.length < 3) {
+            qualityBooks = books.filter(lenientFilter);
+            filterLevel = 'lenient';
+        }
 
         // Deduplicate books by title and author pair
         const uniqueBooks = [];
         const seenPairs = new Map();
 
-        books.forEach(book => {
-            // Create a normalized key for book/author pair
+        qualityBooks.forEach(book => {
             const key = `${book.title.toLowerCase()}||${book.author.toLowerCase()}`;
 
             if (!seenPairs.has(key)) {
@@ -1533,39 +2071,38 @@ async function searchBooks(query) {
         });
 
         if (uniqueBooks.length === 0) {
-            searchStatus.textContent = 'No books found. Try a different search term.';
+            searchStatus.textContent = 'No high-quality books found. Try a different search term.';
             return;
         }
 
-        // Sort by popularity (combination of rating and number of ratings)
-        // But first prioritize author matches if the search query matches an author
-        uniqueBooks.sort((a, b) => {
-            const queryLower = query.toLowerCase();
-            const aAuthorMatch = a.author.toLowerCase().includes(queryLower);
-            const bAuthorMatch = b.author.toLowerCase().includes(queryLower);
-
-            // If one matches author and other doesn't, author match goes first
-            if (aAuthorMatch && !bAuthorMatch) return -1;
-            if (!aAuthorMatch && bAuthorMatch) return 1;
-
-            // Both match author or both don't - sort by popularity
-            const hasRatingsA = a.averageRating && a.ratingsCount;
-            const hasRatingsB = b.averageRating && b.ratingsCount;
-
-            if (!hasRatingsA && !hasRatingsB) return 0;
-            if (!hasRatingsA) return 1;  // a goes to end
-            if (!hasRatingsB) return -1; // b goes to end
-
-            // For books with ratings, combine rating quality and review count
-            const popularityA = a.averageRating * Math.log(a.ratingsCount + 1);
-            const popularityB = b.averageRating * Math.log(b.ratingsCount + 1);
-            return popularityB - popularityA; // Sort descending (most popular first)
+        // Calculate relevance scores and sort
+        uniqueBooks.forEach(book => {
+            book.relevanceScore = calculateRelevanceScore(book, query);
         });
 
-        // Update status to show count
-        searchStatus.textContent = `Found ${uniqueBooks.length} book${uniqueBooks.length !== 1 ? 's' : ''}`;
+        uniqueBooks.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
-        uniqueBooks.forEach(book => {
+        // Limit to top 20 results
+        const topBooks = uniqueBooks.slice(0, 20);
+
+        // Update status with filter level and validation info
+        const validatedCount = topBooks.filter(b => b.validation?.validated).length;
+        const withISBN = topBooks.filter(b => b.isbn13 || b.isbn10).length;
+
+        let statusText = `Found ${topBooks.length} book${topBooks.length !== 1 ? 's' : ''}`;
+        if (validatedCount > 0) {
+            statusText += ` (${validatedCount} validated`;
+            if (withISBN > validatedCount) {
+                statusText += `, ${withISBN} with ISBN`;
+            }
+            statusText += ')';
+        } else if (withISBN > 0) {
+            statusText += ` (${withISBN} with ISBN)`;
+        }
+
+        searchStatus.textContent = statusText;
+
+        topBooks.forEach(book => {
             const bookCard = createBookCard(book, true);
             resultsGrid.appendChild(bookCard);
         });
@@ -1595,21 +2132,43 @@ function displayRecommendations() {
         return;
     }
 
-    // Display all active recommendations
-    activeRecommendations.forEach(book => {
+    // Filter out books that have been rated or are in want-to-read shelf
+    const wantToReadIds = new Set(wantToReadShelf.map(b => b.id));
+    const unratedRecommendations = activeRecommendations.filter(book => {
+        const notRated = !ratings[book.id];
+        const notInWantToRead = !wantToReadIds.has(book.id);
+
+        // Apply genre filter if set
+        const matchesGenre = !currentRecGenreFilter || book.genres.includes(currentRecGenreFilter);
+
+        return notRated && notInWantToRead && matchesGenre;
+    });
+
+    // Repopulate genre filter to reflect available genres
+    populateRecGenreFilter();
+
+    // Calculate match scores and prepare for sorting
+    const libraryGenres = new Set();
+    userLibrary.forEach(libBook => {
+        libBook.genres.forEach(genre => libraryGenres.add(genre));
+    });
+
+    const booksWithScores = unratedRecommendations.map(book => {
         // Calculate a simple match score based on genre overlap with library
         let matchScore = 50; // Base score
-
-        // Boost score if genres match books in user's library
-        const libraryGenres = new Set();
-        userLibrary.forEach(libBook => {
-            libBook.genres.forEach(genre => libraryGenres.add(genre));
-        });
 
         const matchingGenres = book.genres.filter(genre => libraryGenres.has(genre)).length;
         matchScore += matchingGenres * 10;
         matchScore = Math.min(matchScore, 99);
 
+        return { book, matchScore };
+    });
+
+    // Sort by match score in descending order
+    booksWithScores.sort((a, b) => b.matchScore - a.matchScore);
+
+    // Display sorted recommendations
+    booksWithScores.forEach(({ book, matchScore }) => {
         const bookCard = createBookCard(book, false, matchScore);
         recommendationsGrid.appendChild(bookCard);
     });
@@ -1628,8 +2187,18 @@ function analyzePreferences(ratedBooks) {
         const book = userLibrary.find(b => b.id === bookId);
         if (!book) return;
 
-        // Weight by rating
-        const weight = rating;
+        // Improved weighting algorithm:
+        // - 5 stars: +3 weight (love it!)
+        // - 4 stars: +1.5 weight (really liked it)
+        // - 3 stars: +0.5 weight (it was okay)
+        // - 2 stars: -0.5 weight (didn't like it)
+        // - 1 star: -2 weight (hated it)
+        let weight;
+        if (rating === 5) weight = 3;
+        else if (rating === 4) weight = 1.5;
+        else if (rating === 3) weight = 0.5;
+        else if (rating === 2) weight = -0.5;
+        else weight = -2; // 1 star
 
         // Analyze genres
         book.genres.forEach(genre => {
@@ -1653,22 +2222,42 @@ function calculateMatchScore(book, preferences) {
 
     // Genre matching (60% of score)
     const genreWeight = 60;
+    let genreScore = 0;
     book.genres.forEach(genre => {
         if (preferences.genres[genre]) {
-            score += preferences.genres[genre] * genreWeight;
+            genreScore += preferences.genres[genre] * genreWeight;
         }
     });
 
-    const maxGenreScore = Math.max(...Object.values(preferences.genres)) * book.genres.length * genreWeight;
+    // Find max positive genre preference for normalization
+    const maxGenrePreference = Math.max(...Object.values(preferences.genres).filter(v => v > 0), 0.1);
+    const maxGenreScore = maxGenrePreference * book.genres.length * genreWeight;
+
+    // Only add positive genre scores, penalize negative ones more heavily
+    if (genreScore > 0) {
+        score += genreScore;
+    } else if (genreScore < 0) {
+        score += genreScore * 2; // Double penalty for disliked genres
+    }
     maxScore += maxGenreScore;
 
     // Author matching (25% of score)
     const authorWeight = 25;
+    let authorScore = 0;
     if (preferences.authors[book.author]) {
-        score += preferences.authors[book.author] * authorWeight;
+        authorScore = preferences.authors[book.author] * authorWeight;
     }
 
-    const maxAuthorScore = Math.max(...Object.values(preferences.authors || {1: 1})) * authorWeight;
+    // Find max positive author preference for normalization
+    const maxAuthorPreference = Math.max(...Object.values(preferences.authors).filter(v => v > 0), 0.1);
+    const maxAuthorScore = maxAuthorPreference * authorWeight;
+
+    // Only add positive author scores, penalize negative ones
+    if (authorScore > 0) {
+        score += authorScore;
+    } else if (authorScore < 0) {
+        score += authorScore * 2; // Double penalty for disliked authors
+    }
     maxScore += maxAuthorScore;
 
     // Popularity boost (15% of score)
@@ -1685,15 +2274,16 @@ function calculateMatchScore(book, preferences) {
         // Scale caps around 10,000+ ratings
         const countScore = Math.min(Math.log10(book.ratingsCount + 1) / 4, 1);
 
-        // Combine both (60% weight on rating quality, 40% on popularity)
-        popularityScore = (ratingScore * 0.6 + countScore * 0.4) * 5 * popularityWeight;
+        // Combine both (70% weight on rating quality, 30% on popularity)
+        // Give more weight to actual rating quality
+        popularityScore = (ratingScore * 0.7 + countScore * 0.3) * 5 * popularityWeight;
     }
 
     score += popularityScore;
     maxScore += 5 * popularityWeight; // Max possible popularity score
 
-    // Convert to percentage
-    const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+    // Convert to percentage, ensuring it's never negative
+    const percentage = maxScore > 0 ? Math.round((Math.max(score, 0) / maxScore) * 100) : 0;
 
     return Math.min(percentage, 99);
 }
@@ -1711,12 +2301,57 @@ function displayLibraryShelf() {
         return;
     }
 
+    // Filter books based on search and genre filters
+    const filteredLibrary = userLibrary.filter(book => {
+        const matchesSearch = !currentFilter ||
+            book.title.toLowerCase().includes(currentFilter) ||
+            book.author.toLowerCase().includes(currentFilter) ||
+            book.genres.some(g => g.toLowerCase().includes(currentFilter));
+
+        const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
+
+        // Handle "Want to Read" filter
+        let matchesGenre;
+        if (currentGenreFilter === 'Want to Read') {
+            matchesGenre = isWantToRead;
+        } else {
+            matchesGenre = !currentGenreFilter || book.genres.includes(currentGenreFilter);
+        }
+
+        // Enforce constraint: book must have rating OR be in want-to-read
+        const hasRating = ratings[book.id] && ratings[book.id] > 0;
+        const meetsConstraint = hasRating || isWantToRead;
+
+        return matchesSearch && matchesGenre && meetsConstraint;
+    });
+
+    if (filteredLibrary.length === 0) {
+        // Hide the entire section if no books match filter
+        librarySection.style.display = 'none';
+        return;
+    }
+
     // Show the section
     librarySection.style.display = 'block';
 
-    // Create shelves (group books in rows of up to 8)
-    const booksPerShelf = 8;
-    const numShelves = Math.ceil(userLibrary.length / booksPerShelf);
+    // Sort books: rated books first, then want-to-read books at the bottom
+    const sortedLibrary = [...filteredLibrary].sort((a, b) => {
+        const isWantToReadA = wantToReadShelf.find(book => book.id === a.id);
+        const isWantToReadB = wantToReadShelf.find(book => book.id === b.id);
+
+        // Want-to-read books go to the bottom
+        if (isWantToReadA && !isWantToReadB) return 1;
+        if (!isWantToReadA && isWantToReadB) return -1;
+
+        // Within each group, maintain current order
+        return 0;
+    });
+
+    // Calculate books per shelf based on container width
+    const containerWidth = shelfContainer.offsetWidth || 1000;
+    const averageBookWidth = 50 + 8; // base width + gap
+    const booksPerShelf = Math.max(8, Math.floor(containerWidth / averageBookWidth));
+    const numShelves = Math.ceil(sortedLibrary.length / booksPerShelf);
 
     for (let shelfNum = 0; shelfNum < numShelves; shelfNum++) {
         const shelfDiv = document.createElement('div');
@@ -1726,42 +2361,50 @@ function displayLibraryShelf() {
         booksDiv.className = 'shelf-books';
 
         const startIdx = shelfNum * booksPerShelf;
-        const endIdx = Math.min(startIdx + booksPerShelf, userLibrary.length);
-        const booksOnThisShelf = userLibrary.slice(startIdx, endIdx);
+        const endIdx = Math.min(startIdx + booksPerShelf, sortedLibrary.length);
+        const booksOnThisShelf = sortedLibrary.slice(startIdx, endIdx);
 
         booksOnThisShelf.forEach(book => {
-            const bookSpine = document.createElement('div');
-            bookSpine.className = 'book-spine';
+                const bookSpine = document.createElement('div');
+                bookSpine.className = 'book-spine';
 
-            // Get color based on genre
-            const color = getGenreColor(book.genres);
-            bookSpine.setAttribute('data-color', color);
+                // Check if book is in want-to-read shelf
+                const isWantToRead = wantToReadShelf.find(b => b.id === book.id);
+                if (isWantToRead) {
+                    bookSpine.classList.add('want-to-read-book');
+                }
 
-            // Add random width and height variations
-            const baseWidth = 60;
-            const baseHeight = 220;
-            const widthVariation = Math.random() * 20 - 10; // -10 to +10px
-            const heightVariation = Math.random() * 40 - 20; // -20 to +20px
-            bookSpine.style.width = `${baseWidth + widthVariation}px`;
-            bookSpine.style.height = `${baseHeight + heightVariation}px`;
+                // Get color based on genre
+                const color = getGenreColor(book.genres);
+                bookSpine.setAttribute('data-color', color);
 
-            const titleDiv = document.createElement('div');
-            titleDiv.className = 'spine-title';
-            titleDiv.textContent = book.title;
+                // Add random width and height variations with wider range
+                const baseWidth = 50;
+                const baseHeight = 160;
+                // Vary widths more: from 30px (skinny) to 75px (thick)
+                const widthVariation = Math.random() * 45 - 20; // -20 to +25px
+                // Vary heights more for better visual variety
+                const heightVariation = Math.random() * 60 - 15; // -15 to +45px
+                bookSpine.style.width = `${baseWidth + widthVariation}px`;
+                bookSpine.style.height = `${baseHeight + heightVariation}px`;
 
-            const authorDiv = document.createElement('div');
-            authorDiv.className = 'spine-author';
-            authorDiv.textContent = book.author;
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'spine-title';
+                titleDiv.textContent = book.title;
 
-            bookSpine.appendChild(titleDiv);
-            bookSpine.appendChild(authorDiv);
+                const authorDiv = document.createElement('div');
+                authorDiv.className = 'spine-author';
+                authorDiv.textContent = book.author;
 
-            // Add click handler to show book details popup
-            bookSpine.addEventListener('click', () => {
-                showBookDetailsPopup(book, false, null);
-            });
+                bookSpine.appendChild(titleDiv);
+                bookSpine.appendChild(authorDiv);
 
-            booksDiv.appendChild(bookSpine);
+                // Add click handler to show book details popup
+                bookSpine.addEventListener('click', () => {
+                    showBookDetailsPopup(book, false, null, true);
+                });
+
+                booksDiv.appendChild(bookSpine);
         });
 
         const shelfBoard = document.createElement('div');
@@ -1789,8 +2432,10 @@ function displayWantToReadShelf() {
     // Show the section
     wtrSection.style.display = 'block';
 
-    // Create shelves (group books in rows of up to 8)
-    const booksPerShelf = 8;
+    // Calculate books per shelf based on container width
+    const containerWidth = shelfContainer.offsetWidth || 1000;
+    const averageBookWidth = 50 + 8; // base width + gap
+    const booksPerShelf = Math.max(8, Math.floor(containerWidth / averageBookWidth));
     const numShelves = Math.ceil(wantToReadShelf.length / booksPerShelf);
 
     for (let shelfNum = 0; shelfNum < numShelves; shelfNum++) {
@@ -1812,11 +2457,13 @@ function displayWantToReadShelf() {
             const color = getGenreColor(book.genres);
             bookSpine.setAttribute('data-color', color);
 
-            // Add random width and height variations
-            const baseWidth = 60;
-            const baseHeight = 220;
-            const widthVariation = Math.random() * 20 - 10; // -10 to +10px
-            const heightVariation = Math.random() * 40 - 20; // -20 to +20px
+            // Add random width and height variations with wider range
+            const baseWidth = 50;
+            const baseHeight = 160;
+            // Vary widths more: from 30px (skinny) to 75px (thick)
+            const widthVariation = Math.random() * 45 - 20; // -20 to +25px
+            // Vary heights more for better visual variety
+            const heightVariation = Math.random() * 60 - 15; // -15 to +45px
             bookSpine.style.width = `${baseWidth + widthVariation}px`;
             bookSpine.style.height = `${baseHeight + heightVariation}px`;
 
@@ -1833,7 +2480,7 @@ function displayWantToReadShelf() {
 
             // Add click handler to show book details popup
             bookSpine.addEventListener('click', () => {
-                showBookDetailsPopup(book);
+                showBookDetailsPopup(book, false, null, false, true);
             });
 
             booksDiv.appendChild(bookSpine);
@@ -1849,7 +2496,7 @@ function displayWantToReadShelf() {
 }
 
 // Show book details popup
-function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
+function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, fromShelf = false, fromWantToRead = false) {
     // Create popup overlay
     const overlay = document.createElement('div');
     overlay.className = 'popup-overlay';
@@ -1869,7 +2516,7 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
         `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
 
     const publishedDateHTML = book.publishedDate ?
-        `<div class="book-published-date">published ${book.publishedDate}</div>` : '';
+        `<div class="book-published-date">${book.publishedDate}</div>` : '';
 
     const popularityHTML = book.averageRating && book.ratingsCount ?
         `<div class="popularity-rating">
@@ -1886,10 +2533,23 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
     const isInWantToRead = wantToReadShelf.find(b => b.id === book.id);
     const isRecommendation = matchScore !== null;
 
+    // Add Want to Read badge if applicable
+    const wantToReadBadgeHTML = isInWantToRead ?
+        `<div class="want-to-read-badge">🐛 Want to Read</div>` : '';
+
     // Build action buttons based on book status
     let actionButtons = '';
 
-    if (isInWantToRead) {
+    // If opened from any shelf and it's a want-to-read book, show only remove button
+    if ((fromShelf || fromWantToRead) && isInWantToRead) {
+        actionButtons = `
+            <button class="remove-from-wtr-btn popup-action-btn" data-book-id="${book.id}">Remove from Want to Read</button>
+        `;
+    } else if (fromShelf && !isInWantToRead) {
+        // Rated books from library shelf - show nothing
+        actionButtons = '';
+    } else if (isInWantToRead) {
+        // Want to read books from search/recommendations - show both buttons
         actionButtons = `
             <button class="add-to-library-btn popup-action-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>
             <button class="remove-from-wtr-btn popup-action-btn" data-book-id="${book.id}">Remove from Want to Read</button>
@@ -1923,6 +2583,7 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
         <div class="book-title">${book.title}</div>
         <div class="book-author">by ${book.author}</div>
         ${publishedDateHTML}
+        ${wantToReadBadgeHTML}
         <div class="book-genres">${genreTags}</div>
         <div class="book-description">${book.description}</div>
         ${popularityHTML}
