@@ -1,3 +1,31 @@
+// Security: HTML Sanitization Functions
+function sanitizeHTML(str) {
+    if (!str) return '';
+    const temp = document.createElement('div');
+    temp.textContent = str; // Automatically escapes HTML
+    return temp.innerHTML;
+}
+
+function sanitizeBookData(book) {
+    return {
+        id: book.id,
+        title: sanitizeHTML(book.title),
+        author: sanitizeHTML(book.author),
+        genres: Array.isArray(book.genres) ? book.genres.map(g => sanitizeHTML(g)) : [],
+        description: sanitizeHTML(book.description),
+        thumbnail: book.thumbnail, // URLs are validated by browser
+        averageRating: typeof book.averageRating === 'number' ? book.averageRating : null,
+        ratingsCount: typeof book.ratingsCount === 'number' ? book.ratingsCount : null,
+        publishedDate: book.publishedDate ? sanitizeHTML(book.publishedDate) : null,
+        publisher: book.publisher ? sanitizeHTML(book.publisher) : null,
+        isbn13: book.isbn13,
+        isbn10: book.isbn10,
+        language: book.language,
+        validation: book.validation,
+        isAuthorMatch: book.isAuthorMatch
+    };
+}
+
 // Starter books for new users
 const starterBooks = [
     {
