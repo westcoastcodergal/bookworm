@@ -1253,7 +1253,9 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         if (e.target.classList.contains('star') ||
             e.target.classList.contains('add-to-library-btn') ||
             e.target.classList.contains('want-to-read-btn') ||
-            e.target.classList.contains('remove-from-library-btn')) {
+            e.target.classList.contains('remove-from-library-btn') ||
+            e.target.classList.contains('remove-from-library-btn-x') ||
+            e.target.classList.contains('remove-recommendation-btn-x')) {
             return;
         }
         showBookDetailsPopup(book, isSearchResult, matchScore);
@@ -1483,6 +1485,7 @@ document.addEventListener('click', (e) => {
 
     // Remove from library button
     if (e.target.classList.contains('remove-from-library-btn-x')) {
+        e.stopPropagation(); // Prevent popup from opening
         const button = e.target;
         const bookId = button.dataset.bookId;
         const book = userLibrary.find(b => b.id === bookId);
@@ -1509,6 +1512,7 @@ document.addEventListener('click', (e) => {
 
     // Remove from recommendations button
     if (e.target.classList.contains('remove-recommendation-btn-x')) {
+        e.stopPropagation(); // Prevent popup from opening
         const button = e.target;
         const bookId = button.dataset.bookId;
         const book = activeRecommendations.find(b => b.id === bookId);
@@ -2262,7 +2266,15 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
     // Build action buttons based on book status
     let actionButtons = '';
 
-    if (isInWantToRead) {
+    // If opened from shelf, don't show any action buttons
+    if (fromShelf) {
+        actionButtons = '';
+    } else if ((fromWantToRead) && isInWantToRead) {
+        actionButtons = `
+            <button class="remove-from-wtr-btn popup-action-btn" data-book-id="${book.id}">Remove from Want to Read</button>
+        `;
+    } else if (isInWantToRead) {
+        // Want to read books from search/recommendations - show both buttons
         actionButtons = `
             <button class="add-to-library-btn popup-action-btn" data-book='${JSON.stringify(book).replace(/'/g, "&apos;")}'>Add to Library</button>
             <button class="remove-from-wtr-btn popup-action-btn" data-book-id="${book.id}">Remove from Want to Read</button>

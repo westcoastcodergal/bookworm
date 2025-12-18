@@ -103,7 +103,7 @@ main {
         -10px -10px 0px rgba(78, 205, 196, 0.3),
         0 15px 40px rgba(0,0,0,0.15);
     border: 5px solid #2a2a2a;
-    transform: rotate(0.5deg);
+    transform: rotate(0.3deg);
     position: relative;
     overflow: visible;
 }
@@ -910,7 +910,7 @@ main::after {
 
 /* Want to read books get a vibrant pink gradient */
 .book-spine.want-to-read-book {
-    background: linear-gradient(135deg, #ff1493 0%, #ff69b4 50%, #ff8c00 100%) !important;
+    background: linear-gradient(135deg, #ff8c00 0%, #ff69b4 50%, #ff1493 100%) !important;
     border-left: 3px solid rgba(255, 255, 255, 0.5);
 }
 
