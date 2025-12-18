@@ -434,34 +434,6 @@ main::after {
     transform: rotate(-5deg);
 }
 
-/* Quality Badge for Search Results */
-.quality-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 6px 12px;
-    border-radius: 15px 5px 15px 5px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    z-index: 5;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border: 2px solid #2a2a2a;
-    transform: rotate(5deg);
-}
-
-.quality-badge.validated {
-    background: linear-gradient(135deg, #32cd32 0%, #228b22 100%);
-    color: white;
-    box-shadow: 3px 3px 0px rgba(34, 139, 34, 0.4);
-}
-
-.quality-badge.isbn {
-    background: linear-gradient(135deg, #4169e1 0%, #1e90ff 100%);
-    color: white;
-    box-shadow: 3px 3px 0px rgba(30, 144, 255, 0.4);
-}
-
 .book-title {
     font-family: 'Lobster', cursive;
     font-size: 1.4rem;
