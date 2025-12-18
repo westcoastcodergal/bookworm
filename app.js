@@ -26,6 +26,107 @@ function sanitizeBookData(book) {
     };
 }
 
+// Book Cover Image Utilities
+
+/**
+ * Get Open Library cover URL from ISBN
+ * @param {string} isbn - ISBN-13 or ISBN-10
+ * @param {string} size - 'S' (small), 'M' (medium), or 'L' (large)
+ * @returns {string|null} Open Library cover URL or null
+ */
+function getOpenLibraryCoverURL(isbn, size = 'L') {
+    if (!isbn) return null;
+    // Open Library covers API: https://covers.openlibrary.org/b/isbn/{isbn}-{size}.jpg
+    return `https://covers.openlibrary.org/b/isbn/${isbn}-${size}.jpg`;
+}
+
+/**
+ * Get the best available book cover image URL with fallback strategy
+ * Google Books (zoom=5) -> Open Library (Large) -> Default SVG
+ * @param {Object} book - Book object with thumbnail, isbn13, isbn10 properties
+ * @returns {Object} { primaryUrl, fallbackUrls, useDefault }
+ */
+function getBookCoverUrls(book) {
+    const urls = [];
+
+    // Primary: Google Books thumbnail (already upgraded to zoom=5)
+    if (book.thumbnail) {
+        urls.push(book.thumbnail);
+    }
+
+    // Secondary: Open Library via ISBN-13 (Large size for better quality)
+    if (book.isbn13) {
+        urls.push(getOpenLibraryCoverURL(book.isbn13, 'L'));
+    }
+
+    // Tertiary: Open Library via ISBN-10 (if ISBN-13 not available)
+    if (book.isbn10 && !book.isbn13) {
+        urls.push(getOpenLibraryCoverURL(book.isbn10, 'L'));
+    }
+
+    // Default: Custom SVG fallback
+    const defaultUrl = 'default-book-cover.svg';
+
+    return {
+        primaryUrl: urls[0] || defaultUrl,
+        fallbackUrls: urls.slice(1),
+        defaultUrl: defaultUrl
+    };
+}
+
+/**
+ * Create image element with comprehensive error handling and fallback chain
+ * @param {Object} book - Book object
+ * @param {string} altText - Alt text for image
+ * @param {string} className - CSS class for image
+ * @returns {string} HTML string for image with error handling
+ */
+function createBookCoverImage(book, altText, className = 'book-cover') {
+    const coverUrls = getBookCoverUrls(book);
+    const escapedAlt = sanitizeHTML(altText);
+
+    // Build fallback chain as data attributes
+    const fallbackChain = coverUrls.fallbackUrls.concat([coverUrls.defaultUrl]);
+    const fallbackData = fallbackChain.map((url, index) =>
+        `data-fallback-${index}="${url}"`
+    ).join(' ');
+
+    return `<img src="${coverUrls.primaryUrl}"
+                 alt="${escapedAlt}"
+                 class="${className}"
+                 ${fallbackData}
+                 onerror="handleImageError(this)"
+                 loading="lazy">`;
+}
+
+/**
+ * Handle image loading errors by cascading through fallback URLs
+ * Called via onerror attribute on img elements
+ * @param {HTMLImageElement} img - Image element that failed to load
+ */
+function handleImageError(img) {
+    // Find the next fallback URL
+    let fallbackIndex = 0;
+    while (img.dataset[`fallback${fallbackIndex}`]) {
+        const fallbackUrl = img.dataset[`fallback${fallbackIndex}`];
+
+        // Remove this fallback from dataset to prevent infinite loops
+        delete img.dataset[`fallback${fallbackIndex}`];
+
+        // Try next fallback
+        img.src = fallbackUrl;
+        return;
+    }
+
+    // If we've exhausted all fallbacks, ensure default cover is loaded
+    if (!img.src.includes('default-book-cover.svg')) {
+        img.src = 'default-book-cover.svg';
+    }
+
+    // Remove error handler to prevent infinite loops
+    img.onerror = null;
+}
+
 // Starter books for new users
 const starterBooks = [
     {
@@ -1278,8 +1379,8 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
             <span class="rating-count">(${book.ratingsCount.toLocaleString()} ratings)</span>
         </div>` : '';
 
-    const thumbnailHTML = book.thumbnail ?
-        `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
+    // Use enhanced book cover with multi-source fallback
+    const thumbnailHTML = createBookCoverImage(book, book.title, 'book-cover');
 
     const publishedDateHTML = book.publishedDate ?
         `<div class="book-published-date">published ${book.publishedDate}</div>` : '';
@@ -1717,10 +1818,30 @@ function parseBookData(item) {
     const isbn13 = industryIdentifiers.find(id => id.type === 'ISBN_13')?.identifier;
     const isbn10 = industryIdentifiers.find(id => id.type === 'ISBN_10')?.identifier;
 
-    // Get higher resolution thumbnail
-    let thumbnail = volumeInfo.imageLinks?.thumbnail || null;
-    if (thumbnail) {
-        thumbnail = thumbnail.replace('zoom=1', 'zoom=5');
+    // Get highest resolution image available from Google Books
+    // Priority: extraLarge > large > medium > small > thumbnail > smallThumbnail
+    let thumbnail = null;
+    if (volumeInfo.imageLinks) {
+        const imageLinks = volumeInfo.imageLinks;
+        thumbnail = imageLinks.extraLarge ||
+                   imageLinks.large ||
+                   imageLinks.medium ||
+                   imageLinks.small ||
+                   imageLinks.thumbnail ||
+                   imageLinks.smallThumbnail ||
+                   null;
+
+        // Upgrade zoom level for maximum resolution
+        if (thumbnail) {
+            // Replace http with https for security
+            thumbnail = thumbnail.replace('http://', 'https://');
+            // Maximize zoom level (zoom=5 is higher quality than zoom=1)
+            thumbnail = thumbnail.replace(/zoom=\d+/, 'zoom=5');
+            // If no zoom parameter exists, add it
+            if (!thumbnail.includes('zoom=')) {
+                thumbnail += (thumbnail.includes('?') ? '&' : '?') + 'zoom=5';
+            }
+        }
     }
 
     // Extract year only from published date
@@ -2242,8 +2363,8 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
         `<span class="genre-tag">${genre}</span>`
     ).join('');
 
-    const thumbnailHTML = book.thumbnail ?
-        `<img src="${book.thumbnail}" alt="${book.title}" class="book-cover">` : '';
+    // Use enhanced book cover with multi-source fallback
+    const thumbnailHTML = createBookCoverImage(book, book.title, 'book-cover');
 
     const publishedDateHTML = book.publishedDate ?
         `<div class="book-published-date">published ${book.publishedDate}</div>` : '';
