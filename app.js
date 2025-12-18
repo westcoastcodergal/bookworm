@@ -1915,7 +1915,23 @@ async function searchBooks(query) {
             }
         });
 
-        uniqueBooks.sort((a, b) => b.relevanceScore - a.relevanceScore);
+        // Sort by popularity (review count) first, then by relevance
+        uniqueBooks.sort((a, b) => {
+            const hasReviewsA = a.ratingsCount && a.ratingsCount > 0;
+            const hasReviewsB = b.ratingsCount && b.ratingsCount > 0;
+
+            // Both have reviews - sort by review count (most reviews first)
+            if (hasReviewsA && hasReviewsB) {
+                return b.ratingsCount - a.ratingsCount;
+            }
+
+            // One has reviews, one doesn't - prioritize the one with reviews
+            if (hasReviewsA && !hasReviewsB) return -1;
+            if (!hasReviewsA && hasReviewsB) return 1;
+
+            // Neither has reviews - sort by relevance score
+            return b.relevanceScore - a.relevanceScore;
+        });
 
         // Limit to top 20 results
         const topBooks = uniqueBooks.slice(0, 20);
