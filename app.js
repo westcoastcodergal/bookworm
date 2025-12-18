@@ -1446,7 +1446,8 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
             e.target.classList.contains('add-to-library-btn') ||
             e.target.classList.contains('want-to-read-btn') ||
             e.target.classList.contains('remove-from-library-btn') ||
-            e.target.classList.contains('remove-from-library-btn-x')) {
+            e.target.classList.contains('remove-from-library-btn-x') ||
+            e.target.classList.contains('remove-recommendation-btn-x')) {
             return;
         }
         showBookDetailsPopup(book, isSearchResult, matchScore);
@@ -1726,6 +1727,7 @@ document.addEventListener('click', (e) => {
 
     // Remove from library button
     if (e.target.classList.contains('remove-from-library-btn-x')) {
+        e.stopPropagation(); // Prevent popup from opening
         const button = e.target;
         const bookId = button.dataset.bookId;
         const book = userLibrary.find(b => b.id === bookId);
@@ -1751,6 +1753,7 @@ document.addEventListener('click', (e) => {
 
     // Remove from recommendations button
     if (e.target.classList.contains('remove-recommendation-btn-x')) {
+        e.stopPropagation(); // Prevent popup from opening
         const button = e.target;
         const bookId = button.dataset.bookId;
         const book = activeRecommendations.find(b => b.id === bookId);
@@ -2557,14 +2560,13 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, f
     // Build action buttons based on book status
     let actionButtons = '';
 
-    // If opened from any shelf and it's a want-to-read book, show only remove button
-    if ((fromShelf || fromWantToRead) && isInWantToRead) {
+    // If opened from shelf, don't show any action buttons
+    if (fromShelf) {
+        actionButtons = '';
+    } else if ((fromWantToRead) && isInWantToRead) {
         actionButtons = `
             <button class="remove-from-wtr-btn popup-action-btn" data-book-id="${book.id}">Remove from Want to Read</button>
         `;
-    } else if (fromShelf && !isInWantToRead) {
-        // Rated books from library shelf - show nothing
-        actionButtons = '';
     } else if (isInWantToRead) {
         // Want to read books from search/recommendations - show both buttons
         actionButtons = `
