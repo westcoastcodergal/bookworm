@@ -108,6 +108,10 @@ main {
     overflow: visible;
 }
 
+main.no-tilt {
+    transform: rotate(0deg);
+}
+
 main::before {
     content: '✨';
     position: absolute;

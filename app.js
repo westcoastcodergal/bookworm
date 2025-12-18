@@ -1072,11 +1072,16 @@ function initializeTabs() {
             });
             document.getElementById(`${tabName}-tab`).classList.add('active');
 
-            // Refresh content when switching tabs
+            // Remove tilt on recommendations tab
+            const mainElement = document.querySelector('main');
             if (tabName === 'recommendations') {
+                mainElement.classList.add('no-tilt');
                 displayRecommendations();
-            } else if (tabName === 'library') {
-                displayLibrary();
+            } else {
+                mainElement.classList.remove('no-tilt');
+                if (tabName === 'library') {
+                    displayLibrary();
+                }
             }
         });
     });
@@ -2197,7 +2202,7 @@ function displayLibraryShelf() {
 
             // Add click handler to show book details popup
             bookSpine.addEventListener('click', () => {
-                showBookDetailsPopup(book, false, null);
+                showBookDetailsPopup(book, false, null, true, false);
             });
 
             booksDiv.appendChild(bookSpine);
@@ -2245,7 +2250,7 @@ function displayWantToReadShelf() {
 
         booksOnThisShelf.forEach(book => {
             const bookSpine = document.createElement('div');
-            bookSpine.className = 'book-spine';
+            bookSpine.className = 'book-spine want-to-read-book';
 
             // Get color based on genre
             const color = getGenreColor(book.genres);
@@ -2272,7 +2277,7 @@ function displayWantToReadShelf() {
 
             // Add click handler to show book details popup
             bookSpine.addEventListener('click', () => {
-                showBookDetailsPopup(book);
+                showBookDetailsPopup(book, false, null, true, true);
             });
 
             booksDiv.appendChild(bookSpine);
@@ -2288,7 +2293,7 @@ function displayWantToReadShelf() {
 }
 
 // Show book details popup
-function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
+function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, fromShelf = false, fromWantToRead = false) {
     // Create popup overlay
     const overlay = document.createElement('div');
     overlay.className = 'popup-overlay';
