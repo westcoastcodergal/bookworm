@@ -41,41 +41,48 @@ function getOpenLibraryCoverURL(isbn, size = 'L') {
 }
 
 /**
+ * Check if a thumbnail URL is valid and not a known placeholder source
+ * @param {string} url - Image URL to validate
+ * @returns {boolean} True if valid, false if placeholder/invalid
+ */
+function isValidThumbnailUrl(url) {
+    if (!url) return false;
+
+    // Reject Open Library URLs (often return "image not available" placeholders)
+    if (url.includes('openlibrary.org')) return false;
+
+    // Reject other known placeholder patterns
+    if (url.includes('placeholder')) return false;
+    if (url.includes('no-cover')) return false;
+    if (url.includes('not-available')) return false;
+
+    return true;
+}
+
+/**
  * Get the best available book cover image URL with fallback strategy
- * Google Books (zoom=5) -> Open Library (Large) -> Default SVG
- * @param {Object} book - Book object with thumbnail, isbn13, isbn10 properties
- * @returns {Object} { primaryUrl, fallbackUrls, useDefault }
+ * Google Books (zoom=5) -> Default SVG
+ * Filters out Open Library and other unreliable sources
+ * @param {Object} book - Book object with thumbnail property
+ * @returns {Object} { primaryUrl, defaultUrl }
  */
 function getBookCoverUrls(book) {
-    const urls = [];
-
-    // Primary: Google Books thumbnail (already upgraded to zoom=5)
-    if (book.thumbnail) {
-        urls.push(book.thumbnail);
-    }
-
-    // Secondary: Open Library via ISBN-13 (Large size for better quality)
-    if (book.isbn13) {
-        urls.push(getOpenLibraryCoverURL(book.isbn13, 'L'));
-    }
-
-    // Tertiary: Open Library via ISBN-10 (if ISBN-13 not available)
-    if (book.isbn10 && !book.isbn13) {
-        urls.push(getOpenLibraryCoverURL(book.isbn10, 'L'));
-    }
-
     // Default: Custom SVG fallback
     const defaultUrl = 'default-book-cover.svg';
 
+    // Validate thumbnail URL - reject Open Library and other placeholders
+    const hasValidThumbnail = isValidThumbnailUrl(book.thumbnail);
+    const primaryUrl = hasValidThumbnail ? book.thumbnail : defaultUrl;
+
     return {
-        primaryUrl: urls[0] || defaultUrl,
-        fallbackUrls: urls.slice(1),
+        primaryUrl: primaryUrl,
+        fallbackUrls: [],
         defaultUrl: defaultUrl
     };
 }
 
 /**
- * Create image element with comprehensive error handling and fallback chain
+ * Create image element with error handling that falls back to default cover
  * @param {Object} book - Book object
  * @param {string} altText - Alt text for image
  * @param {string} className - CSS class for image
@@ -85,46 +92,11 @@ function createBookCoverImage(book, altText, className = 'book-cover') {
     const coverUrls = getBookCoverUrls(book);
     const escapedAlt = sanitizeHTML(altText);
 
-    // Build fallback chain as data attributes
-    const fallbackChain = coverUrls.fallbackUrls.concat([coverUrls.defaultUrl]);
-    const fallbackData = fallbackChain.map((url, index) =>
-        `data-fallback-${index}="${url}"`
-    ).join(' ');
-
     return `<img src="${coverUrls.primaryUrl}"
                  alt="${escapedAlt}"
                  class="${className}"
-                 ${fallbackData}
-                 onerror="handleImageError(this)"
+                 onerror="this.onerror=null; this.src='default-book-cover.svg';"
                  loading="lazy">`;
-}
-
-/**
- * Handle image loading errors by cascading through fallback URLs
- * Called via onerror attribute on img elements
- * @param {HTMLImageElement} img - Image element that failed to load
- */
-function handleImageError(img) {
-    // Find the next fallback URL
-    let fallbackIndex = 0;
-    while (img.dataset[`fallback${fallbackIndex}`]) {
-        const fallbackUrl = img.dataset[`fallback${fallbackIndex}`];
-
-        // Remove this fallback from dataset to prevent infinite loops
-        delete img.dataset[`fallback${fallbackIndex}`];
-
-        // Try next fallback
-        img.src = fallbackUrl;
-        return;
-    }
-
-    // If we've exhausted all fallbacks, ensure default cover is loaded
-    if (!img.src.includes('default-book-cover.svg')) {
-        img.src = 'default-book-cover.svg';
-    }
-
-    // Remove error handler to prevent infinite loops
-    img.onerror = null;
 }
 
 // Starter books for new users
