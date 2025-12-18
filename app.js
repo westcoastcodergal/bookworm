@@ -1753,15 +1753,21 @@ async function searchBooks(query) {
     resultsGrid.innerHTML = '';
 
     try {
+        console.log('Starting search for:', query);
         const isPersonName = isLikelyPersonName(query);
+        console.log('Is person name:', isPersonName);
         let allBooks = [];
 
         // Fetch general search results
+        console.log('Fetching from Google Books API...');
         const generalResponse = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=40&langRestrict=en`);
         const generalData = await generalResponse.json();
+        console.log('API response received, items count:', generalData.items?.length || 0);
 
         if (generalData.items) {
+            console.log('Parsing book data...');
             allBooks = generalData.items.map(parseBookData);
+            console.log('Parsed books count:', allBooks.length);
         }
 
         // If query looks like a person's name, also search specifically by author
@@ -1928,7 +1934,12 @@ async function searchBooks(query) {
 
     } catch (error) {
         searchStatus.textContent = 'Error searching books. Please try again.';
-        console.error('Search error:', error);
+        console.error('=== SEARCH ERROR DETAILS ===');
+        console.error('Error:', error);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        console.error('Query was:', query);
+        console.error('===========================');
     }
 }
 
