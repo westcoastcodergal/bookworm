@@ -82,6 +82,27 @@ function getBookCoverUrls(book) {
 }
 
 /**
+ * Validate if loaded image is a real book cover or a placeholder
+ * Called after image loads to detect "image not available" placeholders
+ * @param {HTMLImageElement} img - Image element that loaded
+ */
+function validateLoadedImage(img) {
+    // Check if image is too small (likely a placeholder)
+    // Google Books placeholders are often 1x1 or very small
+    if (img.naturalWidth < 50 || img.naturalHeight < 50) {
+        img.src = 'default-book-cover.svg';
+        return;
+    }
+
+    // Check if image has "generic" aspect ratio of exactly 1:1 (placeholder indicator)
+    const aspectRatio = img.naturalWidth / img.naturalHeight;
+    if (aspectRatio === 1.0 && img.naturalWidth < 100) {
+        img.src = 'default-book-cover.svg';
+        return;
+    }
+}
+
+/**
  * Create image element with error handling that falls back to default cover
  * @param {Object} book - Book object
  * @param {string} altText - Alt text for image
@@ -96,6 +117,7 @@ function createBookCoverImage(book, altText, className = 'book-cover') {
                  alt="${escapedAlt}"
                  class="${className}"
                  onerror="this.onerror=null; this.src='default-book-cover.svg';"
+                 onload="validateLoadedImage(this)"
                  loading="lazy">`;
 }
 
