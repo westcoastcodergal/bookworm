@@ -1048,6 +1048,7 @@ let userLibrary = JSON.parse(localStorage.getItem('userLibrary')) || [...starter
 let ratings = JSON.parse(localStorage.getItem('bookRatings')) || {};
 let currentFilter = '';
 let currentGenreFilter = '';
+let currentRecGenreFilter = '';
 let activeRecommendations = JSON.parse(localStorage.getItem('activeRecommendations')) || [];
 let wantToReadShelf = JSON.parse(localStorage.getItem('wantToReadShelf')) || [];
 
@@ -1122,6 +1123,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeRecommendations();
     populateGenreFilter();
     setupGenreFilter();
+    setupRecGenreFilter();
+    setupGenreTagClicks();
     displayLibrary();
     setupLibrarySearch();
     setupAPISearch();
@@ -1184,6 +1187,65 @@ function setupGenreFilter() {
     genreFilter.addEventListener('change', (e) => {
         currentGenreFilter = e.target.value;
         displayLibrary();
+    });
+}
+
+// Populate Recommendations Genre Filter
+function populateRecGenreFilter() {
+    const genres = new Set();
+    activeRecommendations.forEach(book => {
+        book.genres.forEach(genre => genres.add(genre));
+    });
+
+    const recGenreFilter = document.getElementById('rec-genre-filter');
+    recGenreFilter.innerHTML = '<option value="">All Genres</option>';
+
+    Array.from(genres).sort().forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre;
+        option.textContent = genre;
+        recGenreFilter.appendChild(option);
+    });
+}
+
+// Setup Recommendations Genre Filter Event Listener
+function setupRecGenreFilter() {
+    const recGenreFilter = document.getElementById('rec-genre-filter');
+    recGenreFilter.addEventListener('change', (e) => {
+        currentRecGenreFilter = e.target.value;
+        displayRecommendations();
+    });
+}
+
+// Setup Genre Tag Click Handlers
+function setupGenreTagClicks() {
+    // Use event delegation on the entire document
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('genre-tag')) {
+            const genre = e.target.dataset.genre;
+
+            // Determine which tab is active
+            const activeTab = document.querySelector('.tab-btn.active');
+            const tabName = activeTab ? activeTab.dataset.tab : '';
+
+            if (tabName === 'library') {
+                // Update library genre filter
+                currentGenreFilter = genre;
+                const genreFilter = document.getElementById('genre-filter');
+                if (genreFilter) {
+                    genreFilter.value = genre;
+                }
+                displayLibrary();
+            } else if (tabName === 'recommendations') {
+                // Update recommendations genre filter
+                currentRecGenreFilter = genre;
+                const recGenreFilter = document.getElementById('rec-genre-filter');
+                if (recGenreFilter) {
+                    recGenreFilter.value = genre;
+                }
+                displayRecommendations();
+            }
+        }
     });
 }
 
@@ -1402,7 +1464,7 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
 
     const genreTags = book.genres.map(genre => {
         const color = getGenreTagColor(genre);
-        return `<span class="genre-tag" style="background: ${color.bg}; color: ${color.text};">${genre}</span>`;
+        return `<span class="genre-tag" data-genre="${genre}" style="background: ${color.bg}; color: ${color.text}; cursor: pointer;">${genre}</span>`;
     }).join('');
 
     const currentRating = ratings[book.id] || 0;
@@ -2139,6 +2201,9 @@ function displayRecommendations() {
         initializeRecommendations();
     }
 
+    // Populate genre filter
+    populateRecGenreFilter();
+
     recDescription.textContent = `Discover your next great read:`;
 
     recommendationsGrid.innerHTML = '';
@@ -2148,8 +2213,18 @@ function displayRecommendations() {
         return;
     }
 
-    // Display all active recommendations
-    activeRecommendations.forEach(book => {
+    // Filter recommendations by genre if filter is set
+    const filteredRecommendations = currentRecGenreFilter
+        ? activeRecommendations.filter(book => book.genres.includes(currentRecGenreFilter))
+        : activeRecommendations;
+
+    if (filteredRecommendations.length === 0) {
+        recommendationsGrid.innerHTML = '<p style="text-align: center; color: #666;">No recommendations found for this genre.</p>';
+        return;
+    }
+
+    // Display filtered recommendations
+    filteredRecommendations.forEach(book => {
         // Calculate a simple match score based on genre overlap with library
         let matchScore = 50; // Base score
 
@@ -2416,7 +2491,7 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null, f
 
     const genreTags = book.genres.map(genre => {
         const color = getGenreTagColor(genre);
-        return `<span class="genre-tag" style="background: ${color.bg}; color: ${color.text};">${genre}</span>`;
+        return `<span class="genre-tag" data-genre="${genre}" style="background: ${color.bg}; color: ${color.text}; cursor: pointer;">${genre}</span>`;
     }).join('');
 
     // Use enhanced book cover with multi-source fallback
