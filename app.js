@@ -1525,25 +1525,25 @@ document.addEventListener('click', (e) => {
         const book = activeRecommendations.find(b => b.id === bookId);
 
         if (book) {
-            // Remove immediately without confirmation
-            activeRecommendations = activeRecommendations.filter(b => b.id !== bookId);
-            refillRecommendations();
-            saveActiveRecommendations();
-
-            // Animate removal
+            // Animate removal first
             const bookCard = button.closest('.book-card');
             if (bookCard) {
                 bookCard.style.opacity = '0';
                 bookCard.style.transform = 'scale(0.8)';
                 setTimeout(() => {
-                    bookCard.remove();
-                    // Re-render if grid is empty
-                    const grid = document.getElementById('recommendations-grid');
-                    if (grid && grid.children.length === 0) {
-                        displayRecommendations();
-                    }
+                    // Remove from data and save
+                    activeRecommendations = activeRecommendations.filter(b => b.id !== bookId);
+                    refillRecommendations();
+                    saveActiveRecommendations();
+
+                    // Refresh display to show new recommendations
+                    displayRecommendations();
                 }, 300);
             } else {
+                // Fallback if card not found
+                activeRecommendations = activeRecommendations.filter(b => b.id !== bookId);
+                refillRecommendations();
+                saveActiveRecommendations();
                 displayRecommendations();
             }
         }
