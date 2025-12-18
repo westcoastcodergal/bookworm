@@ -1321,6 +1321,67 @@ const genreColorMap = {
     'Historical': 'orange'
 };
 
+// Genre tag color mapping - each genre gets a specific color
+const genreTagColors = {
+    // Fiction categories - blues and purples
+    'Fiction': { bg: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', text: 'white' },
+    'Science Fiction': { bg: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', text: 'white' },
+    'Fantasy': { bg: 'linear-gradient(135deg, #a855f7 0%, #9333ea 100%)', text: 'white' },
+    'Dystopian': { bg: 'linear-gradient(135deg, #64748b 0%, #475569 100%)', text: 'white' },
+    'Historical': { bg: 'linear-gradient(135deg, #92400e 0%, #78350f 100%)', text: 'white' },
+    'Adventure': { bg: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)', text: 'white' },
+    'Mystery': { bg: 'linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%)', text: 'white' },
+    'Thriller': { bg: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)', text: 'white' },
+    'Horror': { bg: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)', text: 'white' },
+    'Crime': { bg: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)', text: 'white' },
+
+    // Romance and relationships - pinks and reds
+    'Romance': { bg: 'linear-gradient(135deg, #ff69b4 0%, #ff1493 100%)', text: 'white' },
+    'Contemporary': { bg: 'linear-gradient(135deg, #fb7185 0%, #f43f5e 100%)', text: 'white' },
+    'Drama': { bg: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)', text: 'white' },
+
+    // Non-fiction - greens
+    'Non-Fiction': { bg: 'linear-gradient(135deg, #059669 0%, #047857 100%)', text: 'white' },
+    'Biography': { bg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', text: 'white' },
+    'Memoir': { bg: 'linear-gradient(135deg, #34d399 0%, #10b981 100%)', text: 'white' },
+    'History': { bg: 'linear-gradient(135deg, #14532d 0%, #166534 100%)', text: 'white' },
+    'Science': { bg: 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)', text: 'white' },
+
+    // Self-improvement - yellows and oranges
+    'Self-Help': { bg: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', text: '#2a2a2a' },
+    'Psychology': { bg: 'linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%)', text: '#2a2a2a' },
+    'Philosophy': { bg: 'linear-gradient(135deg, #fde047 0%, #facc15 100%)', text: '#2a2a2a' },
+    'Spirituality': { bg: 'linear-gradient(135deg, #fef08a 0%, #fde047 100%)', text: '#2a2a2a' },
+    'Business': { bg: 'linear-gradient(135deg, #fb923c 0%, #f97316 100%)', text: 'white' },
+    'Productivity': { bg: 'linear-gradient(135deg, #fdba74 0%, #fb923c 100%)', text: '#2a2a2a' },
+    'Management': { bg: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)', text: 'white' },
+
+    // Classic and literary - earth tones
+    'Classic': { bg: 'linear-gradient(135deg, #a16207 0%, #854d0e 100%)', text: 'white' },
+    'Poetry': { bg: 'linear-gradient(135deg, #be185d 0%, #9f1239 100%)', text: 'white' },
+    'Mythology': { bg: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)', text: 'white' },
+
+    // Special categories - unique colors
+    'War': { bg: 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)', text: 'white' },
+    'Comedy': { bg: 'linear-gradient(135deg, #fde047 0%, #facc15 100%)', text: '#2a2a2a' },
+    'General': { bg: 'linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)', text: '#2a2a2a' },
+    'Magical Realism': { bg: 'linear-gradient(135deg, #c026d3 0%, #a21caf 100%)', text: 'white' },
+    'Physics': { bg: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)', text: 'white' },
+    'Biology': { bg: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)', text: 'white' },
+    'Strategy': { bg: 'linear-gradient(135deg, #b45309 0%, #92400e 100%)', text: 'white' },
+    'Politics': { bg: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)', text: 'white' },
+    'LGBTQ': { bg: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)', text: 'white' }
+};
+
+// Get genre tag color (for individual tags)
+function getGenreTagColor(genre) {
+    if (genreTagColors[genre]) {
+        return genreTagColors[genre];
+    }
+    // Default fallback color
+    return { bg: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)', text: '#2a2a2a' };
+}
+
 // Get color based on primary genre
 function getGenreColor(genres) {
     for (const genre of genres) {
@@ -1362,9 +1423,10 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
         showBookDetailsPopup(book, isSearchResult, matchScore);
     });
 
-    const genreTags = book.genres.map(genre =>
-        `<span class="genre-tag">${genre}</span>`
-    ).join('');
+    const genreTags = book.genres.map(genre => {
+        const color = getGenreTagColor(genre);
+        return `<span class="genre-tag" style="background: ${color.bg}; color: ${color.text};">${genre}</span>`;
+    }).join('');
 
     const currentRating = ratings[book.id] || 0;
     const stars = createStars(book.id, currentRating);
@@ -2375,9 +2437,10 @@ function showBookDetailsPopup(book, isSearchResult = false, matchScore = null) {
     const color = getGenreColor(book.genres);
     popup.setAttribute('data-color', color);
 
-    const genreTags = book.genres.map(genre =>
-        `<span class="genre-tag">${genre}</span>`
-    ).join('');
+    const genreTags = book.genres.map(genre => {
+        const color = getGenreTagColor(genre);
+        return `<span class="genre-tag" style="background: ${color.bg}; color: ${color.text};">${genre}</span>`;
+    }).join('');
 
     // Use enhanced book cover with multi-source fallback
     const thumbnailHTML = createBookCoverImage(book, book.title, 'book-cover');
