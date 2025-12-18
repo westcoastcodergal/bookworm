@@ -107,7 +107,7 @@ const starterBooks = [
         author: "Matt Haig",
         genres: ["Fiction", "Fantasy", "Philosophy"],
         description: "A dazzling novel about all the choices that go into a life well lived.",
-        thumbnail: "http://books.google.com/books/content?id=1ZxRzgEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=1ZxRzgEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
         publishedDate: "2020"
     },
     {
@@ -116,7 +116,7 @@ const starterBooks = [
         author: "James Clear",
         genres: ["Self-Help", "Psychology", "Productivity"],
         description: "An easy and proven way to build good habits and break bad ones.",
-        thumbnail: "http://books.google.com/books/content?id=XfFvDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=XfFvDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
         publishedDate: "2018"
     },
     {
@@ -125,7 +125,7 @@ const starterBooks = [
         author: "Andy Weir",
         genres: ["Science Fiction", "Adventure", "Thriller"],
         description: "A lone astronaut must save the earth from disaster in this incredible new science-based thriller.",
-        thumbnail: "http://books.google.com/books/content?id=G1lmEAAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=G1lmEAAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
         publishedDate: "2021"
     },
     {
@@ -134,7 +134,7 @@ const starterBooks = [
         author: "Tara Westover",
         genres: ["Memoir", "Biography", "Non-Fiction"],
         description: "A memoir about a young girl who leaves her survivalist family and goes on to earn a PhD from Cambridge.",
-        thumbnail: "http://books.google.com/books/content?id=2ObWDgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=2ObWDgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
         publishedDate: "2018"
     },
     {
@@ -143,7 +143,7 @@ const starterBooks = [
         author: "Taylor Jenkins Reid",
         genres: ["Fiction", "Historical", "Romance"],
         description: "Aging Hollywood icon Evelyn Hugo finally tells the story of her glamorous and scandalous life.",
-        thumbnail: "http://books.google.com/books/content?id=y8pLDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=y8pLDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
         publishedDate: "2017"
     }
 ];
@@ -156,7 +156,7 @@ const recommendedBooksPool = [
         author: "Paulo Coelho",
         genres: ["Fiction", "Philosophy", "Adventure"],
         description: "A magical tale about following your dreams and listening to your heart.",
-        thumbnail: "http://books.google.com/books/content?id=FzVjBgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=FzVjBgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "1988"
     },
     {
@@ -165,7 +165,7 @@ const recommendedBooksPool = [
         author: "George Orwell",
         genres: ["Fiction", "Dystopian", "Classic"],
         description: "A dystopian social science fiction novel and cautionary tale about the dangers of totalitarianism.",
-        thumbnail: "http://books.google.com/books/content?id=kotPYEqx7kMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=kotPYEqx7kMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "1949"
     },
     {
@@ -174,7 +174,7 @@ const recommendedBooksPool = [
         author: "Yuval Noah Harari",
         genres: ["Non-Fiction", "History", "Science"],
         description: "A brief history of humankind exploring how Homo sapiens came to dominate the world.",
-        thumbnail: "http://books.google.com/books/content?id=1EiJAwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=1EiJAwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "2011"
     },
     {
@@ -183,7 +183,7 @@ const recommendedBooksPool = [
         author: "F. Scott Fitzgerald",
         genres: ["Fiction", "Classic", "Romance"],
         description: "A portrait of the Jazz Age in all of its decadence and excess.",
-        thumbnail: "http://books.google.com/books/content?id=iXn5U2IzVH0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=iXn5U2IzVH0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "1925"
     },
     {
@@ -192,7 +192,7 @@ const recommendedBooksPool = [
         author: "Frank Herbert",
         genres: ["Science Fiction", "Adventure", "Fantasy"],
         description: "Set in the distant future amidst a sprawling feudal interstellar empire.",
-        thumbnail: "http://books.google.com/books/content?id=B1hSG45JCX4C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=B1hSG45JCX4C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "1965"
     },
     {
@@ -201,7 +201,7 @@ const recommendedBooksPool = [
         author: "Daniel Kahneman",
         genres: ["Psychology", "Non-Fiction", "Science"],
         description: "A groundbreaking tour of the mind explaining the two systems that drive the way we think.",
-        thumbnail: "http://books.google.com/books/content?id=ZuKTvERuPG8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=ZuKTvERuPG8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "2011"
     },
     {
@@ -210,7 +210,7 @@ const recommendedBooksPool = [
         author: "J.R.R. Tolkien",
         genres: ["Fantasy", "Adventure", "Fiction"],
         description: "A timeless classic about the adventure of Bilbo Baggins.",
-        thumbnail: "http://books.google.com/books/content?id=pD6arNyKyi8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=pD6arNyKyi8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "1937"
     },
     {
@@ -219,7 +219,7 @@ const recommendedBooksPool = [
         author: "Michelle Obama",
         genres: ["Memoir", "Biography", "Non-Fiction"],
         description: "The memoir of former United States First Lady Michelle Obama.",
-        thumbnail: "http://books.google.com/books/content?id=ov4vDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=ov4vDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "2018"
     },
     {
@@ -228,7 +228,7 @@ const recommendedBooksPool = [
         author: "Suzanne Collins",
         genres: ["Fiction", "Dystopian", "Adventure"],
         description: "In a dark vision of the near future, twelve boys and twelve girls are forced to appear in a live TV show called the Hunger Games.",
-        thumbnail: "http://books.google.com/books/content?id=_zAHKFQeid8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=_zAHKFQeid8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "2008"
     },
     {
@@ -237,7 +237,7 @@ const recommendedBooksPool = [
         author: "Eckhart Tolle",
         genres: ["Self-Help", "Philosophy", "Spirituality"],
         description: "A guide to spiritual enlightenment and living in the present moment.",
-        thumbnail: "http://books.google.com/books/content?id=b9jWtEDQp2gC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=b9jWtEDQp2gC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "1997"
     },
     {
@@ -246,7 +246,7 @@ const recommendedBooksPool = [
         author: "Dan Brown",
         genres: ["Thriller", "Mystery", "Fiction"],
         description: "A mystery thriller that follows symbologist Robert Langdon as he investigates a murder in Paris.",
-        thumbnail: "http://books.google.com/books/content?id=EjgZknNJLs0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=EjgZknNJLs0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "2003"
     },
     {
@@ -255,7 +255,7 @@ const recommendedBooksPool = [
         author: "Trevor Noah",
         genres: ["Memoir", "Biography", "Comedy"],
         description: "Stories from a South African childhood by the host of The Daily Show.",
-        thumbnail: "http://books.google.com/books/content?id=B7fZCwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=B7fZCwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "2016"
     },
     {
@@ -264,7 +264,7 @@ const recommendedBooksPool = [
         author: "Andy Weir",
         genres: ["Science Fiction", "Adventure", "Thriller"],
         description: "An astronaut becomes one of the first people to walk on Mars, and now he may be the first person to die there.",
-        thumbnail: "http://books.google.com/books/content?id=EHJCAwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=EHJCAwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "2011"
     },
     {
@@ -273,7 +273,7 @@ const recommendedBooksPool = [
         author: "Delia Owens",
         genres: ["Fiction", "Mystery", "Romance"],
         description: "A coming-of-age story with a mystery at its heart in the marshlands of North Carolina.",
-        thumbnail: "http://books.google.com/books/content?id=pZJZDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=pZJZDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
         publishedDate: "2018"
     },
     {
@@ -282,7 +282,7 @@ const recommendedBooksPool = [
         author: "Timothy Ferriss",
         genres: ["Self-Help", "Business", "Productivity"],
         description: "Escape 9-5, live anywhere, and join the new rich with lifestyle design strategies.",
-        thumbnail: "http://books.google.com/books/content?id=ZuJZmwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=ZuJZmwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2007"
     },
     {
@@ -291,7 +291,7 @@ const recommendedBooksPool = [
         author: "J.K. Rowling",
         genres: ["Fantasy", "Fiction", "Adventure"],
         description: "A young wizard begins his magical education at Hogwarts School of Witchcraft and Wizardry.",
-        thumbnail: "http://books.google.com/books/content?id=wrOQLV6xB-wC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=wrOQLV6xB-wC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1997"
     },
     {
@@ -300,7 +300,7 @@ const recommendedBooksPool = [
         author: "Harper Lee",
         genres: ["Fiction", "Classic", "Historical"],
         description: "A gripping tale of racial injustice and childhood innocence in the American South.",
-        thumbnail: "http://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1960"
     },
     {
@@ -309,7 +309,7 @@ const recommendedBooksPool = [
         author: "J.D. Salinger",
         genres: ["Fiction", "Classic", "Contemporary"],
         description: "The story of teenage angst and alienation in post-war America.",
-        thumbnail: "http://books.google.com/books/content?id=5wQnDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=5wQnDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1951"
     },
     {
@@ -318,7 +318,7 @@ const recommendedBooksPool = [
         author: "Jane Austen",
         genres: ["Romance", "Classic", "Fiction"],
         description: "A witty comedy of manners exploring marriage, morality, and misconceptions.",
-        thumbnail: "http://books.google.com/books/content?id=s1gVAAAAYAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=s1gVAAAAYAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1813"
     },
     {
@@ -327,7 +327,7 @@ const recommendedBooksPool = [
         author: "J.R.R. Tolkien",
         genres: ["Fantasy", "Adventure", "Fiction"],
         description: "An epic tale of good versus evil in Middle-earth.",
-        thumbnail: "http://books.google.com/books/content?id=aWZzLPhY4o0C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=aWZzLPhY4o0C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1954"
     },
     {
@@ -336,7 +336,7 @@ const recommendedBooksPool = [
         author: "George Orwell",
         genres: ["Fiction", "Classic", "Dystopian"],
         description: "A satirical allegory of totalitarianism told through farm animals.",
-        thumbnail: "http://books.google.com/books/content?id=0PSRCgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=0PSRCgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1945"
     },
     {
@@ -345,7 +345,7 @@ const recommendedBooksPool = [
         author: "Aldous Huxley",
         genres: ["Science Fiction", "Dystopian", "Classic"],
         description: "A dystopian vision of a future society obsessed with pleasure and conformity.",
-        thumbnail: "http://books.google.com/books/content?id=LibH7jh7dNkC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=LibH7jh7dNkC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1932"
     },
     {
@@ -354,7 +354,7 @@ const recommendedBooksPool = [
         author: "Markus Zusak",
         genres: ["Historical", "Fiction", "War"],
         description: "Death tells the story of a girl who steals books in Nazi Germany.",
-        thumbnail: "http://books.google.com/books/content?id=1f6suzKRS7sC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=1f6suzKRS7sC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2005"
     },
     {
@@ -363,7 +363,7 @@ const recommendedBooksPool = [
         author: "Khaled Hosseini",
         genres: ["Fiction", "Historical", "Drama"],
         description: "A powerful story of friendship and redemption set in Afghanistan.",
-        thumbnail: "http://books.google.com/books/content?id=AdvW468RZBMC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=AdvW468RZBMC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2003"
     },
     {
@@ -372,7 +372,7 @@ const recommendedBooksPool = [
         author: "Yann Martel",
         genres: ["Fiction", "Adventure", "Fantasy"],
         description: "A boy survives a shipwreck and shares a lifeboat with a Bengal tiger.",
-        thumbnail: "http://books.google.com/books/content?id=e3nBE-_LNYIC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=e3nBE-_LNYIC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2001"
     },
     {
@@ -381,7 +381,7 @@ const recommendedBooksPool = [
         author: "Margaret Atwood",
         genres: ["Dystopian", "Science Fiction", "Fiction"],
         description: "A chilling dystopia about women's oppression in a theocratic society.",
-        thumbnail: "http://books.google.com/books/content?id=N3KdRAAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=N3KdRAAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1985"
     },
     {
@@ -390,7 +390,7 @@ const recommendedBooksPool = [
         author: "C.S. Lewis",
         genres: ["Fantasy", "Adventure", "Fiction"],
         description: "Children discover a magical land accessed through a wardrobe.",
-        thumbnail: "http://books.google.com/books/content?id=p8bMZRqPXsEC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=p8bMZRqPXsEC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1950"
     },
     {
@@ -399,7 +399,7 @@ const recommendedBooksPool = [
         author: "Ray Bradbury",
         genres: ["Science Fiction", "Dystopian", "Classic"],
         description: "A future American society where books are outlawed and burned.",
-        thumbnail: "http://books.google.com/books/content?id=fHjoRmV7cD4C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=fHjoRmV7cD4C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1953"
     },
     {
@@ -408,7 +408,7 @@ const recommendedBooksPool = [
         author: "Stieg Larsson",
         genres: ["Mystery", "Thriller", "Crime"],
         description: "A journalist and a hacker investigate a decades-old disappearance.",
-        thumbnail: "http://books.google.com/books/content?id=qgcm9v0dAuAC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=qgcm9v0dAuAC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2005"
     },
     {
@@ -417,7 +417,7 @@ const recommendedBooksPool = [
         author: "Gillian Flynn",
         genres: ["Thriller", "Mystery", "Fiction"],
         description: "A wife disappears on her fifth wedding anniversary, and the husband becomes the prime suspect.",
-        thumbnail: "http://books.google.com/books/content?id=hWwLqZsJKYAC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=hWwLqZsJKYAC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2012"
     },
     {
@@ -426,7 +426,7 @@ const recommendedBooksPool = [
         author: "John Green",
         genres: ["Romance", "Fiction", "Contemporary"],
         description: "Two teens with cancer fall in love while confronting mortality.",
-        thumbnail: "http://books.google.com/books/content?id=mJr5CwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=mJr5CwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2012"
     },
     {
@@ -435,7 +435,7 @@ const recommendedBooksPool = [
         author: "Cormac McCarthy",
         genres: ["Fiction", "Dystopian", "Adventure"],
         description: "A father and son journey through a post-apocalyptic America.",
-        thumbnail: "http://books.google.com/books/content?id=HJIKAQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=HJIKAQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2006"
     },
     {
@@ -444,7 +444,7 @@ const recommendedBooksPool = [
         author: "Frances Hodgson Burnett",
         genres: ["Fiction", "Classic", "Adventure"],
         description: "A young orphan discovers a magical garden that changes her life.",
-        thumbnail: "http://books.google.com/books/content?id=IwCWDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=IwCWDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1911"
     },
     {
@@ -453,7 +453,7 @@ const recommendedBooksPool = [
         author: "E.B. White",
         genres: ["Fiction", "Adventure", "Classic"],
         description: "A spider saves a pig with her web-writing talents.",
-        thumbnail: "http://books.google.com/books/content?id=t_1lDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=t_1lDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1952"
     },
     {
@@ -462,7 +462,7 @@ const recommendedBooksPool = [
         author: "Orson Scott Card",
         genres: ["Science Fiction", "Adventure", "Fiction"],
         description: "A child prodigy is trained to fight an alien invasion.",
-        thumbnail: "http://books.google.com/books/content?id=zaRODQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=zaRODQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1985"
     },
     {
@@ -471,7 +471,7 @@ const recommendedBooksPool = [
         author: "George R.R. Martin",
         genres: ["Fantasy", "Fiction", "Adventure"],
         description: "Noble families fight for control of the Iron Throne.",
-        thumbnail: "http://books.google.com/books/content?id=5NomkK4EV68C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=5NomkK4EV68C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1996"
     },
     {
@@ -480,7 +480,7 @@ const recommendedBooksPool = [
         author: "Lois Lowry",
         genres: ["Dystopian", "Fiction", "Science Fiction"],
         description: "A boy discovers the dark truth behind his seemingly perfect community.",
-        thumbnail: "http://books.google.com/books/content?id=Mn0fPAZ4EQAC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=Mn0fPAZ4EQAC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1993"
     },
     {
@@ -489,7 +489,7 @@ const recommendedBooksPool = [
         author: "Kurt Vonnegut",
         genres: ["Fiction", "Science Fiction", "Classic"],
         description: "A soldier becomes unstuck in time during World War II.",
-        thumbnail: "http://books.google.com/books/content?id=NAXrZQHZ5LIC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=NAXrZQHZ5LIC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1969"
     },
     {
@@ -498,7 +498,7 @@ const recommendedBooksPool = [
         author: "Sylvia Plath",
         genres: ["Fiction", "Classic", "Contemporary"],
         description: "A brilliant student descends into mental illness in 1950s America.",
-        thumbnail: "http://books.google.com/books/content?id=RKy0CgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=RKy0CgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1963"
     },
     {
@@ -507,7 +507,7 @@ const recommendedBooksPool = [
         author: "Louisa May Alcott",
         genres: ["Fiction", "Classic", "Historical"],
         description: "Four sisters grow up during the American Civil War.",
-        thumbnail: "http://books.google.com/books/content?id=ZPAIDAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=ZPAIDAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1868"
     },
     {
@@ -516,7 +516,7 @@ const recommendedBooksPool = [
         author: "Alexandre Dumas",
         genres: ["Adventure", "Classic", "Fiction"],
         description: "An imprisoned sailor escapes and seeks revenge on those who betrayed him.",
-        thumbnail: "http://books.google.com/books/content?id=FhGwcJLVT-oC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=FhGwcJLVT-oC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1844"
     },
     {
@@ -525,7 +525,7 @@ const recommendedBooksPool = [
         author: "Herman Melville",
         genres: ["Adventure", "Classic", "Fiction"],
         description: "Captain Ahab's obsessive quest to kill a great white whale.",
-        thumbnail: "http://books.google.com/books/content?id=y5y7BAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=y5y7BAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1851"
     },
     {
@@ -534,7 +534,7 @@ const recommendedBooksPool = [
         author: "Emily Brontë",
         genres: ["Romance", "Classic", "Fiction"],
         description: "A tale of passion and revenge on the Yorkshire moors.",
-        thumbnail: "http://books.google.com/books/content?id=OG2XsgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=OG2XsgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1847"
     },
     {
@@ -543,7 +543,7 @@ const recommendedBooksPool = [
         author: "Charlotte Brontë",
         genres: ["Romance", "Classic", "Fiction"],
         description: "An orphaned governess falls in love with her mysterious employer.",
-        thumbnail: "http://books.google.com/books/content?id=dXCJDQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=dXCJDQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1847"
     },
     {
@@ -552,7 +552,7 @@ const recommendedBooksPool = [
         author: "Fyodor Dostoevsky",
         genres: ["Classic", "Fiction", "Philosophy"],
         description: "A poor student commits murder and wrestles with guilt and redemption.",
-        thumbnail: "http://books.google.com/books/content?id=5A56J9IAmtEC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=5A56J9IAmtEC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1866"
     },
     {
@@ -561,7 +561,7 @@ const recommendedBooksPool = [
         author: "Fyodor Dostoevsky",
         genres: ["Classic", "Fiction", "Philosophy"],
         description: "Three brothers grapple with faith, doubt, and morality in Imperial Russia.",
-        thumbnail: "http://books.google.com/books/content?id=vg5FAAAAYAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=vg5FAAAAYAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1880"
     },
     {
@@ -570,7 +570,7 @@ const recommendedBooksPool = [
         author: "Leo Tolstoy",
         genres: ["Classic", "Historical", "Fiction"],
         description: "Russian families navigate love and war during Napoleon's invasion.",
-        thumbnail: "http://books.google.com/books/content?id=mImFCgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=mImFCgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1869"
     },
     {
@@ -579,7 +579,7 @@ const recommendedBooksPool = [
         author: "Leo Tolstoy",
         genres: ["Classic", "Romance", "Fiction"],
         description: "A married aristocrat has an affair with devastating consequences.",
-        thumbnail: "http://books.google.com/books/content?id=ZVGsDAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=ZVGsDAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1877"
     },
     {
@@ -588,7 +588,7 @@ const recommendedBooksPool = [
         author: "Oscar Wilde",
         genres: ["Classic", "Fiction", "Philosophy"],
         description: "A man's portrait ages while he remains young and corrupt.",
-        thumbnail: "http://books.google.com/books/content?id=vU5GAQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=vU5GAQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1890"
     },
     {
@@ -597,7 +597,7 @@ const recommendedBooksPool = [
         author: "Bram Stoker",
         genres: ["Horror", "Classic", "Fiction"],
         description: "The classic tale of the vampire Count Dracula.",
-        thumbnail: "http://books.google.com/books/content?id=qNHCAQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=qNHCAQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1897"
     },
     {
@@ -606,7 +606,7 @@ const recommendedBooksPool = [
         author: "Mary Shelley",
         genres: ["Horror", "Science Fiction", "Classic"],
         description: "A scientist creates a monster with tragic consequences.",
-        thumbnail: "http://books.google.com/books/content?id=dp0lDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=dp0lDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1818"
     },
     {
@@ -615,7 +615,7 @@ const recommendedBooksPool = [
         author: "Mark Twain",
         genres: ["Adventure", "Classic", "Fiction"],
         description: "A boy and a runaway slave journey down the Mississippi River.",
-        thumbnail: "http://books.google.com/books/content?id=ZdlNk5NgDnkC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=ZdlNk5NgDnkC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1884"
     },
     {
@@ -624,7 +624,7 @@ const recommendedBooksPool = [
         author: "Mark Twain",
         genres: ["Adventure", "Classic", "Fiction"],
         description: "A mischievous boy's adventures in a Mississippi River town.",
-        thumbnail: "http://books.google.com/books/content?id=Nv8_AQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=Nv8_AQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1876"
     },
     {
@@ -633,7 +633,7 @@ const recommendedBooksPool = [
         author: "Homer",
         genres: ["Classic", "Mythology", "Adventure"],
         description: "Odysseus's epic journey home after the Trojan War.",
-        thumbnail: "http://books.google.com/books/content?id=pMmADwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=pMmADwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "-800"
     },
     {
@@ -642,7 +642,7 @@ const recommendedBooksPool = [
         author: "Homer",
         genres: ["Classic", "Mythology", "War"],
         description: "The legendary war between Greeks and Trojans.",
-        thumbnail: "http://books.google.com/books/content?id=gZecDAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=gZecDAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "-762"
     },
     {
@@ -651,7 +651,7 @@ const recommendedBooksPool = [
         author: "Dante Alighieri",
         genres: ["Classic", "Poetry", "Philosophy"],
         description: "Dante's journey through Hell, Purgatory, and Paradise.",
-        thumbnail: "http://books.google.com/books/content?id=8UHuAgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=8UHuAgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1320"
     },
     {
@@ -660,7 +660,7 @@ const recommendedBooksPool = [
         author: "Miguel de Cervantes",
         genres: ["Classic", "Adventure", "Fiction"],
         description: "A delusional knight-errant tilts at windmills across Spain.",
-        thumbnail: "http://books.google.com/books/content?id=p5EUAAAAQAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=p5EUAAAAQAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1605"
     },
     {
@@ -669,7 +669,7 @@ const recommendedBooksPool = [
         author: "Gabriel García Márquez",
         genres: ["Fiction", "Classic", "Magical Realism"],
         description: "The multi-generational story of the Buendía family.",
-        thumbnail: "http://books.google.com/books/content?id=3Qz_fw3aXZ0C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=3Qz_fw3aXZ0C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1967"
     },
     {
@@ -678,7 +678,7 @@ const recommendedBooksPool = [
         author: "Gabriel García Márquez",
         genres: ["Romance", "Fiction", "Classic"],
         description: "A man waits over fifty years for his lost love.",
-        thumbnail: "http://books.google.com/books/content?id=CENEAQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=CENEAQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1985"
     },
     {
@@ -687,7 +687,7 @@ const recommendedBooksPool = [
         author: "Patrick Rothfuss",
         genres: ["Fantasy", "Adventure", "Fiction"],
         description: "A legendary wizard recounts his journey from gifted student to infamous figure.",
-        thumbnail: "http://books.google.com/books/content?id=nNaCDwAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=nNaCDwAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
         publishedDate: "2007"
     },
     {
@@ -696,7 +696,7 @@ const recommendedBooksPool = [
         author: "Carlos Ruiz Zafón",
         genres: ["Mystery", "Fiction", "Historical"],
         description: "A boy discovers a mysterious book that changes his life in post-war Barcelona.",
-        thumbnail: "http://books.google.com/books/content?id=e88_AQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=e88_AQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2001"
     },
     {
@@ -705,7 +705,7 @@ const recommendedBooksPool = [
         author: "Ken Follett",
         genres: ["Historical", "Fiction", "Adventure"],
         description: "The building of a cathedral in medieval England.",
-        thumbnail: "http://books.google.com/books/content?id=axQLbwAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=axQLbwAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1989"
     },
     {
@@ -714,7 +714,7 @@ const recommendedBooksPool = [
         author: "Erin Morgenstern",
         genres: ["Fantasy", "Romance", "Fiction"],
         description: "Two magicians duel in an enchanted circus that appears without warning.",
-        thumbnail: "http://books.google.com/books/content?id=6F5JPwAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=6F5JPwAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2011"
     },
     {
@@ -723,7 +723,7 @@ const recommendedBooksPool = [
         author: "Audrey Niffenegger",
         genres: ["Romance", "Science Fiction", "Fiction"],
         description: "A love story complicated by involuntary time travel.",
-        thumbnail: "http://books.google.com/books/content?id=0D28AAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=0D28AAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2003"
     },
     {
@@ -732,7 +732,7 @@ const recommendedBooksPool = [
         author: "Alice Sebold",
         genres: ["Fiction", "Mystery", "Drama"],
         description: "A murdered girl watches from heaven as her family copes with loss.",
-        thumbnail: "http://books.google.com/books/content?id=O1jjzgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=O1jjzgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2002"
     },
     {
@@ -741,7 +741,7 @@ const recommendedBooksPool = [
         author: "Mark Haddon",
         genres: ["Mystery", "Fiction", "Contemporary"],
         description: "An autistic teenager investigates the death of a neighbor's dog.",
-        thumbnail: "http://books.google.com/books/content?id=e5Ui-7w5C_0C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=e5Ui-7w5C_0C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2003"
     },
     {
@@ -750,7 +750,7 @@ const recommendedBooksPool = [
         author: "Kathryn Stockett",
         genres: ["Historical", "Fiction", "Drama"],
         description: "Black maids in 1960s Mississippi share their stories.",
-        thumbnail: "http://books.google.com/books/content?id=kBZ8cRN2JFYC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=kBZ8cRN2JFYC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2009"
     },
     {
@@ -759,7 +759,7 @@ const recommendedBooksPool = [
         author: "William P. Young",
         genres: ["Fiction", "Spirituality", "Philosophy"],
         description: "A grieving father encounters God in an unexpected place.",
-        thumbnail: "http://books.google.com/books/content?id=VB5rPwAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=VB5rPwAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2007"
     },
     {
@@ -768,7 +768,7 @@ const recommendedBooksPool = [
         author: "Mitch Albom",
         genres: ["Fiction", "Philosophy", "Spirituality"],
         description: "An amusement park worker learns life lessons in the afterlife.",
-        thumbnail: "http://books.google.com/books/content?id=6a7RNNZXhJwC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=6a7RNNZXhJwC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2003"
     },
     {
@@ -777,7 +777,7 @@ const recommendedBooksPool = [
         author: "Mitch Albom",
         genres: ["Memoir", "Philosophy", "Non-Fiction"],
         description: "A student reconnects with his dying professor for life lessons.",
-        thumbnail: "http://books.google.com/books/content?id=vN-LI48s_tsC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=vN-LI48s_tsC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1997"
     },
     {
@@ -786,7 +786,7 @@ const recommendedBooksPool = [
         author: "Randy Pausch",
         genres: ["Memoir", "Self-Help", "Non-Fiction"],
         description: "A dying professor's final lecture on achieving childhood dreams.",
-        thumbnail: "http://books.google.com/books/content?id=CksKAAAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=CksKAAAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2008"
     },
     {
@@ -795,7 +795,7 @@ const recommendedBooksPool = [
         author: "Jon Krakauer",
         genres: ["Non-Fiction", "Biography", "Adventure"],
         description: "A young man abandons society to live in the Alaskan wilderness.",
-        thumbnail: "http://books.google.com/books/content?id=sJQvDAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=sJQvDAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1996"
     },
     {
@@ -804,7 +804,7 @@ const recommendedBooksPool = [
         author: "Jon Krakauer",
         genres: ["Non-Fiction", "Adventure", "Biography"],
         description: "A firsthand account of the deadly 1996 Mount Everest disaster.",
-        thumbnail: "http://books.google.com/books/content?id=gWb2DQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=gWb2DQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1997"
     },
     {
@@ -813,7 +813,7 @@ const recommendedBooksPool = [
         author: "Laura Hillenbrand",
         genres: ["Biography", "Non-Fiction", "History"],
         description: "An Olympic runner's survival story as a WWII POW.",
-        thumbnail: "http://books.google.com/books/content?id=8FjHf2kBJb8C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=8FjHf2kBJb8C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2010"
     },
     {
@@ -822,7 +822,7 @@ const recommendedBooksPool = [
         author: "Jeannette Walls",
         genres: ["Memoir", "Biography", "Non-Fiction"],
         description: "A journalist's unconventional upbringing in a dysfunctional family.",
-        thumbnail: "http://books.google.com/books/content?id=Th3tDQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=Th3tDQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2005"
     },
     {
@@ -831,7 +831,7 @@ const recommendedBooksPool = [
         author: "Cheryl Strayed",
         genres: ["Memoir", "Biography", "Non-Fiction"],
         description: "A woman hikes the Pacific Crest Trail to find herself.",
-        thumbnail: "http://books.google.com/books/content?id=SNMDAAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=SNMDAAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2012"
     },
     {
@@ -840,7 +840,7 @@ const recommendedBooksPool = [
         author: "Stephen Hawking",
         genres: ["Science", "Non-Fiction", "Physics"],
         description: "An accessible exploration of cosmology and the universe.",
-        thumbnail: "http://books.google.com/books/content?id=JlT4Vr5bTOcC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=JlT4Vr5bTOcC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1988"
     },
     {
@@ -849,7 +849,7 @@ const recommendedBooksPool = [
         author: "Richard Dawkins",
         genres: ["Science", "Non-Fiction", "Biology"],
         description: "A gene-centered view of evolution and natural selection.",
-        thumbnail: "http://books.google.com/books/content?id=WkHO9HI7koEC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=WkHO9HI7koEC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1976"
     },
     {
@@ -858,7 +858,7 @@ const recommendedBooksPool = [
         author: "Rebecca Skloot",
         genres: ["Non-Fiction", "Biography", "Science"],
         description: "The story behind the woman whose cells changed medicine forever.",
-        thumbnail: "http://books.google.com/books/content?id=av3VZQjKA3IC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=av3VZQjKA3IC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2010"
     },
     {
@@ -867,7 +867,7 @@ const recommendedBooksPool = [
         author: "Walter Isaacson",
         genres: ["Biography", "Non-Fiction", "Business"],
         description: "The authorized biography of Apple's iconic co-founder.",
-        thumbnail: "http://books.google.com/books/content?id=8U2oAAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=8U2oAAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2011"
     },
     {
@@ -876,7 +876,7 @@ const recommendedBooksPool = [
         author: "Eric Ries",
         genres: ["Business", "Non-Fiction", "Productivity"],
         description: "How continuous innovation creates radically successful businesses.",
-        thumbnail: "http://books.google.com/books/content?id=tvfyz-4JILwC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=tvfyz-4JILwC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2011"
     },
     {
@@ -885,7 +885,7 @@ const recommendedBooksPool = [
         author: "Peter Thiel",
         genres: ["Business", "Non-Fiction", "Productivity"],
         description: "Notes on startups and how to build the future.",
-        thumbnail: "http://books.google.com/books/content?id=iXs5BAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=iXs5BAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2014"
     },
     {
@@ -894,7 +894,7 @@ const recommendedBooksPool = [
         author: "Annie Duke",
         genres: ["Psychology", "Business", "Non-Fiction"],
         description: "Making smarter decisions when you don't have all the facts.",
-        thumbnail: "http://books.google.com/books/content?id=2W9kDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=2W9kDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2018"
     },
     {
@@ -903,7 +903,7 @@ const recommendedBooksPool = [
         author: "Mark Manson",
         genres: ["Self-Help", "Philosophy", "Psychology"],
         description: "A counterintuitive approach to living a good life.",
-        thumbnail: "http://books.google.com/books/content?id=yng_CwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=yng_CwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2016"
     },
     {
@@ -912,7 +912,7 @@ const recommendedBooksPool = [
         author: "Viktor E. Frankl",
         genres: ["Psychology", "Philosophy", "Memoir"],
         description: "A Holocaust survivor's insights on finding meaning in suffering.",
-        thumbnail: "http://books.google.com/books/content?id=K2Uc6O85jCYC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=K2Uc6O85jCYC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1946"
     },
     {
@@ -921,7 +921,7 @@ const recommendedBooksPool = [
         author: "Stephen R. Covey",
         genres: ["Self-Help", "Business", "Productivity"],
         description: "Principles for personal and professional effectiveness.",
-        thumbnail: "http://books.google.com/books/content?id=_xAMswEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=_xAMswEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1989"
     },
     {
@@ -930,7 +930,7 @@ const recommendedBooksPool = [
         author: "Dale Carnegie",
         genres: ["Self-Help", "Business", "Psychology"],
         description: "Timeless advice on building relationships and influencing others.",
-        thumbnail: "http://books.google.com/books/content?id=1rW-QpIAs8UC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=1rW-QpIAs8UC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1936"
     },
     {
@@ -939,7 +939,7 @@ const recommendedBooksPool = [
         author: "Sun Tzu",
         genres: ["Philosophy", "Classic", "Strategy"],
         description: "Ancient Chinese military strategy applicable to modern life.",
-        thumbnail: "http://books.google.com/books/content?id=VVgPAAAAQAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=VVgPAAAAQAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "-500"
     },
     {
@@ -948,7 +948,7 @@ const recommendedBooksPool = [
         author: "Marcus Aurelius",
         genres: ["Philosophy", "Classic", "Self-Help"],
         description: "Personal writings of a Roman Emperor on Stoic philosophy.",
-        thumbnail: "http://books.google.com/books/content?id=AJR1CQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=AJR1CQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "180"
     },
     {
@@ -957,7 +957,7 @@ const recommendedBooksPool = [
         author: "Plato",
         genres: ["Philosophy", "Classic", "Politics"],
         description: "Socratic dialogue on justice, the ideal state, and the good life.",
-        thumbnail: "http://books.google.com/books/content?id=VvUaAAAAYAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=VvUaAAAAYAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "-380"
     },
     {
@@ -966,7 +966,7 @@ const recommendedBooksPool = [
         author: "Niccolò Machiavelli",
         genres: ["Philosophy", "Politics", "Classic"],
         description: "A political treatise on acquiring and maintaining power.",
-        thumbnail: "http://books.google.com/books/content?id=pW8AAAAAQAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=pW8AAAAAQAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1532"
     },
     {
@@ -975,7 +975,7 @@ const recommendedBooksPool = [
         author: "Jim Collins",
         genres: ["Business", "Non-Fiction", "Management"],
         description: "Why some companies make the leap and others don't.",
-        thumbnail: "http://books.google.com/books/content?id=8nZZAAAAYAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=8nZZAAAAYAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2001"
     },
     {
@@ -984,7 +984,7 @@ const recommendedBooksPool = [
         author: "Clayton M. Christensen",
         genres: ["Business", "Non-Fiction", "Management"],
         description: "When new technologies cause great firms to fail.",
-        thumbnail: "http://books.google.com/books/content?id=SIexi_qgq2gC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=SIexi_qgq2gC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1997"
     },
     {
@@ -993,7 +993,7 @@ const recommendedBooksPool = [
         author: "Ben Horowitz",
         genres: ["Business", "Non-Fiction", "Management"],
         description: "Building a business when there are no easy answers.",
-        thumbnail: "http://books.google.com/books/content?id=kKbeCgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=kKbeCgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2014"
     },
     {
@@ -1002,7 +1002,7 @@ const recommendedBooksPool = [
         author: "Phil Knight",
         genres: ["Memoir", "Business", "Biography"],
         description: "The founder of Nike's memoir about building an empire.",
-        thumbnail: "http://books.google.com/books/content?id=6IIPCgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=6IIPCgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "2016"
     },
     {
@@ -1011,7 +1011,7 @@ const recommendedBooksPool = [
         author: "Anne Frank",
         genres: ["Biography", "History", "Memoir"],
         description: "A Jewish girl's diary while hiding from the Nazis during WWII.",
-        thumbnail: "http://books.google.com/books/content?id=VZOXDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=VZOXDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1947"
     },
     {
@@ -1020,7 +1020,7 @@ const recommendedBooksPool = [
         author: "Alice Walker",
         genres: ["Fiction", "Classic", "Historical"],
         description: "An African-American woman's journey to self-discovery in the early 20th century South.",
-        thumbnail: "http://books.google.com/books/content?id=jSHLtwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=jSHLtwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1982"
     },
     {
@@ -1029,7 +1029,7 @@ const recommendedBooksPool = [
         author: "Toni Morrison",
         genres: ["Fiction", "Historical", "Classic"],
         description: "A former slave is haunted by the ghost of her baby daughter.",
-        thumbnail: "http://books.google.com/books/content?id=BXeCAQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=BXeCAQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1987"
     },
     {
@@ -1038,7 +1038,7 @@ const recommendedBooksPool = [
         author: "Ernest Hemingway",
         genres: ["Fiction", "Classic", "Adventure"],
         description: "An aging fisherman's epic battle with a giant marlin.",
-        thumbnail: "http://books.google.com/books/content?id=nA0TAQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+        thumbnail: "https://books.google.com/books/content?id=nA0TAQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         publishedDate: "1952"
     }
 ];
