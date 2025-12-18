@@ -1314,22 +1314,11 @@ function createBookCard(book, isSearchResult = false, matchScore = null) {
     const wantToReadBadgeHTML = wantToReadShelf.find(b => b.id === book.id) ?
         `<div class="want-to-read-badge">🐛 Want to Read</div>` : '';
 
-    // Add quality badge for search results
-    let qualityBadgeHTML = '';
-    if (isSearchResult) {
-        if (book.validation?.validated) {
-            qualityBadgeHTML = `<div class="quality-badge validated">✓ Validated</div>`;
-        } else if (book.isbn13 || book.isbn10) {
-            qualityBadgeHTML = `<div class="quality-badge isbn">ISBN</div>`;
-        }
-    }
-
     card.innerHTML = `
         ${thumbnailHTML}
         ${removeButtonHTML}
         ${removeRecommendationHTML}
         ${wantToReadBadgeHTML}
-        ${qualityBadgeHTML}
         <div class="book-title">${book.title}</div>
         <div class="book-author">by ${book.author}</div>
         ${publishedDateHTML}
