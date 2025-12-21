@@ -41,6 +41,23 @@ function getOpenLibraryCoverURL(isbn, size = 'L') {
 }
 
 /**
+ * Generate alternative Google Books cover URLs with different parameters
+ * @param {string} bookId - Google Books ID
+ * @returns {string[]} Array of alternative cover URLs
+ */
+function getAlternativeGoogleBooksUrls(bookId) {
+    if (!bookId) return [];
+    const baseUrl = 'https://books.google.com/books/content';
+    return [
+        // Try different zoom levels and edge parameters
+        `${baseUrl}?id=${bookId}&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api`,
+        `${baseUrl}?id=${bookId}&printsec=frontcover&img=1&zoom=3&edge=curl&source=gbs_api`,
+        `${baseUrl}?id=${bookId}&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api`,
+        `${baseUrl}?id=${bookId}&printsec=frontcover&img=1&zoom=0&source=gbs_api`,
+    ];
+}
+
+/**
  * Check if a thumbnail URL is valid and not a known placeholder source
  * @param {string} url - Image URL to validate
  * @returns {boolean} True if valid, false if placeholder/invalid
@@ -48,10 +65,7 @@ function getOpenLibraryCoverURL(isbn, size = 'L') {
 function isValidThumbnailUrl(url) {
     if (!url) return false;
 
-    // Reject Open Library URLs (often return "image not available" placeholders)
-    if (url.includes('openlibrary.org')) return false;
-
-    // Reject other known placeholder patterns
+    // Reject known placeholder patterns
     if (url.includes('placeholder')) return false;
     if (url.includes('no-cover')) return false;
     if (url.includes('not-available')) return false;
@@ -60,23 +74,48 @@ function isValidThumbnailUrl(url) {
 }
 
 /**
- * Get the best available book cover image URL with fallback strategy
- * Google Books (zoom=5) -> Default SVG
- * Filters out Open Library and other unreliable sources
- * @param {Object} book - Book object with thumbnail property
- * @returns {Object} { primaryUrl, defaultUrl }
+ * Get the best available book cover image URL with comprehensive fallback strategy
+ * Google Books (multiple zoom levels) -> Open Library ISBN -> Default SVG
+ * @param {Object} book - Book object with thumbnail, id, isbn13, isbn10 properties
+ * @returns {Object} { primaryUrl, fallbackUrls, defaultUrl }
  */
 function getBookCoverUrls(book) {
     // Default: Custom SVG fallback
     const defaultUrl = 'default-book-cover.svg';
+    const fallbackUrls = [];
 
-    // Validate thumbnail URL - reject Open Library and other placeholders
+    // Validate primary thumbnail URL
     const hasValidThumbnail = isValidThumbnailUrl(book.thumbnail);
-    const primaryUrl = hasValidThumbnail ? book.thumbnail : defaultUrl;
+    let primaryUrl = hasValidThumbnail ? book.thumbnail : null;
+
+    // If we have a book ID, add alternative Google Books URLs as fallbacks
+    if (book.id) {
+        const altUrls = getAlternativeGoogleBooksUrls(book.id);
+        // If no primary, use first alternative as primary
+        if (!primaryUrl && altUrls.length > 0) {
+            primaryUrl = altUrls[0];
+            fallbackUrls.push(...altUrls.slice(1));
+        } else {
+            fallbackUrls.push(...altUrls);
+        }
+    }
+
+    // Add Open Library as a fallback source using ISBN
+    // Open Library can have good covers, but we'll use it as a fallback
+    const isbn = book.isbn13 || book.isbn10;
+    if (isbn) {
+        fallbackUrls.push(getOpenLibraryCoverURL(isbn, 'L'));
+        fallbackUrls.push(getOpenLibraryCoverURL(isbn, 'M'));
+    }
+
+    // Final fallback
+    if (!primaryUrl) {
+        primaryUrl = defaultUrl;
+    }
 
     return {
         primaryUrl: primaryUrl,
-        fallbackUrls: [],
+        fallbackUrls: fallbackUrls.filter(url => url && url !== primaryUrl),
         defaultUrl: defaultUrl
     };
 }
@@ -90,20 +129,79 @@ function validateLoadedImage(img) {
     // Check if image is too small (likely a placeholder)
     // Google Books placeholders are often 1x1 or very small
     if (img.naturalWidth < 50 || img.naturalHeight < 50) {
-        img.src = 'default-book-cover.svg';
+        tryNextFallbackImage(img);
         return;
     }
 
     // Check if image has "generic" aspect ratio of exactly 1:1 (placeholder indicator)
     const aspectRatio = img.naturalWidth / img.naturalHeight;
     if (aspectRatio === 1.0 && img.naturalWidth < 100) {
-        img.src = 'default-book-cover.svg';
+        tryNextFallbackImage(img);
         return;
+    }
+
+    // Check for Open Library "image not available" placeholder (typically 180x180 or similar small square)
+    if (img.src.includes('openlibrary.org') && img.naturalWidth < 200 && img.naturalHeight < 200) {
+        tryNextFallbackImage(img);
+        return;
+    }
+
+    // Check for gray/blank placeholder by sampling the image (common for missing covers)
+    // Google Books sometimes returns a gray placeholder that's larger but still invalid
+    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 10;
+            canvas.height = 10;
+            ctx.drawImage(img, 0, 0, 10, 10);
+            const imageData = ctx.getImageData(0, 0, 10, 10).data;
+
+            // Check if image is mostly uniform gray (placeholder detection)
+            let grayCount = 0;
+            let totalPixels = 0;
+            for (let i = 0; i < imageData.length; i += 4) {
+                const r = imageData[i];
+                const g = imageData[i + 1];
+                const b = imageData[i + 2];
+                // Check if pixel is grayish (r ≈ g ≈ b) and in gray range
+                if (Math.abs(r - g) < 15 && Math.abs(g - b) < 15 && Math.abs(r - b) < 15) {
+                    if (r > 180 && r < 250) { // Light gray range
+                        grayCount++;
+                    }
+                }
+                totalPixels++;
+            }
+            // If more than 85% of pixels are uniform light gray, it's likely a placeholder
+            if (grayCount / totalPixels > 0.85) {
+                tryNextFallbackImage(img);
+                return;
+            }
+        } catch (e) {
+            // Canvas operations may fail due to CORS, ignore and keep the image
+        }
     }
 }
 
 /**
- * Create image element with error handling that falls back to default cover
+ * Try the next fallback image URL from the data attribute
+ * @param {HTMLImageElement} img - Image element to update
+ */
+function tryNextFallbackImage(img) {
+    const fallbacks = img.dataset.fallbacks ? JSON.parse(img.dataset.fallbacks) : [];
+    const defaultUrl = img.dataset.default || 'default-book-cover.svg';
+
+    if (fallbacks.length > 0) {
+        const nextUrl = fallbacks.shift();
+        img.dataset.fallbacks = JSON.stringify(fallbacks);
+        img.src = nextUrl;
+    } else {
+        img.src = defaultUrl;
+    }
+}
+
+/**
+ * Create image element with comprehensive error handling and fallback chain
  * @param {Object} book - Book object
  * @param {string} altText - Alt text for image
  * @param {string} className - CSS class for image
@@ -112,11 +210,14 @@ function validateLoadedImage(img) {
 function createBookCoverImage(book, altText, className = 'book-cover') {
     const coverUrls = getBookCoverUrls(book);
     const escapedAlt = sanitizeHTML(altText);
+    const fallbacksJson = JSON.stringify(coverUrls.fallbackUrls).replace(/"/g, '&quot;');
 
     return `<img src="${coverUrls.primaryUrl}"
                  alt="${escapedAlt}"
                  class="${className}"
-                 onerror="this.onerror=null; this.src='default-book-cover.svg';"
+                 data-fallbacks="${fallbacksJson}"
+                 data-default="${coverUrls.defaultUrl}"
+                 onerror="tryNextFallbackImage(this)"
                  onload="validateLoadedImage(this)"
                  loading="lazy">`;
 }
