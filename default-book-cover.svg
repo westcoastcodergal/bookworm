@@ -1,73 +1,116 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 450" width="300" height="450">
   <defs>
+    <!-- Pink to orange gradient matching My Library theme -->
     <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#f4f4f4;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#e8e8e8;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#fff0f5;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#fff5f0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fff9e6;stop-opacity:1" />
     </linearGradient>
     <linearGradient id="accent-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:0.8" />
-      <stop offset="50%" style="stop-color:#4ecdc4;stop-opacity:0.8" />
-      <stop offset="100%" style="stop-color:#a67bf7;stop-opacity:0.8" />
+      <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ff6b4a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff8c00;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="spine-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff8c00;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="text-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff0080;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#ff8c00;stop-opacity:0.8" />
     </linearGradient>
     <filter id="shadow">
-      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
     </filter>
   </defs>
 
-  <!-- Background -->
+  <!-- Soft gradient background -->
   <rect width="300" height="450" fill="url(#bg-gradient)"/>
 
-  <!-- Border frame -->
-  <rect x="10" y="10" width="280" height="430" fill="none" stroke="#2a2a2a" stroke-width="4" rx="2"/>
+  <!-- Border frame with pink-orange gradient -->
+  <rect x="8" y="8" width="284" height="434" fill="none" stroke="url(#accent-gradient)" stroke-width="5" rx="4"/>
+  <rect x="14" y="14" width="272" height="422" fill="none" stroke="#2a2a2a" stroke-width="3" rx="2"/>
 
-  <!-- Decorative corner elements (Picasso-style asymmetry) -->
-  <polygon points="30,30 60,30 45,45" fill="#ff6b6b" opacity="0.6" transform="rotate(-5 45 35)"/>
-  <polygon points="270,30 240,30 255,45" fill="#4ecdc4" opacity="0.6" transform="rotate(5 255 35)"/>
-  <polygon points="30,420 60,420 45,405" fill="#ffd93d" opacity="0.6" transform="rotate(5 45 415)"/>
-  <polygon points="270,420 240,420 255,405" fill="#a67bf7" opacity="0.6" transform="rotate(-5 255 415)"/>
+  <!-- Decorative corner flourishes with pink-orange theme -->
+  <path d="M 30 30 Q 45 30 45 45 Q 30 45 30 30" fill="#ff0080" opacity="0.5" transform="rotate(-5 37 37)"/>
+  <path d="M 270 30 Q 255 30 255 45 Q 270 45 270 30" fill="#ff6b4a" opacity="0.5" transform="rotate(5 262 37)"/>
+  <path d="M 30 420 Q 45 420 45 405 Q 30 405 30 420" fill="#ff8c00" opacity="0.5" transform="rotate(5 37 412)"/>
+  <path d="M 270 420 Q 255 420 255 405 Q 270 405 270 420" fill="#ff0080" opacity="0.5" transform="rotate(-5 262 412)"/>
 
-  <!-- Abstract geometric shapes (playful design) -->
-  <circle cx="80" cy="120" r="25" fill="#ff6b6b" opacity="0.15"/>
-  <circle cx="220" cy="150" r="30" fill="#4ecdc4" opacity="0.15"/>
-  <rect x="70" y="280" width="40" height="40" fill="#ffd93d" opacity="0.15" transform="rotate(-8 90 300)"/>
-  <rect x="190" y="310" width="35" height="35" fill="#a67bf7" opacity="0.15" transform="rotate(12 207 327)"/>
+  <!-- Playful abstract shapes -->
+  <circle cx="75" cy="100" r="20" fill="#ff0080" opacity="0.12"/>
+  <circle cx="225" cy="120" r="25" fill="#ff8c00" opacity="0.12"/>
+  <circle cx="90" cy="350" r="18" fill="#ff6b4a" opacity="0.1"/>
+  <circle cx="210" cy="370" r="22" fill="#ff0080" opacity="0.1"/>
 
-  <!-- Book icon (centered) -->
-  <g transform="translate(150, 180)" filter="url(#shadow)">
+  <!-- Wavy decorative lines -->
+  <path d="M 40 80 Q 80 70 120 80 T 200 80 T 260 80" stroke="#ff0080" stroke-width="2" fill="none" opacity="0.15"/>
+  <path d="M 40 390 Q 80 400 120 390 T 200 390 T 260 390" stroke="#ff8c00" stroke-width="2" fill="none" opacity="0.15"/>
+
+  <!-- Book icon (centered) with gradient styling -->
+  <g transform="translate(150, 190)" filter="url(#shadow)">
     <!-- Book pages -->
-    <rect x="-45" y="-55" width="90" height="110" fill="#fff" stroke="#2a2a2a" stroke-width="3" rx="2"/>
+    <rect x="-50" y="-65" width="100" height="130" fill="#fff" stroke="#2a2a2a" stroke-width="3" rx="3"/>
 
-    <!-- Book spine detail -->
-    <line x1="-45" y1="-55" x2="-45" y2="55" stroke="#2a2a2a" stroke-width="3"/>
-    <rect x="-50" y="-55" width="10" height="110" fill="url(#accent-gradient)" stroke="#2a2a2a" stroke-width="3" rx="2"/>
+    <!-- Book spine with gradient -->
+    <rect x="-58" y="-65" width="14" height="130" fill="url(#spine-gradient)" stroke="#2a2a2a" stroke-width="2" rx="2"/>
 
-    <!-- Page lines -->
-    <line x1="-30" y1="-30" x2="30" y2="-30" stroke="#d0d0d0" stroke-width="2" stroke-linecap="round"/>
-    <line x1="-30" y1="-15" x2="30" y2="-15" stroke="#d0d0d0" stroke-width="2" stroke-linecap="round"/>
-    <line x1="-30" y1="0" x2="30" y2="0" stroke="#d0d0d0" stroke-width="2" stroke-linecap="round"/>
-    <line x1="-30" y1="15" x2="25" y2="15" stroke="#d0d0d0" stroke-width="2" stroke-linecap="round"/>
-    <line x1="-30" y1="30" x2="30" y2="30" stroke="#d0d0d0" stroke-width="2" stroke-linecap="round"/>
+    <!-- Spine highlight -->
+    <line x1="-55" y1="-60" x2="-55" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+
+    <!-- Page lines with varying opacity -->
+    <line x1="-35" y1="-40" x2="35" y2="-40" stroke="#ff0080" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+    <line x1="-35" y1="-20" x2="35" y2="-20" stroke="#ff6b4a" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+    <line x1="-35" y1="0" x2="35" y2="0" stroke="#ff8c00" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+    <line x1="-35" y1="20" x2="30" y2="20" stroke="#ff6b4a" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+    <line x1="-35" y1="40" x2="35" y2="40" stroke="#ff0080" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+
+    <!-- Decorative bookmark ribbon -->
+    <path d="M 20 -65 L 20 -30 L 25 -40 L 30 -30 L 30 -65" fill="#ff0080" opacity="0.7"/>
   </g>
 
-  <!-- Text: "No Cover Available" -->
-  <text x="150" y="310" font-family="'Georgia', serif" font-size="16" font-weight="bold" fill="#2a2a2a" text-anchor="middle" opacity="0.7">
+  <!-- Bookworm mascot hint (cute worm peeking) -->
+  <g transform="translate(215, 240)">
+    <ellipse cx="0" cy="0" rx="12" ry="8" fill="#ff8c00" opacity="0.8"/>
+    <circle cx="-8" cy="-2" r="2" fill="#2a2a2a"/>
+    <circle cx="2" cy="-2" r="2" fill="#2a2a2a"/>
+    <path d="M -5 3 Q 0 6 5 3" stroke="#2a2a2a" stroke-width="1.5" fill="none"/>
+  </g>
+
+  <!-- Text: "No Cover" with themed styling -->
+  <text x="150" y="330" font-family="'Georgia', serif" font-size="18" font-weight="bold" fill="#ff0080" text-anchor="middle" opacity="0.85">
     No Cover
   </text>
-  <text x="150" y="332" font-family="'Georgia', serif" font-size="16" font-weight="bold" fill="#2a2a2a" text-anchor="middle" opacity="0.7">
+  <text x="150" y="355" font-family="'Georgia', serif" font-size="18" font-weight="bold" fill="#ff8c00" text-anchor="middle" opacity="0.85">
     Available
   </text>
 
-  <!-- Bottom decorative line -->
-  <line x1="60" y1="370" x2="240" y2="370" stroke="url(#accent-gradient)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Bottom decorative accent line -->
+  <line x1="60" y1="385" x2="240" y2="385" stroke="url(#accent-gradient)" stroke-width="4" stroke-linecap="round"/>
 
-  <!-- Subtle pattern texture -->
-  <g opacity="0.03">
-    <circle cx="100" cy="80" r="3" fill="#2a2a2a"/>
-    <circle cx="200" cy="100" r="3" fill="#2a2a2a"/>
-    <circle cx="120" cy="200" r="3" fill="#2a2a2a"/>
-    <circle cx="180" cy="240" r="3" fill="#2a2a2a"/>
-    <circle cx="140" cy="360" r="3" fill="#2a2a2a"/>
-    <circle cx="90" cy="380" r="3" fill="#2a2a2a"/>
-    <circle cx="210" cy="390" r="3" fill="#2a2a2a"/>
+  <!-- Scattered dots pattern for texture -->
+  <g opacity="0.06">
+    <circle cx="50" cy="150" r="3" fill="#ff0080"/>
+    <circle cx="250" cy="180" r="3" fill="#ff8c00"/>
+    <circle cx="70" cy="280" r="3" fill="#ff6b4a"/>
+    <circle cx="230" cy="300" r="3" fill="#ff0080"/>
+    <circle cx="100" cy="400" r="3" fill="#ff8c00"/>
+    <circle cx="200" cy="60" r="3" fill="#ff6b4a"/>
+    <circle cx="130" cy="130" r="3" fill="#ff0080"/>
+    <circle cx="170" cy="380" r="3" fill="#ff8c00"/>
+  </g>
+
+  <!-- Subtle sparkles -->
+  <g fill="#ff8c00" opacity="0.4">
+    <path d="M 60 50 L 62 55 L 67 55 L 63 58 L 65 63 L 60 60 L 55 63 L 57 58 L 53 55 L 58 55 Z" transform="scale(0.6)"/>
+    <path d="M 420 60 L 422 65 L 427 65 L 423 68 L 425 73 L 420 70 L 415 73 L 417 68 L 413 65 L 418 65 Z" transform="scale(0.6)"/>
+    <path d="M 80 620 L 82 625 L 87 625 L 83 628 L 85 633 L 80 630 L 75 633 L 77 628 L 73 625 L 78 625 Z" transform="scale(0.6)"/>
   </g>
 </svg>

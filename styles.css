@@ -423,7 +423,7 @@ main::after {
     position: absolute;
     top: 50px;
     right: 10px;
-    background: linear-gradient(135deg, #ff1493 0%, #ff8c00 100%);
+    background: linear-gradient(135deg, #ff0080 0%, #ff8c00 100%);
     color: white;
     padding: 8px 15px;
     border-radius: 20px 5px 20px 5px;
@@ -464,7 +464,7 @@ main::after {
 
 .want-to-read-badge {
     display: inline-block;
-    background: linear-gradient(135deg, #ff1493, #ff8c00);
+    background: linear-gradient(135deg, #ff0080, #ff8c00);
     color: white;
     padding: 8px 15px;
     border-radius: 20px 5px 20px 5px;
@@ -746,7 +746,7 @@ main::after {
 .want-to-read-btn {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #ff1493 0%, #ff8c00 100%);
+    background: linear-gradient(135deg, #ff0080 0%, #ff8c00 100%);
     color: white;
     border: 4px solid #2a2a2a;
     border-radius: 10px 25px 10px 25px;
@@ -813,15 +813,18 @@ main::after {
 .want-to-read-section {
     margin-bottom: 30px;
     padding: 20px;
-    background: linear-gradient(135deg, #fff0f5 0%, #ffffff 100%);
+    background: linear-gradient(135deg, #fff0f5 0%, #fff9e6 100%);
     border-radius: 10px 30px 10px 30px;
     border: 5px solid #2a2a2a;
-    box-shadow: 8px 8px 0px rgba(255, 20, 147, 0.3);
+    box-shadow: 8px 8px 0px rgba(255, 0, 128, 0.3);
 }
 
 .want-to-read-title {
     font-family: 'Pacifico', cursive;
-    color: #ff1493;
+    background: linear-gradient(135deg, #ff0080 0%, #ff8c00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     font-size: 1.8rem;
     margin-bottom: 15px;
     text-align: center;
@@ -928,10 +931,14 @@ main::after {
     background: linear-gradient(135deg, #ff8c00 0%, #ffa500 50%, #ff8c00 100%);
 }
 
-/* Want to read books get a vibrant pink gradient */
+/* Want to read books get a vibrant pink to orange gradient (matching My Library theme) */
 .book-spine.want-to-read-book {
-    background: linear-gradient(135deg, #ff8c00 0%, #ff69b4 50%, #ff1493 100%) !important;
+    background: linear-gradient(135deg, #ff0080 0%, #ff6b4a 50%, #ff8c00 100%) !important;
     border-left: 3px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+        inset 2px 0 3px rgba(255,255,255,0.3),
+        inset -1px 0 2px rgba(0,0,0,0.15),
+        3px 3px 8px rgba(255, 0, 128, 0.3);
 }
 
 .book-spine:hover {
